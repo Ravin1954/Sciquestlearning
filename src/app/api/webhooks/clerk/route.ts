@@ -1,0 +1,29 @@
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/db'
+
+export async function POST(req: Request) {
+  const body = await req.json()
+  const { type, data } = body
+
+  if (type === 'user.created') {
+    const { id, first_name, last_name, email_addresses, public_metadata } = data
+    const email = email_addresses?.[0]?.email_address
+    if (!email) return NextResponse.json({ ok: true })
+
+    const role = (public_metadata?.role as string) || 'STUDENT'
+
+    await prisma.user.upsert({
+      where: { clerkId: id },
+      update: {},
+      create: {
+        clerkId: id,
+        role: role.toUpperCase() as 'ADMIN' | 'INSTRUCTOR' | 'STUDENT',
+        firstName: first_name || '',
+        lastName: last_name || '',
+        email,
+      },
+    })
+  }
+
+  return NextResponse.json({ ok: true })
+}
