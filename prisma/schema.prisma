@@ -18,6 +18,11 @@ model User {
   qualifications   String?
   subjects         String[]
   stripeAccountId  String?
+  // Student profile fields
+  age              Int?
+  gender           String?
+  fathersName      String?
+  mothersName      String?
   createdAt        DateTime     @default(now())
   courses          Course[]     @relation("InstructorCourses")
   enrollments      Enrollment[]

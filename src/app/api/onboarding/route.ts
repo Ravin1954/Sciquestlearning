@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const { role, timezone, qualifications, subjects } = body
+  const { role, timezone, qualifications, subjects, age, gender, fathersName, mothersName } = body
 
   if (!role || !timezone) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -22,10 +22,25 @@ export async function POST(req: Request) {
 
   const dbRole = role === 'instructor' ? 'INSTRUCTOR' : 'STUDENT'
 
-  // Upsert user in DB
+  const studentFields =
+    dbRole === 'STUDENT'
+      ? {
+          age: age ? parseInt(age) : null,
+          gender: gender || null,
+          fathersName: fathersName || null,
+          mothersName: mothersName || null,
+        }
+      : {}
+
   await prisma.user.upsert({
     where: { clerkId: userId },
-    update: { role: dbRole, timezone, qualifications, subjects: subjects || [] },
+    update: {
+      role: dbRole,
+      timezone,
+      qualifications: qualifications || null,
+      subjects: subjects || [],
+      ...studentFields,
+    },
     create: {
       clerkId: userId,
       role: dbRole,
@@ -33,12 +48,12 @@ export async function POST(req: Request) {
       lastName,
       email,
       timezone,
-      qualifications,
+      qualifications: qualifications || null,
       subjects: subjects || [],
+      ...studentFields,
     },
   })
 
-  // Set role in Clerk publicMetadata
   await clerk.users.updateUserMetadata(userId, {
     publicMetadata: { role },
   })
