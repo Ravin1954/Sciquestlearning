@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   })
   if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 })
 
-  // Check not already enrolled
+  // Prevent duplicate enrollment
   const existing = await prisma.enrollment.findFirst({
     where: { studentId: student.id, courseId },
   })
@@ -27,15 +27,24 @@ export async function POST(req: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const amountCents = Math.round(Number(course.feeUsd) * 100)
-  const platformFeeCents = Math.round(amountCents * 0.2)
+  const platformFeeCents = Math.round(amountCents * 0.2) // 20% platform fee
 
   const session = await stripe.checkout.sessions.create({
+    // 'card' covers Visa, Mastercard, Amex, Discover, Apple Pay, Google Pay
+    // — Stripe Checkout displays all applicable methods automatically
     payment_method_types: ['card'],
+
+    customer_email: student.email,
+    billing_address_collection: 'auto',
+
     line_items: [
       {
         price_data: {
           currency: 'usd',
-          product_data: { name: course.title },
+          product_data: {
+            name: course.title,
+            description: `${course.subject.replace('_', ' ')} · ${course.durationWeeks} weeks · ${course.daysOfWeek.join(', ')} at ${course.startTimeUtc} UTC`,
+          },
           unit_amount: amountCents,
         },
         quantity: 1,
@@ -45,6 +54,9 @@ export async function POST(req: Request) {
     success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}/courses/${courseId}`,
     metadata: { courseId, studentId: student.id },
+
+    // 80/20 split via Stripe Connect — only applied when instructor has connected their account.
+    // Platform retains 20% (application_fee_amount); 80% is transferred to instructor automatically.
     ...(course.instructor.stripeAccountId
       ? {
           payment_intent_data: {

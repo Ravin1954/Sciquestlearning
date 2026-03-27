@@ -142,9 +142,34 @@ export default function CourseDetailPage() {
               <p style={{ fontFamily: 'Fraunces, serif', fontSize: '2.25rem', fontWeight: 700, color: '#F5C842', marginBottom: '0.25rem' }}>
                 ${Number(course.feeUsd).toFixed(2)}
               </p>
-              <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '1.5rem' }}>
+              <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
                 One-time course fee · Instructor receives ${instructorPayout}
               </p>
+
+              {/* Accepted payment methods */}
+              <div style={{ marginBottom: '1.25rem' }}>
+                <p style={{ color: '#6b88a8', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  Accepted payments
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                  {['Visa', 'Mastercard', 'Amex', 'Discover', 'Apple Pay', 'Google Pay'].map((method) => (
+                    <span
+                      key={method}
+                      style={{
+                        backgroundColor: '#060f1a',
+                        border: '1px solid #1e3a5f',
+                        borderRadius: '5px',
+                        padding: '0.25rem 0.55rem',
+                        fontSize: '0.72rem',
+                        fontWeight: 600,
+                        color: '#a8c4e0',
+                      }}
+                    >
+                      {method}
+                    </span>
+                  ))}
+                </div>
+              </div>
 
               {error && (
                 <p style={{ color: '#f87171', backgroundColor: '#3d0f0f', padding: '0.75rem', borderRadius: '8px', fontSize: '0.8rem', marginBottom: '1rem' }}>
@@ -165,13 +190,18 @@ export default function CourseDetailPage() {
                   fontWeight: 700,
                   fontSize: '1rem',
                   cursor: enrolling ? 'not-allowed' : 'pointer',
-                  marginBottom: '1rem',
+                  marginBottom: '0.75rem',
                 }}
               >
                 {enrolling ? 'Redirecting to Checkout...' : isSignedIn ? 'Enroll Now →' : 'Sign In to Enroll →'}
               </button>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {/* Secure badge */}
+              <p style={{ textAlign: 'center', color: '#6b88a8', fontSize: '0.75rem', marginBottom: '1rem' }}>
+                🔒 Secured by Stripe — your payment info is never stored on our servers
+              </p>
+
+              <div style={{ borderTop: '1px solid #1e3a5f', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {['Live Zoom sessions', 'Email reminders 20 min before class', 'Direct access to your instructor', 'Zoom join link sent on enrollment'].map((benefit) => (
                   <div key={benefit} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
                     <span style={{ color: '#00C2A8', fontWeight: 700, flexShrink: 0 }}>✓</span>
