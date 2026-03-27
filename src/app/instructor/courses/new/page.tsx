@@ -11,6 +11,53 @@ const SUBJECTS = [
   { value: 'CHEMISTRY', label: 'Chemistry' },
   { value: 'MATHEMATICS', label: 'Mathematics' },
 ]
+const TIMEZONES = [
+  'UTC',
+  'America/New_York',
+  'America/Chicago',
+  'America/Denver',
+  'America/Los_Angeles',
+  'America/Toronto',
+  'America/Vancouver',
+  'Europe/London',
+  'Europe/Paris',
+  'Europe/Berlin',
+  'Asia/Dubai',
+  'Asia/Kolkata',
+  'Asia/Singapore',
+  'Asia/Tokyo',
+  'Australia/Sydney',
+  'Pacific/Auckland',
+]
+
+/** Convert a local HH:MM time in a given IANA timezone to HH:MM UTC */
+function localTimeToUtc(localTime: string, timezone: string): string {
+  if (!localTime) return ''
+  const [hours, minutes] = localTime.split(':').map(Number)
+
+  // Create a UTC date at the given local time value
+  const today = new Date()
+  const dateStr = `${today.toISOString().split('T')[0]}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00Z`
+  const tempUTC = new Date(dateStr)
+
+  // See what tempUTC looks like in the instructor's timezone
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(tempUTC)
+
+  const tzHour = parseInt(parts.find((p) => p.type === 'hour')!.value)
+  const tzMin = parseInt(parts.find((p) => p.type === 'minute')!.value)
+
+  // Offset from UTC that the timezone represents right now
+  const diffMins = (hours * 60 + minutes) - (tzHour * 60 + tzMin)
+  const utcMs = tempUTC.getTime() + diffMins * 60_000
+  const utcDate = new Date(utcMs)
+
+  return `${String(utcDate.getUTCHours()).padStart(2, '0')}:${String(utcDate.getUTCMinutes()).padStart(2, '0')}`
+}
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -36,33 +83,43 @@ export default function NewCoursePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [selectedDays, setSelectedDays] = useState<string[]>([])
+  const [timezone, setTimezone] = useState('America/New_York')
+  const [localTime, setLocalTime] = useState('')
   const [form, setForm] = useState({
     title: '',
     description: '',
     subject: 'BIOLOGY',
     durationWeeks: '',
-    startTimeUtc: '',
     sessionDurationMins: '',
     feeUsd: '',
   })
 
-  const toggleDay = (day: string) => {
-    setSelectedDays((prev) => prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day])
-  }
+  const toggleDay = (day: string) =>
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    )
 
-  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [key]: e.target.value }))
+  const set =
+    (key: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+      setForm((f) => ({ ...f, [key]: e.target.value }))
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const utcPreview = localTime ? localTimeToUtc(localTime, timezone) : null
+
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (selectedDays.length === 0) { setError('Select at least one day'); return }
+    if (selectedDays.length === 0) { setError('Select at least one day.'); return }
+    if (!localTime) { setError('Please set a class start time.'); return }
+
     setLoading(true)
     setError('')
+
+    const startTimeUtc = localTimeToUtc(localTime, timezone)
 
     const res = await fetch('/api/courses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, daysOfWeek: selectedDays }),
+      body: JSON.stringify({ ...form, daysOfWeek: selectedDays, startTimeUtc }),
     })
 
     if (res.ok) {
@@ -85,33 +142,60 @@ export default function NewCoursePage() {
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+          {/* Title */}
           <div>
             <label style={labelStyle}>Course Title</label>
-            <input required value={form.title} onChange={set('title')} placeholder="e.g. Introduction to Cell Biology" style={inputStyle} />
+            <input
+              required
+              value={form.title}
+              onChange={set('title')}
+              placeholder="e.g. Introduction to Cell Biology"
+              style={inputStyle}
+            />
           </div>
 
+          {/* Description */}
           <div>
-            <label style={labelStyle}>Description</label>
-            <textarea required value={form.description} onChange={set('description')} rows={4}
+            <label style={labelStyle}>Course Description</label>
+            <textarea
+              required
+              value={form.description}
+              onChange={set('description')}
+              rows={4}
               placeholder="Describe what students will learn, prerequisites, and course structure..."
-              style={{ ...inputStyle, resize: 'vertical' }} />
+              style={{ ...inputStyle, resize: 'vertical' }}
+            />
           </div>
 
+          {/* Subject + Duration */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
               <label style={labelStyle}>Subject</label>
               <select value={form.subject} onChange={set('subject')} style={inputStyle}>
-                {SUBJECTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+                {SUBJECTS.map((s) => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
               </select>
             </div>
             <div>
               <label style={labelStyle}>Duration (weeks)</label>
-              <input required type="number" min="1" max="52" value={form.durationWeeks} onChange={set('durationWeeks')} placeholder="e.g. 8" style={inputStyle} />
+              <input
+                required
+                type="number"
+                min="1"
+                max="52"
+                value={form.durationWeeks}
+                onChange={set('durationWeeks')}
+                placeholder="e.g. 8"
+                style={inputStyle}
+              />
             </div>
           </div>
 
+          {/* Days of the week */}
           <div>
-            <label style={labelStyle}>Days of the Week</label>
+            <label style={labelStyle}>Class Days</label>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {DAYS.map((day) => (
                 <button
@@ -135,23 +219,82 @@ export default function NewCoursePage() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div>
-              <label style={labelStyle}>Start Time (UTC, 24h format)</label>
-              <input required type="time" value={form.startTimeUtc} onChange={set('startTimeUtc')} style={inputStyle} />
+          {/* Timezone + Local time — converts to UTC automatically */}
+          <div>
+            <label style={labelStyle}>Class Start Time</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Your timezone</p>
+                <select
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  style={inputStyle}
+                >
+                  {TIMEZONES.map((tz) => (
+                    <option key={tz} value={tz}>{tz}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Local start time</p>
+                <input
+                  required
+                  type="time"
+                  value={localTime}
+                  onChange={(e) => setLocalTime(e.target.value)}
+                  style={inputStyle}
+                />
+              </div>
             </div>
-            <div>
-              <label style={labelStyle}>Session Duration (minutes)</label>
-              <input required type="number" min="30" max="180" value={form.sessionDurationMins} onChange={set('sessionDurationMins')} placeholder="e.g. 60" style={inputStyle} />
-            </div>
+            {/* UTC preview */}
+            {utcPreview && (
+              <div style={{ marginTop: '0.625rem', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.625rem 0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ color: '#00C2A8', fontSize: '0.75rem', fontWeight: 700 }}>UTC</span>
+                <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 600 }}>{utcPreview}</span>
+                <span style={{ color: '#6b88a8', fontSize: '0.75rem' }}>— stored as UTC, displayed in each student's local timezone</span>
+              </div>
+            )}
           </div>
 
+          {/* Session duration */}
+          <div>
+            <label style={labelStyle}>Session Duration (minutes)</label>
+            <input
+              required
+              type="number"
+              min="30"
+              max="180"
+              step="15"
+              value={form.sessionDurationMins}
+              onChange={set('sessionDurationMins')}
+              placeholder="e.g. 60"
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Fee */}
           <div>
             <label style={labelStyle}>Course Fee (USD)</label>
-            <input required type="number" min="1" step="0.01" value={form.feeUsd} onChange={set('feeUsd')} placeholder="e.g. 149.00" style={inputStyle} />
-            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
-              You receive 80% (${ form.feeUsd ? (parseFloat(form.feeUsd) * 0.8).toFixed(2) : '0.00' }) · Platform fee 20%
-            </p>
+            <input
+              required
+              type="number"
+              min="1"
+              step="0.01"
+              value={form.feeUsd}
+              onChange={set('feeUsd')}
+              placeholder="e.g. 149.00"
+              style={inputStyle}
+            />
+            {form.feeUsd && (
+              <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1.5rem' }}>
+                <p style={{ color: '#00C2A8', fontSize: '0.75rem' }}>
+                  You receive: <strong>${(parseFloat(form.feeUsd) * 0.8).toFixed(2)}</strong> (80%)
+                </p>
+                <p style={{ color: '#6b88a8', fontSize: '0.75rem' }}>
+                  Platform fee: ${(parseFloat(form.feeUsd) * 0.2).toFixed(2)} (20%)
+                </p>
+              </div>
+            )}
           </div>
 
           {error && (
@@ -164,14 +307,32 @@ export default function NewCoursePage() {
             <button
               type="submit"
               disabled={loading}
-              style={{ backgroundColor: loading ? '#005040' : '#00C2A8', color: '#0B1A2E', padding: '0.875rem 2rem', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}
+              style={{
+                backgroundColor: loading ? '#005040' : '#00C2A8',
+                color: '#0B1A2E',
+                padding: '0.875rem 2rem',
+                borderRadius: '10px',
+                fontWeight: 700,
+                fontSize: '1rem',
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+              }}
             >
               {loading ? 'Submitting...' : 'Submit for Review →'}
             </button>
             <button
               type="button"
               onClick={() => router.back()}
-              style={{ backgroundColor: 'transparent', color: '#6b88a8', padding: '0.875rem 1.5rem', borderRadius: '10px', fontWeight: 600, fontSize: '1rem', border: '1px solid #1e3a5f', cursor: 'pointer' }}
+              style={{
+                backgroundColor: 'transparent',
+                color: '#6b88a8',
+                padding: '0.875rem 1.5rem',
+                borderRadius: '10px',
+                fontWeight: 600,
+                fontSize: '1rem',
+                border: '1px solid #1e3a5f',
+                cursor: 'pointer',
+              }}
             >
               Cancel
             </button>
