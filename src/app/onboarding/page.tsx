@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@clerk/nextjs'
 
@@ -61,7 +61,7 @@ const sectionLabel: React.CSSProperties = {
   borderBottom: '1px solid #1e3a5f',
 }
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const { user } = useUser()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -402,5 +402,13 @@ export default function OnboardingPage() {
         </form>
       </div>
     </div>
+  )
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: '#0B1A2E' }} />}>
+      <OnboardingContent />
+    </Suspense>
   )
 }
