@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { createZoomMeeting } from '@/lib/zoom'
@@ -8,8 +8,8 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const admin = await prisma.user.findUnique({ where: { clerkId: userId } })
-  if (!admin || admin.role !== 'ADMIN') {
+  const user = await currentUser()
+  if (user?.publicMetadata?.role !== 'admin') {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
   }
 
