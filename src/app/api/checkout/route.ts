@@ -54,17 +54,9 @@ export async function POST(req: Request) {
     success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}/courses/${courseId}`,
     metadata: { courseId, studentId: student.id },
-
-    // 80/20 split via Stripe Connect — only applied when instructor has connected their account.
-    // Platform retains 20% (application_fee_amount); 80% is transferred to instructor automatically.
-    ...(course.instructor.stripeAccountId
-      ? {
-          payment_intent_data: {
-            application_fee_amount: platformFeeCents,
-            transfer_data: { destination: course.instructor.stripeAccountId },
-          },
-        }
-      : {}),
+    // Full payment goes to platform account.
+    // Instructor 80% is held and transferred manually after the course starts
+    // to allow for cancellations and refunds before the course begins.
   })
 
   return NextResponse.json({ url: session.url })

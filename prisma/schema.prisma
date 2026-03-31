@@ -60,6 +60,8 @@ model Enrollment {
   platformFeeUsd        Decimal  @db.Decimal(10, 2)
   zoomJoinUrl           String?
   enrolledAt            DateTime @default(now())
+  instructorPaidOut     Boolean  @default(false)
+  instructorPaidOutAt   DateTime?
 }
 
 enum Role {
