@@ -100,8 +100,8 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
           {course.daysOfWeek.join(', ')} at {course.startTimeUtc} UTC
         </p>
         <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
-          <span style={{ color: '#6b88a8' }}>Duration: </span>
-          {course.durationWeeks} weeks · {course.sessionDurationMins} min/session
+          <span style={{ color: '#6b88a8' }}>Session: </span>
+          {course.sessionDurationMins} min/session
         </p>
       </div>
 

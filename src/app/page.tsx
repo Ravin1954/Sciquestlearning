@@ -122,7 +122,7 @@ export default function HomePage() {
 
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
-              href="/courses"
+              href="/sign-up/student"
               style={{
                 backgroundColor: '#00C2A8',
                 color: '#0B1A2E',
@@ -134,10 +134,10 @@ export default function HomePage() {
                 display: 'inline-block',
               }}
             >
-              Browse Courses
+              Sign Up as Student
             </Link>
             <Link
-              href="/sign-up"
+              href="/sign-up/instructor"
               style={{
                 backgroundColor: 'transparent',
                 color: '#F5C842',
@@ -254,45 +254,52 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section style={{ padding: '5rem 1.5rem', textAlign: 'center' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '2.25rem', fontWeight: 700, color: '#e8edf5', marginBottom: '1rem' }}>
-            Ready to Start Learning?
-          </h2>
-          <p style={{ color: '#6b88a8', marginBottom: '2rem', lineHeight: 1.7 }}>
-            Join thousands of students already excelling in science and math with SciQuest Learning.
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link
-              href="/sign-up"
-              style={{
-                backgroundColor: '#00C2A8',
-                color: '#0B1A2E',
-                padding: '0.875rem 2.5rem',
-                borderRadius: '10px',
-                fontWeight: 700,
-                fontSize: '1rem',
-                textDecoration: 'none',
-              }}
-            >
-              Sign Up Free
-            </Link>
-            <Link
-              href="/courses"
-              style={{
-                backgroundColor: 'transparent',
-                color: '#a8c4e0',
-                padding: '0.875rem 2.5rem',
-                borderRadius: '10px',
-                fontWeight: 600,
-                fontSize: '1rem',
-                textDecoration: 'none',
-                border: '1px solid #1e3a5f',
-              }}
-            >
-              Explore Courses
-            </Link>
+      {/* Two-path CTA Section */}
+      <section style={{ padding: '5rem 1.5rem' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '2.25rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.75rem' }}>
+              Join SciQuest Learning
+            </h2>
+            <p style={{ color: '#6b88a8', fontSize: '1rem' }}>Choose your path to get started</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+            {/* Student Card */}
+            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '16px', padding: '2.5rem', textAlign: 'center' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎓</div>
+              <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.5rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.75rem' }}>
+                I&apos;m a Student
+              </h3>
+              <p style={{ color: '#6b88a8', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '2rem' }}>
+                Browse courses from verified instructors, enroll, and join live Zoom sessions.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <Link href="/sign-up/student" style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.875rem', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', display: 'block' }}>
+                  Create Student Account
+                </Link>
+                <Link href="/sign-in" style={{ backgroundColor: 'transparent', color: '#a8c4e0', padding: '0.875rem', borderRadius: '10px', fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none', border: '1px solid #1e3a5f', display: 'block' }}>
+                  Student Sign In
+                </Link>
+              </div>
+            </div>
+            {/* Instructor Card */}
+            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '16px', padding: '2.5rem', textAlign: 'center' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>👩‍🏫</div>
+              <h3 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.5rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.75rem' }}>
+                I&apos;m an Instructor
+              </h3>
+              <p style={{ color: '#6b88a8', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '2rem' }}>
+                Create courses, set your schedule, and earn 80% of every enrollment fee.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <Link href="/sign-up/instructor" style={{ backgroundColor: '#F5C842', color: '#0B1A2E', padding: '0.875rem', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', display: 'block' }}>
+                  Apply as Instructor
+                </Link>
+                <Link href="/sign-in" style={{ backgroundColor: 'transparent', color: '#a8c4e0', padding: '0.875rem', borderRadius: '10px', fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none', border: '1px solid #1e3a5f', display: 'block' }}>
+                  Instructor Sign In
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>

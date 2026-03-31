@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@clerk/nextjs'
 
 const TIMEZONES = [
@@ -64,10 +64,12 @@ const sectionLabel: React.CSSProperties = {
 export default function OnboardingPage() {
   const { user } = useUser()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const roleFromUrl = searchParams.get('role') as 'student' | 'instructor' | null
 
   const presetRole = user?.publicMetadata?.role as string | undefined
   const [role, setRole] = useState<'student' | 'instructor'>(
-    presetRole === 'instructor' ? 'instructor' : 'student'
+    presetRole === 'instructor' || roleFromUrl === 'instructor' ? 'instructor' : 'student'
   )
 
   // Shared fields
@@ -105,7 +107,7 @@ export default function OnboardingPage() {
       prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
     )
 
-  const isRoleLocked = !!presetRole && presetRole !== 'admin'
+  const isRoleLocked = (!!presetRole && presetRole !== 'admin') || !!roleFromUrl
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
