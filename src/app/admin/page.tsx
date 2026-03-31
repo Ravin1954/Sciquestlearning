@@ -26,6 +26,21 @@ interface Course {
   _count: { enrollments: number }
 }
 
+interface Enrollment {
+  id: string
+  enrolledAt: string
+  amountPaidUsd: number
+  instructorPayoutUsd: number
+  instructorPaidOut: boolean
+  instructorPaidOutAt: string | null
+  student: { firstName: string; lastName: string; email: string }
+  course: {
+    title: string
+    subject: string
+    instructor: { firstName: string; lastName: string; stripeAccountId: string | null }
+  }
+}
+
 const S = {
   card: { backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' } as React.CSSProperties,
   label: { color: '#6b88a8', fontSize: '0.8rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.25rem' },
@@ -41,16 +56,21 @@ const S = {
 export default function AdminPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null)
   const [courses, setCourses] = useState<Course[]>([])
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [payoutLoading, setPayoutLoading] = useState<string | null>(null)
+  const [payoutMsg, setPayoutMsg] = useState<{ id: string; success: boolean; text: string } | null>(null)
 
   useEffect(() => {
     Promise.all([
       fetch('/api/admin/metrics').then((r) => r.json()),
       fetch('/api/admin/courses').then((r) => r.json()),
-    ]).then(([m, c]) => {
+      fetch('/api/admin/enrollments').then((r) => r.json()),
+    ]).then(([m, c, e]) => {
       setMetrics(m)
-      setCourses(c)
+      setCourses(Array.isArray(c) ? c : [])
+      setEnrollments(Array.isArray(e) ? e : [])
       setLoading(false)
     })
   }, [])
@@ -65,7 +85,32 @@ export default function AdminPage() {
     setActionLoading(null)
   }
 
+  const handlePayout = async (enrollmentId: string) => {
+    setPayoutLoading(enrollmentId)
+    setPayoutMsg(null)
+    try {
+      const res = await fetch('/api/admin/payout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enrollmentId }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setPayoutMsg({ id: enrollmentId, success: true, text: `Paid out $${Number(data.payoutUsd).toFixed(2)} ✓` })
+        const updated = await fetch('/api/admin/enrollments').then((r) => r.json())
+        setEnrollments(Array.isArray(updated) ? updated : [])
+      } else {
+        setPayoutMsg({ id: enrollmentId, success: false, text: data.error || 'Payout failed' })
+      }
+    } catch {
+      setPayoutMsg({ id: enrollmentId, success: false, text: 'Network error' })
+    }
+    setPayoutLoading(null)
+  }
+
   const pending = courses.filter((c) => c.status === 'PENDING')
+  const pendingPayouts = enrollments.filter((e) => !e.instructorPaidOut)
+  const completedPayouts = enrollments.filter((e) => e.instructorPaidOut)
 
   return (
     <DashboardLayout role="admin">
@@ -140,6 +185,102 @@ export default function AdminPage() {
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+
+          {/* Instructor Payouts */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#e8edf5', marginBottom: '0.5rem' }}>
+              Instructor Payouts
+              {pendingPayouts.length > 0 && (
+                <span style={{ backgroundColor: '#F5C842', color: '#0B1A2E', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
+                  {pendingPayouts.length} pending
+                </span>
+              )}
+            </h2>
+            <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '1rem' }}>
+              Full payment is held on the platform. Pay out 80% to the instructor after the course has started.
+            </p>
+
+            {pendingPayouts.length === 0 ? (
+              <div style={{ ...S.card, textAlign: 'center', color: '#6b88a8', padding: '2rem' }}>
+                No pending payouts.
+              </div>
+            ) : (
+              <div style={{ ...S.card, padding: 0, overflow: 'hidden', marginBottom: '1rem' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #1e3a5f' }}>
+                      {['Student', 'Course', 'Instructor', 'Paid', 'Payout (80%)', 'Stripe', 'Action'].map((h) => (
+                        <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingPayouts.map((e, i) => (
+                      <tr key={e.id} style={{ borderBottom: i < pendingPayouts.length - 1 ? '1px solid #1e3a5f' : 'none' }}>
+                        <td style={{ padding: '0.75rem 1rem', color: '#e8edf5', fontSize: '0.8rem' }}>{e.student.firstName} {e.student.lastName}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.8rem' }}>{e.course.title}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.8rem' }}>{e.course.instructor.firstName} {e.course.instructor.lastName}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: '#F5C842', fontSize: '0.8rem', fontWeight: 600 }}>${Number(e.amountPaidUsd).toFixed(2)}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: '#00C2A8', fontSize: '0.8rem', fontWeight: 600 }}>${Number(e.instructorPayoutUsd).toFixed(2)}</td>
+                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.75rem' }}>
+                          {e.course.instructor.stripeAccountId
+                            ? <span style={{ color: '#00C2A8' }}>Connected</span>
+                            : <span style={{ color: '#f87171' }}>Not connected</span>}
+                        </td>
+                        <td style={{ padding: '0.75rem 1rem' }}>
+                          {payoutMsg?.id === e.id ? (
+                            <span style={{ fontSize: '0.8rem', color: payoutMsg.success ? '#00C2A8' : '#f87171' }}>{payoutMsg.text}</span>
+                          ) : (
+                            <button
+                              onClick={() => handlePayout(e.id)}
+                              disabled={payoutLoading === e.id || !e.course.instructor.stripeAccountId}
+                              style={{
+                                ...S.btn('#0B1A2E', '#00C2A8'),
+                                opacity: (!e.course.instructor.stripeAccountId || payoutLoading === e.id) ? 0.4 : 1,
+                                cursor: !e.course.instructor.stripeAccountId ? 'not-allowed' : 'pointer',
+                              }}
+                            >
+                              {payoutLoading === e.id ? '...' : 'Pay Out'}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {completedPayouts.length > 0 && (
+              <details>
+                <summary style={{ color: '#6b88a8', fontSize: '0.8rem', cursor: 'pointer', marginBottom: '0.75rem' }}>
+                  {completedPayouts.length} completed payout{completedPayouts.length > 1 ? 's' : ''}
+                </summary>
+                <div style={{ ...S.card, padding: 0, overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid #1e3a5f' }}>
+                        {['Student', 'Course', 'Instructor', 'Amount Paid Out', 'Date'].map((h) => (
+                          <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {completedPayouts.map((e, i) => (
+                        <tr key={e.id} style={{ borderBottom: i < completedPayouts.length - 1 ? '1px solid #1e3a5f' : 'none' }}>
+                          <td style={{ padding: '0.75rem 1rem', color: '#e8edf5', fontSize: '0.8rem' }}>{e.student.firstName} {e.student.lastName}</td>
+                          <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.8rem' }}>{e.course.title}</td>
+                          <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.8rem' }}>{e.course.instructor.firstName} {e.course.instructor.lastName}</td>
+                          <td style={{ padding: '0.75rem 1rem', color: '#00C2A8', fontSize: '0.8rem', fontWeight: 600 }}>${Number(e.instructorPayoutUsd).toFixed(2)}</td>
+                          <td style={{ padding: '0.75rem 1rem', color: '#6b88a8', fontSize: '0.8rem' }}>{e.instructorPaidOutAt ? new Date(e.instructorPaidOutAt).toLocaleDateString() : '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
             )}
           </div>
 
