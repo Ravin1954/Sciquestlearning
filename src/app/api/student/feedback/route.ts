@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { sendInstructorNoShowWarningEmail } from '@/lib/resend'
 
 export async function POST(req: Request) {
   const { userId } = await auth()
@@ -13,6 +14,11 @@ export async function POST(req: Request) {
 
   const enrollment = await prisma.enrollment.findUnique({
     where: { id: enrollmentId },
+    include: {
+      course: {
+        include: { instructor: true },
+      },
+    },
   })
 
   if (!enrollment || enrollment.studentId !== user.id) {
@@ -25,6 +31,16 @@ export async function POST(req: Request) {
   const feedback = await prisma.feedback.create({
     data: { enrollmentId, attended, rating: parseInt(rating), comment },
   })
+
+  // Send warning email to instructor if student reports no-show
+  if (!attended) {
+    const instructor = enrollment.course.instructor
+    await sendInstructorNoShowWarningEmail(
+      instructor.email,
+      instructor.firstName,
+      enrollment.course.title,
+    )
+  }
 
   return NextResponse.json(feedback, { status: 201 })
 }
