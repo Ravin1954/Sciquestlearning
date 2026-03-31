@@ -85,6 +85,7 @@ export default function NewCoursePage() {
     sessionDurationMins: '',
     feeUsd: '',
     contentUrl: '',
+    meetingUrl: '',
   })
 
   const toggleDay = (day: string) =>
@@ -104,6 +105,7 @@ export default function NewCoursePage() {
     if (courseType === 'LIVE') {
       if (selectedDays.length === 0) { setError('Select at least one day.'); return }
       if (!localTime) { setError('Please set a class start time.'); return }
+      if (!form.meetingUrl) { setError('Please provide a Zoom or Google Meet link.'); return }
     }
     if (courseType === 'SELF_PACED' && !form.contentUrl) {
       setError('Please provide a content URL for the self-paced course.'); return
@@ -122,6 +124,7 @@ export default function NewCoursePage() {
         courseType,
         daysOfWeek: courseType === 'LIVE' ? selectedDays : [],
         startTimeUtc,
+        meetingUrl: courseType === 'LIVE' ? form.meetingUrl : undefined,
       }),
     })
 
@@ -298,6 +301,21 @@ export default function NewCoursePage() {
                   placeholder="e.g. 60"
                   style={inputStyle}
                 />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Meeting Link (Zoom or Google Meet)</label>
+                <input
+                  required
+                  type="url"
+                  value={form.meetingUrl}
+                  onChange={set('meetingUrl')}
+                  placeholder="e.g. https://meet.google.com/xxx-xxxx-xxx or https://zoom.us/j/..."
+                  style={inputStyle}
+                />
+                <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                  Paste your Google Meet or Zoom link. Students will use this to join your class.
+                </p>
               </div>
             </>
           )}

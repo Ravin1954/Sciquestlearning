@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/db'
 import { sendEnrollmentConfirmationEmail } from '@/lib/resend'
-import { createZoomMeeting } from '@/lib/zoom'
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -29,18 +28,7 @@ export async function POST(req: Request) {
 
     if (!course || !student) return NextResponse.json({ ok: true })
 
-    let zoomJoinUrl = ''
-    if (course.courseType === 'LIVE') {
-      zoomJoinUrl = course.zoomJoinUrl || ''
-      if (!zoomJoinUrl) {
-        const meeting = await createZoomMeeting(
-          course.title,
-          course.startTimeUtc,
-          course.sessionDurationMins
-        )
-        zoomJoinUrl = meeting.join_url || ''
-      }
-    }
+    const zoomJoinUrl = course.courseType === 'LIVE' ? (course.zoomJoinUrl || '') : ''
 
     const amountPaid = (session.amount_total || 0) / 100
     const instructorPayout = amountPaid * 0.8

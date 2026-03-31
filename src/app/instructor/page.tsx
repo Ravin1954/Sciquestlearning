@@ -15,7 +15,7 @@ interface Course {
   daysOfWeek: string[]
   startTimeUtc: string
   sessionDurationMins: number
-  zoomStartUrl?: string
+  zoomJoinUrl?: string
   _count: { enrollments: number }
 }
 
@@ -125,9 +125,9 @@ export default function InstructorPage() {
                         {c.daysOfWeek.join(', ')} · {c.startTimeUtc} UTC · {c.sessionDurationMins} min · {c._count.enrollments} students
                       </p>
                     </div>
-                    {c.zoomStartUrl ? (
+                    {c.zoomJoinUrl ? (
                       <a
-                        href={c.zoomStartUrl}
+                        href={c.zoomJoinUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}
@@ -135,7 +135,7 @@ export default function InstructorPage() {
                         Start Class →
                       </a>
                     ) : (
-                      <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Zoom pending</span>
+                      <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>No meeting link</span>
                     )}
                   </div>
                 ))}
