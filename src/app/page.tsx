@@ -122,11 +122,11 @@ export default function HomePage() {
 
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
-              href="/sign-up/student"
+              href="/courses"
               style={{
                 backgroundColor: '#00C2A8',
                 color: '#0B1A2E',
-                padding: '0.875rem 2rem',
+                padding: '0.875rem 2.5rem',
                 borderRadius: '10px',
                 fontWeight: 700,
                 fontSize: '1rem',
@@ -134,23 +134,7 @@ export default function HomePage() {
                 display: 'inline-block',
               }}
             >
-              Sign Up as Student
-            </Link>
-            <Link
-              href="/sign-up/instructor"
-              style={{
-                backgroundColor: 'transparent',
-                color: '#F5C842',
-                padding: '0.875rem 2rem',
-                borderRadius: '10px',
-                fontWeight: 600,
-                fontSize: '1rem',
-                textDecoration: 'none',
-                border: '1px solid #F5C842',
-                display: 'inline-block',
-              }}
-            >
-              Teach on SciQuest
+              Browse Courses
             </Link>
           </div>
         </div>

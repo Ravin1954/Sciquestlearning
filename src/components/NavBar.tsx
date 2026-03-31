@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useAuth } from '@clerk/nextjs'
-import { UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
+import { UserButton, SignInButton } from '@clerk/nextjs'
 
 export default function NavBar() {
   const { isSignedIn } = useAuth()
@@ -50,24 +50,14 @@ export default function NavBar() {
             {isSignedIn ? (
               <UserButton />
             ) : (
-              <>
-                <SignInButton mode="modal">
-                  <button
-                    style={{ color: '#00C2A8', border: '1px solid #00C2A8' }}
-                    className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-900 transition-colors"
-                  >
-                    Sign In
-                  </button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <button
-                    style={{ backgroundColor: '#00C2A8', color: '#0B1A2E' }}
-                    className="px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
-                  >
-                    Get Started
-                  </button>
-                </SignUpButton>
-              </>
+              <SignInButton mode="modal">
+                <button
+                  style={{ color: '#00C2A8', border: '1px solid #00C2A8' }}
+                  className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-900 transition-colors"
+                >
+                  Sign In
+                </button>
+              </SignInButton>
             )}
           </div>
         </div>
