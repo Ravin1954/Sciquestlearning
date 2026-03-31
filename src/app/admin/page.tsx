@@ -26,6 +26,22 @@ interface Course {
   _count: { enrollments: number }
 }
 
+interface Feedback {
+  id: string
+  attended: boolean
+  rating: number
+  comment?: string
+  createdAt: string
+  enrollment: {
+    student: { firstName: string; lastName: string; email: string }
+    course: {
+      title: string
+      subject: string
+      instructor: { firstName: string; lastName: string }
+    }
+  }
+}
+
 interface Enrollment {
   id: string
   enrolledAt: string
@@ -61,16 +77,19 @@ export default function AdminPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [payoutLoading, setPayoutLoading] = useState<string | null>(null)
   const [payoutMsg, setPayoutMsg] = useState<{ id: string; success: boolean; text: string } | null>(null)
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
 
   useEffect(() => {
     Promise.all([
       fetch('/api/admin/metrics').then((r) => r.json()),
       fetch('/api/admin/courses').then((r) => r.json()),
       fetch('/api/admin/enrollments').then((r) => r.json()),
-    ]).then(([m, c, e]) => {
+      fetch('/api/admin/feedback').then((r) => r.json()),
+    ]).then(([m, c, e, f]) => {
       setMetrics(m)
       setCourses(Array.isArray(c) ? c : [])
       setEnrollments(Array.isArray(e) ? e : [])
+      setFeedbacks(Array.isArray(f) ? f : [])
       setLoading(false)
     })
   }, [])
@@ -281,6 +300,57 @@ export default function AdminPage() {
                   </table>
                 </div>
               </details>
+            )}
+          </div>
+
+          {/* Student Feedback & Attendance */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#e8edf5', marginBottom: '0.5rem' }}>
+              Student Feedback & Attendance
+              {feedbacks.filter((f) => !f.attended).length > 0 && (
+                <span style={{ backgroundColor: '#f87171', color: '#fff', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
+                  {feedbacks.filter((f) => !f.attended).length} no-show report{feedbacks.filter((f) => !f.attended).length > 1 ? 's' : ''}
+                </span>
+              )}
+            </h2>
+            <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '1rem' }}>
+              Students confirm attendance and rate each class. Review before releasing instructor payouts.
+            </p>
+            {feedbacks.length === 0 ? (
+              <div style={{ ...S.card, textAlign: 'center', color: '#6b88a8', padding: '2rem' }}>
+                No feedback submitted yet.
+              </div>
+            ) : (
+              <div style={{ ...S.card, padding: 0, overflow: 'hidden' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid #1e3a5f' }}>
+                      {['Student', 'Course', 'Instructor', 'Attended', 'Rating', 'Comment', 'Date'].map((h) => (
+                        <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {feedbacks.map((f, i) => (
+                      <tr key={f.id} style={{ borderBottom: i < feedbacks.length - 1 ? '1px solid #1e3a5f' : 'none', backgroundColor: !f.attended ? '#1a0a0a' : 'transparent' }}>
+                        <td style={{ padding: '0.75rem 1rem', color: '#e8edf5', fontSize: '0.8rem' }}>{f.enrollment.student.firstName} {f.enrollment.student.lastName}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.8rem' }}>{f.enrollment.course.title}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.8rem' }}>{f.enrollment.course.instructor.firstName} {f.enrollment.course.instructor.lastName}</td>
+                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.8rem' }}>
+                          {f.attended
+                            ? <span style={{ color: '#00C2A8', fontWeight: 600 }}>Yes</span>
+                            : <span style={{ color: '#f87171', fontWeight: 600 }}>No-show</span>}
+                        </td>
+                        <td style={{ padding: '0.75rem 1rem', color: '#F5C842', fontSize: '0.875rem' }}>
+                          {f.attended ? '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating) : '—'}
+                        </td>
+                        <td style={{ padding: '0.75rem 1rem', color: '#6b88a8', fontSize: '0.8rem', maxWidth: '200px' }}>{f.comment || '—'}</td>
+                        <td style={{ padding: '0.75rem 1rem', color: '#6b88a8', fontSize: '0.8rem' }}>{new Date(f.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
 

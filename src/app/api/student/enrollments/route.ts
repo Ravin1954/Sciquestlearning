@@ -15,6 +15,7 @@ export async function GET() {
       course: {
         include: { instructor: { select: { firstName: true, lastName: true } } },
       },
+      feedback: true,
     },
     orderBy: { enrolledAt: 'desc' },
   })

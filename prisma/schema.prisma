@@ -51,19 +51,30 @@ model Course {
 }
 
 model Enrollment {
-  id                    String   @id @default(cuid())
+  id                    String    @id @default(cuid())
   studentId             String
-  student               User     @relation(fields: [studentId], references: [id])
+  student               User      @relation(fields: [studentId], references: [id])
   courseId              String
-  course                Course   @relation(fields: [courseId], references: [id])
+  course                Course    @relation(fields: [courseId], references: [id])
   stripePaymentIntentId String?
-  amountPaidUsd         Decimal  @db.Decimal(10, 2)
-  instructorPayoutUsd   Decimal  @db.Decimal(10, 2)
-  platformFeeUsd        Decimal  @db.Decimal(10, 2)
+  amountPaidUsd         Decimal   @db.Decimal(10, 2)
+  instructorPayoutUsd   Decimal   @db.Decimal(10, 2)
+  platformFeeUsd        Decimal   @db.Decimal(10, 2)
   zoomJoinUrl           String?
-  enrolledAt            DateTime @default(now())
-  instructorPaidOut     Boolean  @default(false)
+  enrolledAt            DateTime  @default(now())
+  instructorPaidOut     Boolean   @default(false)
   instructorPaidOutAt   DateTime?
+  feedback              Feedback?
+}
+
+model Feedback {
+  id           String     @id @default(cuid())
+  enrollmentId String     @unique
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+  attended     Boolean
+  rating       Int
+  comment      String?
+  createdAt    DateTime   @default(now())
 }
 
 enum Role {
