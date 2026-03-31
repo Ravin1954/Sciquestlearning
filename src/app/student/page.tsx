@@ -12,10 +12,12 @@ interface Enrollment {
     id: string
     title: string
     subject: string
+    courseType: string
     durationWeeks: number
     daysOfWeek: string[]
     startTimeUtc: string
     sessionDurationMins: number
+    contentUrl?: string
     status: string
     instructor: { firstName: string; lastName: string }
   }
@@ -109,10 +111,25 @@ export default function StudentPage() {
                         Instructor: {course.instructor.firstName} {course.instructor.lastName}
                       </p>
                       <p style={{ color: '#6b88a8', fontSize: '0.825rem' }}>
-                        {course.daysOfWeek.join(', ')} · {course.startTimeUtc} UTC · {course.sessionDurationMins} min/session · {course.durationWeeks} weeks
+                        {course.courseType === 'SELF_PACED'
+                          ? `Self-Paced · Study anytime · ${course.durationWeeks > 0 ? `${course.durationWeeks} weeks` : 'Lifetime access'}`
+                          : `${course.daysOfWeek.join(', ')} · ${course.startTimeUtc} UTC · ${course.sessionDurationMins} min/session`}
                       </p>
                     </div>
-                    {enrollment.zoomJoinUrl ? (
+                    {course.courseType === 'SELF_PACED' ? (
+                      course.contentUrl ? (
+                        <a
+                          href={course.contentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}
+                        >
+                          Access Course →
+                        </a>
+                      ) : (
+                        <span style={{ color: '#6b88a8', fontSize: '0.8rem', padding: '0.625rem' }}>Content pending</span>
+                      )
+                    ) : enrollment.zoomJoinUrl ? (
                       <a
                         href={enrollment.zoomJoinUrl}
                         target="_blank"

@@ -25,7 +25,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   let zoomJoinUrl = course.zoomJoinUrl
   let zoomStartUrl = course.zoomStartUrl
 
-  if (!zoomMeetingId) {
+  if (course.courseType === 'LIVE' && !zoomMeetingId) {
     const meeting = await createZoomMeeting(
       course.title,
       course.startTimeUtc,

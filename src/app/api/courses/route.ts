@@ -6,10 +6,12 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const subject = searchParams.get('subject')
   const duration = searchParams.get('duration')
+  const courseType = searchParams.get('courseType')
 
   const where: Record<string, unknown> = { status: 'APPROVED' }
   if (subject) where.subject = subject
   if (duration) where.durationWeeks = parseInt(duration)
+  if (courseType) where.courseType = courseType
 
   const courses = await prisma.course.findMany({
     where,
@@ -34,11 +36,13 @@ export async function POST(req: Request) {
     title,
     description,
     subject,
+    courseType = 'LIVE',
     durationWeeks,
     daysOfWeek,
     startTimeUtc,
     sessionDurationMins,
     feeUsd,
+    contentUrl,
   } = body
 
   const course = await prisma.course.create({
@@ -47,11 +51,13 @@ export async function POST(req: Request) {
       title,
       description,
       subject,
-      durationWeeks: parseInt(durationWeeks),
-      daysOfWeek,
-      startTimeUtc,
-      sessionDurationMins: parseInt(sessionDurationMins),
+      courseType,
+      durationWeeks: durationWeeks ? parseInt(durationWeeks) : 0,
+      daysOfWeek: daysOfWeek || [],
+      startTimeUtc: startTimeUtc || '',
+      sessionDurationMins: sessionDurationMins ? parseInt(sessionDurationMins) : 0,
       feeUsd: parseFloat(feeUsd),
+      contentUrl: contentUrl || null,
       status: 'PENDING',
     },
   })

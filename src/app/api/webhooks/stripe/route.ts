@@ -29,15 +29,17 @@ export async function POST(req: Request) {
 
     if (!course || !student) return NextResponse.json({ ok: true })
 
-    // Create Zoom meeting if not already on course
-    let zoomJoinUrl = course.zoomJoinUrl || ''
-    if (!zoomJoinUrl) {
-      const meeting = await createZoomMeeting(
-        course.title,
-        course.startTimeUtc,
-        course.sessionDurationMins
-      )
-      zoomJoinUrl = meeting.join_url || ''
+    let zoomJoinUrl = ''
+    if (course.courseType === 'LIVE') {
+      zoomJoinUrl = course.zoomJoinUrl || ''
+      if (!zoomJoinUrl) {
+        const meeting = await createZoomMeeting(
+          course.title,
+          course.startTimeUtc,
+          course.sessionDurationMins
+        )
+        zoomJoinUrl = meeting.join_url || ''
+      }
     }
 
     const amountPaid = (session.amount_total || 0) / 100
@@ -56,8 +58,11 @@ export async function POST(req: Request) {
       },
     })
 
-    const schedule = `${course.daysOfWeek.join(', ')} at ${course.startTimeUtc} UTC`
-    await sendEnrollmentConfirmationEmail(student.email, course.title, zoomJoinUrl, schedule)
+    const accessLink = course.courseType === 'SELF_PACED' ? (course.contentUrl || '') : zoomJoinUrl
+    const schedule = course.courseType === 'LIVE'
+      ? `${course.daysOfWeek.join(', ')} at ${course.startTimeUtc} UTC`
+      : 'Self-paced — access anytime'
+    await sendEnrollmentConfirmationEmail(student.email, course.title, accessLink, schedule)
   }
 
   return NextResponse.json({ ok: true })

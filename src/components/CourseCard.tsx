@@ -7,6 +7,7 @@ interface CourseCardProps {
     title: string
     description?: string
     subject: string
+    courseType?: string
     durationWeeks: number
     daysOfWeek: string[]
     startTimeUtc: string
@@ -38,6 +39,7 @@ const subjectLabels: Record<string, string> = {
 
 export default function CourseCard({ course, showStatus = false, showEnroll = true }: CourseCardProps) {
   const subjectColor = subjectColors[course.subject] || '#00C2A8'
+  const isSelfPaced = course.courseType === 'SELF_PACED'
 
   return (
     <div
@@ -52,18 +54,34 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
       }}
     >
       <div className="flex items-start justify-between gap-2">
-        <span
-          style={{
-            backgroundColor: subjectColor + '20',
-            color: subjectColor,
-            padding: '2px 10px',
-            borderRadius: '9999px',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-          }}
-        >
-          {subjectLabels[course.subject] || course.subject}
-        </span>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <span
+            style={{
+              backgroundColor: subjectColor + '20',
+              color: subjectColor,
+              padding: '2px 10px',
+              borderRadius: '9999px',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+            }}
+          >
+            {subjectLabels[course.subject] || course.subject}
+          </span>
+          <span
+            style={{
+              backgroundColor: isSelfPaced ? '#2d1a4a' : '#0a2240',
+              color: isSelfPaced ? '#c084fc' : '#38bdf8',
+              padding: '2px 8px',
+              borderRadius: '9999px',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+            }}
+          >
+            {isSelfPaced ? 'Self-Paced' : 'Live'}
+          </span>
+        </div>
         {showStatus && course.status && <StatusBadge status={course.status} />}
       </div>
 
@@ -95,14 +113,23 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-        <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
-          <span style={{ color: '#6b88a8' }}>Schedule: </span>
-          {course.daysOfWeek.join(', ')} at {course.startTimeUtc} UTC
-        </p>
-        <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
-          <span style={{ color: '#6b88a8' }}>Session: </span>
-          {course.sessionDurationMins} min/session
-        </p>
+        {isSelfPaced ? (
+          <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
+            <span style={{ color: '#6b88a8' }}>Access: </span>
+            Study anytime · {course.durationWeeks > 0 ? `${course.durationWeeks} weeks` : 'Lifetime access'}
+          </p>
+        ) : (
+          <>
+            <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
+              <span style={{ color: '#6b88a8' }}>Schedule: </span>
+              {course.daysOfWeek.join(', ')} at {course.startTimeUtc} UTC
+            </p>
+            <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
+              <span style={{ color: '#6b88a8' }}>Session: </span>
+              {course.sessionDurationMins} min/session
+            </p>
+          </>
+        )}
       </div>
 
       <div className="flex items-center justify-between mt-2">

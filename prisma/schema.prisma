@@ -35,11 +35,13 @@ model Course {
   title               String
   description         String
   subject             Subject
-  durationWeeks       Int
+  courseType          CourseType   @default(LIVE)
+  durationWeeks       Int          @default(0)
   daysOfWeek          String[]
-  startTimeUtc        String
-  sessionDurationMins Int
+  startTimeUtc        String       @default("")
+  sessionDurationMins Int          @default(0)
   feeUsd              Decimal      @db.Decimal(10, 2)
+  contentUrl          String?
   status              CourseStatus @default(PENDING)
   zoomMeetingId       String?
   zoomJoinUrl         String?
@@ -81,4 +83,9 @@ enum CourseStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum CourseType {
+  LIVE
+  SELF_PACED
 }
