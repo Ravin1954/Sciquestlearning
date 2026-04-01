@@ -4,7 +4,11 @@ import { sendReminderEmail } from '@/lib/resend'
 
 // Called by Railway cron every minute
 // Sends reminders for sessions starting in 19–21 minutes
-export async function GET() {
+export async function GET(req: Request) {
+  const authHeader = req.headers.get('authorization')
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   const now = new Date()
   const nowMinutes = now.getUTCHours() * 60 + now.getUTCMinutes()
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']

@@ -12,12 +12,14 @@ export async function POST(req: Request) {
 
   const student = await prisma.user.findUnique({ where: { clerkId: userId } })
   if (!student) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+  if (student.role !== 'STUDENT') return NextResponse.json({ error: 'Only students can enroll' }, { status: 403 })
 
   const course = await prisma.course.findUnique({
     where: { id: courseId, status: 'APPROVED' },
     include: { instructor: true },
   })
   if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 })
+  if (course.instructorId === student.id) return NextResponse.json({ error: 'You cannot enroll in your own course' }, { status: 403 })
 
   // Prevent duplicate enrollment
   const existing = await prisma.enrollment.findFirst({
