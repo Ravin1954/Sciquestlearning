@@ -15,6 +15,7 @@ model User {
   lastName         String
   email            String       @unique
   timezone         String       @default("UTC")
+  country          String       @default("")
   qualifications   String?
   subjects         String[]
   stripeAccountId  String?

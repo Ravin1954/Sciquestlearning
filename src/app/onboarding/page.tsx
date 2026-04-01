@@ -31,6 +31,36 @@ const SUBJECT_LABELS: Record<string, string> = {
   MATHEMATICS: 'Mathematics',
 }
 
+const CARIBBEAN_COUNTRIES = [
+  'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Cuba', 'Dominica',
+  'Dominican Republic', 'Grenada', 'Haiti', 'Jamaica', 'Puerto Rico',
+  'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines',
+  'Trinidad and Tobago',
+]
+
+const EUROPEAN_COUNTRIES = [
+  'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
+  'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
+  'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland',
+  'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania', 'Luxembourg',
+  'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia',
+  'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino', 'Serbia', 'Slovakia',
+  'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Ukraine', 'United Kingdom',
+]
+
+const STUDENT_COUNTRIES = [
+  'United States',
+  'Canada',
+  'Mexico',
+  'China',
+  'Philippines',
+  'South Korea',
+  ...CARIBBEAN_COUNTRIES,
+  ...EUROPEAN_COUNTRIES,
+].sort()
+
+const INSTRUCTOR_COUNTRIES = ['United States']
+
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.75rem',
@@ -72,9 +102,9 @@ function OnboardingContent() {
     presetRole === 'instructor' || roleFromUrl === 'instructor' ? 'instructor' : 'student'
   )
 
-  // Shared fields
   const [timezone, setTimezone] = useState('UTC')
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([])
+  const [country, setCountry] = useState('')
 
   // Instructor fields
   const [qualifications, setQualifications] = useState('')
@@ -90,7 +120,6 @@ function OnboardingContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Pre-fill name from Clerk if available
   useEffect(() => {
     if (!user) return
     if (user.firstName) setFirstName(user.firstName)
@@ -102,6 +131,11 @@ function OnboardingContent() {
     else if (existingRole === 'student') setRole('student')
   }, [user, router])
 
+  // Reset country when role changes
+  useEffect(() => {
+    setCountry(role === 'instructor' ? 'United States' : '')
+  }, [role])
+
   const toggleSubject = (s: string) =>
     setSelectedSubjects((prev) =>
       prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
@@ -111,6 +145,7 @@ function OnboardingContent() {
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!country) { setError('Please select your country.'); return }
     setLoading(true)
     setError('')
 
@@ -121,10 +156,9 @@ function OnboardingContent() {
         body: JSON.stringify({
           role,
           timezone,
+          country,
           subjects: selectedSubjects,
-          // instructor
           qualifications: role === 'instructor' ? qualifications : undefined,
-          // student
           age: role === 'student' ? age : undefined,
           gender: role === 'student' ? gender : undefined,
           fathersName: role === 'student' ? fathersName : undefined,
@@ -145,6 +179,8 @@ function OnboardingContent() {
       setLoading(false)
     }
   }
+
+  const countryOptions = role === 'instructor' ? INSTRUCTOR_COUNTRIES : STUDENT_COUNTRIES
 
   return (
     <div
@@ -185,7 +221,7 @@ function OnboardingContent() {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
 
-          {/* Role toggle — hidden if pre-assigned */}
+          {/* Role toggle */}
           {!isRoleLocked && (
             <div>
               <p style={sectionLabel}>Account Type</p>
@@ -229,59 +265,65 @@ function OnboardingContent() {
             </div>
           )}
 
-          {/* ── STUDENT FIELDS ── */}
+          {/* Country */}
+          <div>
+            <p style={sectionLabel}>Location</p>
+            <label style={labelStyle}>Country</label>
+            {role === 'instructor' ? (
+              <>
+                <div style={{ ...inputStyle, display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'default' }}>
+                  <span>🇺🇸</span>
+                  <span>United States</span>
+                </div>
+                <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                  Instructors must be based in the US and hold a US bank account to receive payouts via Stripe.
+                </p>
+              </>
+            ) : (
+              <>
+                <select
+                  required
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  style={inputStyle}
+                >
+                  <option value="">Select your country</option>
+                  {countryOptions.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                  SciQuest Learning is available in the US, Canada, Mexico, Philippines, Caribbean, China, South Korea, and Europe.
+                </p>
+              </>
+            )}
+          </div>
+
+          {/* STUDENT FIELDS */}
           {role === 'student' && (
             <>
               <div>
                 <p style={sectionLabel}>Personal Information</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  {/* Name row */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
                       <label style={labelStyle}>First Name</label>
-                      <input
-                        required
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="e.g. Sarah"
-                        style={inputStyle}
-                      />
+                      <input required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. Sarah" style={inputStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>Last Name</label>
-                      <input
-                        required
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        placeholder="e.g. Johnson"
-                        style={inputStyle}
-                      />
+                      <input required value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="e.g. Johnson" style={inputStyle} />
                     </div>
                   </div>
 
-                  {/* Age + Gender row */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
                       <label style={labelStyle}>Age</label>
-                      <input
-                        required
-                        type="number"
-                        min="10"
-                        max="20"
-                        value={age}
-                        onChange={(e) => setAge(e.target.value)}
-                        placeholder="e.g. 14"
-                        style={inputStyle}
-                      />
+                      <input required type="number" min="10" max="20" value={age} onChange={(e) => setAge(e.target.value)} placeholder="e.g. 14" style={inputStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>Gender</label>
-                      <select
-                        required
-                        value={gender}
-                        onChange={(e) => setGender(e.target.value)}
-                        style={inputStyle}
-                      >
+                      <select required value={gender} onChange={(e) => setGender(e.target.value)} style={inputStyle}>
                         <option value="">Select gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
@@ -291,27 +333,14 @@ function OnboardingContent() {
                     </div>
                   </div>
 
-                  {/* Parents row */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
                       <label style={labelStyle}>Father's Name</label>
-                      <input
-                        required
-                        value={fathersName}
-                        onChange={(e) => setFathersName(e.target.value)}
-                        placeholder="e.g. Robert Johnson"
-                        style={inputStyle}
-                      />
+                      <input required value={fathersName} onChange={(e) => setFathersName(e.target.value)} placeholder="e.g. Robert Johnson" style={inputStyle} />
                     </div>
                     <div>
                       <label style={labelStyle}>Mother's Name</label>
-                      <input
-                        required
-                        value={mothersName}
-                        onChange={(e) => setMothersName(e.target.value)}
-                        placeholder="e.g. Linda Johnson"
-                        style={inputStyle}
-                      />
+                      <input required value={mothersName} onChange={(e) => setMothersName(e.target.value)} placeholder="e.g. Linda Johnson" style={inputStyle} />
                     </div>
                   </div>
                 </div>
@@ -319,7 +348,7 @@ function OnboardingContent() {
             </>
           )}
 
-          {/* ── INSTRUCTOR FIELDS ── */}
+          {/* INSTRUCTOR FIELDS */}
           {role === 'instructor' && (
             <div>
               <p style={sectionLabel}>Professional Background</p>
@@ -335,7 +364,7 @@ function OnboardingContent() {
             </div>
           )}
 
-          {/* ── SHARED: Timezone ── */}
+          {/* Timezone */}
           <div>
             <p style={sectionLabel}>Preferences</p>
             <label style={labelStyle}>Your Timezone</label>
@@ -344,7 +373,7 @@ function OnboardingContent() {
             </select>
           </div>
 
-          {/* ── SHARED: Subject interests ── */}
+          {/* Subject interests */}
           <div>
             <label style={labelStyle}>
               {role === 'instructor' ? 'Subjects You Teach' : 'Subjects of Interest'}
