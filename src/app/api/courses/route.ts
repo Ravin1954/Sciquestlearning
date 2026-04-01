@@ -43,7 +43,6 @@ export async function POST(req: Request) {
     sessionDurationMins,
     feeUsd,
     contentUrl,
-    meetingUrl,
   } = body
 
   const course = await prisma.course.create({
@@ -59,7 +58,6 @@ export async function POST(req: Request) {
       sessionDurationMins: sessionDurationMins ? parseInt(sessionDurationMins) : 0,
       feeUsd: parseFloat(feeUsd),
       contentUrl: contentUrl || null,
-      zoomJoinUrl: meetingUrl || null,
       status: 'PENDING',
     },
   })

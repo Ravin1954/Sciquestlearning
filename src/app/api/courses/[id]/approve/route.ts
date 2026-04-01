@@ -2,6 +2,7 @@ import { auth, currentUser } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { sendCourseApprovalEmail } from '@/lib/resend'
+import { createGoogleMeetSpace } from '@/lib/google-meet'
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { userId } = await auth()
@@ -20,9 +21,24 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   if (!course) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
+  let meetingUrl = course.zoomJoinUrl || ''
+
+  // Auto-create a Google Meet space for live courses
+  if (course.courseType === 'LIVE') {
+    try {
+      meetingUrl = await createGoogleMeetSpace()
+    } catch (err) {
+      console.error('Failed to create Google Meet space:', err)
+      // Fall back to instructor-provided link if Meet API fails
+    }
+  }
+
   await prisma.course.update({
     where: { id },
-    data: { status: 'APPROVED' },
+    data: {
+      status: 'APPROVED',
+      ...(course.courseType === 'LIVE' && meetingUrl ? { zoomJoinUrl: meetingUrl } : {}),
+    },
   })
 
   await sendCourseApprovalEmail(course.instructor.email, course.title)
