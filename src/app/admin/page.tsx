@@ -19,8 +19,10 @@ interface Course {
   title: string
   subject: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  courseType: 'LIVE' | 'SELF_PACED'
   feeUsd: number
   durationWeeks: number
+  zoomJoinUrl: string | null
   createdAt: string
   instructor: { firstName: string; lastName: string; email: string }
   _count: { enrollments: number }
@@ -78,6 +80,7 @@ export default function AdminPage() {
   const [payoutLoading, setPayoutLoading] = useState<string | null>(null)
   const [payoutMsg, setPayoutMsg] = useState<{ id: string; success: boolean; text: string } | null>(null)
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
+  const [meetLoading, setMeetLoading] = useState<string | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -125,6 +128,14 @@ export default function AdminPage() {
       setPayoutMsg({ id: enrollmentId, success: false, text: 'Network error' })
     }
     setPayoutLoading(null)
+  }
+
+  const handleGenerateMeet = async (courseId: string) => {
+    setMeetLoading(courseId)
+    await fetch(`/api/admin/courses/${courseId}/generate-meet`, { method: 'POST' })
+    const updated = await fetch('/api/admin/courses').then((r) => r.json())
+    setCourses(Array.isArray(updated) ? updated : [])
+    setMeetLoading(null)
   }
 
   const pending = courses.filter((c) => c.status === 'PENDING')
@@ -206,6 +217,40 @@ export default function AdminPage() {
               </div>
             )}
           </div>
+
+          {/* Live Courses Missing Meet Link */}
+          {courses.filter((c) => c.status === 'APPROVED' && c.courseType === 'LIVE' && !c.zoomJoinUrl).length > 0 && (
+            <div style={{ marginBottom: '2.5rem' }}>
+              <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#e8edf5', marginBottom: '0.5rem' }}>
+                Missing Meet Links
+                <span style={{ backgroundColor: '#f87171', color: '#fff', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
+                  action needed
+                </span>
+              </h2>
+              <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                These approved live courses don&apos;t have a Google Meet link yet.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {courses.filter((c) => c.status === 'APPROVED' && c.courseType === 'LIVE' && !c.zoomJoinUrl).map((course) => (
+                  <div key={course.id} style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div>
+                      <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{course.title}</p>
+                      <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                        by {course.instructor.firstName} {course.instructor.lastName} · {course._count.enrollments} enrolled
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleGenerateMeet(course.id)}
+                      disabled={meetLoading === course.id}
+                      style={{ ...S.btn('#0B1A2E', '#00C2A8'), opacity: meetLoading === course.id ? 0.5 : 1 }}
+                    >
+                      {meetLoading === course.id ? 'Generating...' : 'Generate Meet Link'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Instructor Payouts */}
           <div style={{ marginBottom: '2.5rem' }}>

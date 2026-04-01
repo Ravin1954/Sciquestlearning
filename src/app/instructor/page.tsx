@@ -40,6 +40,8 @@ export default function InstructorPage() {
   const [hasStripe, setHasStripe] = useState(false)
   const [stripeLoading, setStripeLoading] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -59,6 +61,20 @@ export default function InstructorPage() {
     const { url } = await res.json()
     if (url) window.location.href = url
     setStripeLoading(false)
+  }
+
+  const handleDelete = async (courseId: string) => {
+    if (!confirm('Are you sure you want to delete this course? This cannot be undone.')) return
+    setDeleteLoading(courseId)
+    setDeleteError(null)
+    const res = await fetch(`/api/instructor/courses/${courseId}`, { method: 'DELETE' })
+    if (res.ok) {
+      setCourses((prev) => prev.filter((c) => c.id !== courseId))
+    } else {
+      const d = await res.json()
+      setDeleteError(d.error || 'Failed to delete')
+    }
+    setDeleteLoading(null)
   }
 
   const approved = courses.filter((c) => c.status === 'APPROVED')
@@ -146,6 +162,9 @@ export default function InstructorPage() {
           {/* All Courses */}
           <div>
             <h2 style={S.h2}>All Courses</h2>
+            {deleteError && (
+              <p style={{ color: '#f87171', backgroundColor: '#3d0f0f', padding: '0.75rem', borderRadius: '8px', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{deleteError}</p>
+            )}
             {courses.length === 0 ? (
               <div style={{ ...S.card, textAlign: 'center', color: '#6b88a8', padding: '3rem' }}>
                 No courses yet.{' '}
@@ -161,7 +180,18 @@ export default function InstructorPage() {
                         {c.subject.replace('_', ' ')} · {c.durationWeeks} weeks · ${Number(c.feeUsd).toFixed(2)} · {c._count.enrollments} enrolled
                       </p>
                     </div>
-                    <StatusBadge status={c.status} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <StatusBadge status={c.status} />
+                      {c._count.enrollments === 0 && (
+                        <button
+                          onClick={() => handleDelete(c.id)}
+                          disabled={deleteLoading === c.id}
+                          style={{ backgroundColor: 'transparent', color: '#f87171', border: '1px solid #f87171', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', opacity: deleteLoading === c.id ? 0.5 : 1 }}
+                        >
+                          {deleteLoading === c.id ? '...' : 'Delete'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
