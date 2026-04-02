@@ -7,11 +7,13 @@ export async function GET(req: Request) {
   const subject = searchParams.get('subject')
   const duration = searchParams.get('duration')
   const courseType = searchParams.get('courseType')
+  const gradeLevel = searchParams.get('gradeLevel')
 
   const where: Record<string, unknown> = { status: 'APPROVED' }
   if (subject) where.subject = subject
   if (duration) where.durationWeeks = parseInt(duration)
   if (courseType) where.courseType = courseType
+  if (gradeLevel) where.gradeLevel = gradeLevel
 
   const courses = await prisma.course.findMany({
     where,
@@ -37,6 +39,7 @@ export async function POST(req: Request) {
     description,
     subject,
     courseType = 'LIVE',
+    gradeLevel,
     durationWeeks,
     daysOfWeek,
     startTimeUtc,
@@ -52,6 +55,7 @@ export async function POST(req: Request) {
       description,
       subject,
       courseType,
+      gradeLevel: gradeLevel || '',
       durationWeeks: durationWeeks ? parseInt(durationWeeks) : 0,
       daysOfWeek: daysOfWeek || [],
       startTimeUtc: startTimeUtc || '',

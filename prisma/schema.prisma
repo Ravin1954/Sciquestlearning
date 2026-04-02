@@ -43,6 +43,7 @@ model Course {
   sessionDurationMins Int          @default(0)
   feeUsd              Decimal      @db.Decimal(10, 2)
   contentUrl          String?
+  gradeLevel          String       @default("")
   status              CourseStatus @default(PENDING)
   zoomMeetingId       String?
   zoomJoinUrl         String?

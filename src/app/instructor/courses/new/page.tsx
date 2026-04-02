@@ -11,6 +11,13 @@ const SUBJECTS = [
   { value: 'CHEMISTRY', label: 'Chemistry' },
   { value: 'MATHEMATICS', label: 'Mathematics' },
 ]
+
+const GRADE_LEVELS: Record<string, string[]> = {
+  BIOLOGY: ['9th Grade', '10th Grade'],
+  PHYSICAL_SCIENCE: ['8th Grade'],
+  CHEMISTRY: ['10th Grade'],
+  MATHEMATICS: ['8th Grade', '9th Grade', '10th Grade', '11th Grade', '12th Grade'],
+}
 const TIMEZONES = [
   'UTC',
   'America/New_York',
@@ -81,6 +88,7 @@ export default function NewCoursePage() {
     title: '',
     description: '',
     subject: 'BIOLOGY',
+    gradeLevel: '9th Grade',
     durationWeeks: '',
     sessionDurationMins: '',
     feeUsd: '',
@@ -120,6 +128,7 @@ export default function NewCoursePage() {
       body: JSON.stringify({
         ...form,
         courseType,
+        gradeLevel: form.gradeLevel,
         daysOfWeek: courseType === 'LIVE' ? selectedDays : [],
         startTimeUtc,
       }),
@@ -201,16 +210,36 @@ export default function NewCoursePage() {
             />
           </div>
 
-          {/* Subject + Duration */}
+          {/* Subject + Grade Level */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
               <label style={labelStyle}>Subject</label>
-              <select value={form.subject} onChange={set('subject')} style={inputStyle}>
+              <select
+                value={form.subject}
+                onChange={(e) => {
+                  const newSubject = e.target.value
+                  const grades = GRADE_LEVELS[newSubject] || []
+                  setForm((f) => ({ ...f, subject: newSubject, gradeLevel: grades[0] || '' }))
+                }}
+                style={inputStyle}
+              >
                 {SUBJECTS.map((s) => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
               </select>
             </div>
+            <div>
+              <label style={labelStyle}>Grade Level</label>
+              <select value={form.gradeLevel} onChange={set('gradeLevel')} style={inputStyle}>
+                {(GRADE_LEVELS[form.subject] || []).map((g) => (
+                  <option key={g} value={g}>{g}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Duration */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
               <label style={labelStyle}>Duration (weeks)</label>
               <input

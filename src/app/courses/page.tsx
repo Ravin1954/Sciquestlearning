@@ -10,6 +10,7 @@ interface Course {
   description?: string
   subject: string
   courseType: string
+  gradeLevel?: string
   durationWeeks: number
   daysOfWeek: string[]
   startTimeUtc: string
@@ -41,17 +42,28 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'LIVE' | 'SELF_PACED'>('LIVE')
   const [subject, setSubject] = useState('')
+  const [gradeLevel, setGradeLevel] = useState('')
   const [search, setSearch] = useState('')
+
+  const GRADE_OPTIONS = [
+    { value: '', label: 'All Grades' },
+    { value: '8th Grade', label: '8th Grade' },
+    { value: '9th Grade', label: '9th Grade' },
+    { value: '10th Grade', label: '10th Grade' },
+    { value: '11th Grade', label: '11th Grade' },
+    { value: '12th Grade', label: '12th Grade' },
+  ]
 
   useEffect(() => {
     const params = new URLSearchParams()
     if (subject) params.set('subject', subject)
+    if (gradeLevel) params.set('gradeLevel', gradeLevel)
     params.set('courseType', activeTab)
     setLoading(true)
     fetch(`/api/courses?${params}`)
       .then((r) => r.json())
       .then((data) => { setCourses(data); setLoading(false) })
-  }, [subject, activeTab])
+  }, [subject, gradeLevel, activeTab])
 
   const filtered = courses.filter((c) =>
     !search || c.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -108,6 +120,9 @@ export default function CoursesPage() {
           />
           <select value={subject} onChange={(e) => setSubject(e.target.value)} style={filterStyle}>
             {SUBJECTS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
+          <select value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)} style={filterStyle}>
+            {GRADE_OPTIONS.map((g) => <option key={g.value} value={g.value}>{g.label}</option>)}
           </select>
         </div>
 

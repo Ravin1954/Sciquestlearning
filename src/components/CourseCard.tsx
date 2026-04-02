@@ -8,6 +8,7 @@ interface CourseCardProps {
     description?: string
     subject: string
     courseType?: string
+    gradeLevel?: string
     durationWeeks: number
     daysOfWeek: string[]
     startTimeUtc: string
@@ -81,6 +82,20 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
           >
             {isSelfPaced ? 'Self-Paced' : 'Live'}
           </span>
+          {course.gradeLevel && (
+            <span
+              style={{
+                backgroundColor: '#1a2d4a',
+                color: '#F5C842',
+                padding: '2px 8px',
+                borderRadius: '9999px',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+              }}
+            >
+              {course.gradeLevel}
+            </span>
+          )}
         </div>
         {showStatus && course.status && <StatusBadge status={course.status} />}
       </div>
