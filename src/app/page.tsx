@@ -31,7 +31,7 @@ const subjects = [
 const features = [
   {
     icon: '🎥',
-    title: 'Live Zoom Sessions',
+    title: 'Live Google Meet Sessions',
     description: 'Real-time interactive classes with verified educators. Ask questions, get answers instantly.',
   },
   {
@@ -116,7 +116,7 @@ export default function HomePage() {
               margin: '0 auto 2.5rem',
             }}
           >
-            Connect with verified science educators for live, interactive Zoom sessions.
+            Connect with verified science educators for live, interactive Google Meet sessions.
             Biology, Chemistry, Physical Science, and Mathematics — tailored for grades 6–12.
           </p>
 
@@ -255,7 +255,7 @@ export default function HomePage() {
                 I&apos;m a Student
               </h3>
               <p style={{ color: '#6b88a8', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '2rem' }}>
-                Browse courses from verified instructors, enroll, and join live Zoom sessions.
+                Browse courses from verified instructors, enroll, and join live Google Meet sessions.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <Link href="/sign-up/student" style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.875rem', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', display: 'block' }}>
