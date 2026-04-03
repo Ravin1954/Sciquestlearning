@@ -46,6 +46,8 @@ export async function POST(req: Request) {
     sessionDurationMins,
     feeUsd,
     contentUrl,
+    topics,
+    scheduleJson,
   } = body
 
   const course = await prisma.course.create({
@@ -62,6 +64,8 @@ export async function POST(req: Request) {
       sessionDurationMins: sessionDurationMins ? parseInt(sessionDurationMins) : 0,
       feeUsd: parseFloat(feeUsd),
       contentUrl: contentUrl || null,
+      topics: Array.isArray(topics) ? topics : [],
+      scheduleJson: scheduleJson || '',
       status: 'PENDING',
     },
   })

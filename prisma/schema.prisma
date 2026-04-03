@@ -44,6 +44,8 @@ model Course {
   feeUsd              Decimal      @db.Decimal(10, 2)
   contentUrl          String?
   gradeLevel          String       @default("")
+  topics              String[]     @default([])
+  scheduleJson        String       @default("")
   status              CourseStatus @default(PENDING)
   zoomMeetingId       String?
   zoomJoinUrl         String?

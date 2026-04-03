@@ -18,6 +18,7 @@ const GRADE_LEVELS: Record<string, string[]> = {
   CHEMISTRY: ['10th Grade'],
   MATHEMATICS: ['8th Grade', '9th Grade', '10th Grade', '11th Grade', '12th Grade'],
 }
+
 const TIMEZONES = [
   'UTC',
   'America/New_York',
@@ -57,6 +58,14 @@ function localTimeToUtc(localTime: string, timezone: string): string {
   return `${String(utcDate.getUTCHours()).padStart(2, '0')}:${String(utcDate.getUTCMinutes()).padStart(2, '0')}`
 }
 
+function formatTime12h(time24: string): string {
+  if (!time24) return ''
+  const [h, m] = time24.split(':').map(Number)
+  const period = h >= 12 ? 'PM' : 'AM'
+  const h12 = h % 12 === 0 ? 12 : h % 12
+  return `${h12}:${String(m).padStart(2, '0')} ${period}`
+}
+
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.75rem',
@@ -83,7 +92,12 @@ export default function NewCoursePage() {
   const [courseType, setCourseType] = useState<'LIVE' | 'SELF_PACED'>('LIVE')
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [timezone, setTimezone] = useState('America/New_York')
-  const [localTime, setLocalTime] = useState('')
+  // Per-day local times: { Monday: '09:00', Wednesday: '14:00' }
+  const [dayTimes, setDayTimes] = useState<Record<string, string>>({})
+  // Topics
+  const [topics, setTopics] = useState<string[]>([])
+  const [topicInput, setTopicInput] = useState('')
+
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -95,23 +109,48 @@ export default function NewCoursePage() {
     contentUrl: '',
   })
 
-  const toggleDay = (day: string) =>
-    setSelectedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    )
+  const toggleDay = (day: string) => {
+    setSelectedDays((prev) => {
+      if (prev.includes(day)) {
+        setDayTimes((dt) => { const next = { ...dt }; delete next[day]; return next })
+        return prev.filter((d) => d !== day)
+      } else {
+        setDayTimes((dt) => ({ ...dt, [day]: '' }))
+        return [...prev, day]
+      }
+    })
+  }
 
   const set =
     (key: string) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm((f) => ({ ...f, [key]: e.target.value }))
 
-  const utcPreview = localTime ? localTimeToUtc(localTime, timezone) : null
+  const addTopic = () => {
+    const t = topicInput.trim()
+    if (t && !topics.includes(t)) {
+      setTopics((prev) => [...prev, t])
+      setTopicInput('')
+    }
+  }
+
+  const removeTopic = (t: string) => setTopics((prev) => prev.filter((x) => x !== t))
+
+  // Build schedule for submission and display
+  const buildSchedule = () =>
+    DAYS.filter((d) => selectedDays.includes(d)).map((day) => ({
+      day,
+      localTime: dayTimes[day] || '',
+      utcTime: localTimeToUtc(dayTimes[day] || '', timezone),
+    }))
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     if (courseType === 'LIVE') {
-      if (selectedDays.length === 0) { setError('Select at least one day.'); return }
-      if (!localTime) { setError('Please set a class start time.'); return }
+      if (selectedDays.length === 0) { setError('Select at least one class day.'); return }
+      const missingTime = selectedDays.find((d) => !dayTimes[d])
+      if (missingTime) { setError(`Please set a start time for ${missingTime}.`); return }
     }
     if (courseType === 'SELF_PACED' && !form.contentUrl) {
       setError('Please provide a content URL for the self-paced course.'); return
@@ -120,7 +159,10 @@ export default function NewCoursePage() {
     setLoading(true)
     setError('')
 
-    const startTimeUtc = courseType === 'LIVE' ? localTimeToUtc(localTime, timezone) : ''
+    const schedule = buildSchedule()
+    // Use first day's UTC time as startTimeUtc for reminder cron compatibility
+    const startTimeUtc = schedule.length > 0 ? schedule[0].utcTime : ''
+    const scheduleJson = courseType === 'LIVE' ? JSON.stringify(schedule) : ''
 
     const res = await fetch('/api/courses', {
       method: 'POST',
@@ -131,6 +173,8 @@ export default function NewCoursePage() {
         gradeLevel: form.gradeLevel,
         daysOfWeek: courseType === 'LIVE' ? selectedDays : [],
         startTimeUtc,
+        topics,
+        scheduleJson,
       }),
     })
 
@@ -160,7 +204,7 @@ export default function NewCoursePage() {
             <label style={labelStyle}>Course Type</label>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               {[
-                { value: 'LIVE', label: 'Live Class', desc: 'Scheduled sessions with students via Zoom' },
+                { value: 'LIVE', label: 'Live Class', desc: 'Scheduled sessions with students via Google Meet' },
                 { value: 'SELF_PACED', label: 'Self-Paced', desc: 'Students learn at their own time via your content link' },
               ].map((opt) => (
                 <button
@@ -208,6 +252,69 @@ export default function NewCoursePage() {
               placeholder="Describe what students will learn, prerequisites, and course structure..."
               style={{ ...inputStyle, resize: 'vertical' }}
             />
+          </div>
+
+          {/* Topics */}
+          <div>
+            <label style={labelStyle}>Topics Covered</label>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <input
+                value={topicInput}
+                onChange={(e) => setTopicInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTopic() } }}
+                placeholder="e.g. Cell Division, Genetics, DNA Replication..."
+                style={{ ...inputStyle, flex: 1 }}
+              />
+              <button
+                type="button"
+                onClick={addTopic}
+                style={{
+                  padding: '0.75rem 1.25rem',
+                  borderRadius: '8px',
+                  backgroundColor: '#003d35',
+                  border: '1px solid #00C2A8',
+                  color: '#00C2A8',
+                  fontWeight: 700,
+                  fontSize: '0.875rem',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                + Add
+              </button>
+            </div>
+            {topics.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                {topics.map((t) => (
+                  <span
+                    key={t}
+                    style={{
+                      backgroundColor: '#0a2240',
+                      border: '1px solid #1e3a5f',
+                      borderRadius: '6px',
+                      padding: '0.3rem 0.65rem',
+                      fontSize: '0.8rem',
+                      color: '#a8c4e0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
+                    {t}
+                    <button
+                      type="button"
+                      onClick={() => removeTopic(t)}
+                      style={{ background: 'none', border: 'none', color: '#6b88a8', cursor: 'pointer', padding: 0, fontSize: '0.9rem', lineHeight: 1 }}
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+              Add each topic and press Enter or click + Add. Students will see this list before enrolling.
+            </p>
           </div>
 
           {/* Subject + Grade Level */}
@@ -258,8 +365,23 @@ export default function NewCoursePage() {
           {/* LIVE-only fields */}
           {courseType === 'LIVE' && (
             <>
+              {/* Class Days */}
               <div>
-                <label style={labelStyle}>Class Days</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <label style={{ ...labelStyle, marginBottom: 0 }}>Class Days</label>
+                  {selectedDays.length > 0 && (
+                    <span style={{
+                      backgroundColor: '#1a2d4a',
+                      color: '#F5C842',
+                      padding: '0.2rem 0.6rem',
+                      borderRadius: '5px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                    }}>
+                      {selectedDays.length} meeting{selectedDays.length !== 1 ? 's' : ''} per week
+                    </span>
+                  )}
+                </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {DAYS.map((day) => (
                     <button
@@ -283,36 +405,63 @@ export default function NewCoursePage() {
                 </div>
               </div>
 
-              <div>
-                <label style={labelStyle}>Class Start Time</label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <div>
-                    <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Your timezone</p>
-                    <select value={timezone} onChange={(e) => setTimezone(e.target.value)} style={inputStyle}>
-                      {TIMEZONES.map((tz) => (
-                        <option key={tz} value={tz}>{tz}</option>
-                      ))}
-                    </select>
+              {/* Per-day start times */}
+              {selectedDays.length > 0 && (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <label style={{ ...labelStyle, marginBottom: 0 }}>Class Start Times</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ color: '#6b88a8', fontSize: '0.75rem' }}>Timezone:</span>
+                      <select
+                        value={timezone}
+                        onChange={(e) => setTimezone(e.target.value)}
+                        style={{ ...inputStyle, width: 'auto', padding: '0.375rem 0.625rem', fontSize: '0.8rem' }}
+                      >
+                        {TIMEZONES.map((tz) => (
+                          <option key={tz} value={tz}>{tz}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                  <div>
-                    <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Local start time</p>
-                    <input
-                      required
-                      type="time"
-                      value={localTime}
-                      onChange={(e) => setLocalTime(e.target.value)}
-                      style={inputStyle}
-                    />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+                    {DAYS.filter((d) => selectedDays.includes(d)).map((day) => {
+                      const localT = dayTimes[day] || ''
+                      const utcT = localT ? localTimeToUtc(localT, timezone) : ''
+                      return (
+                        <div
+                          key={day}
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: '120px 1fr auto',
+                            gap: '0.75rem',
+                            alignItems: 'center',
+                            backgroundColor: '#060f1a',
+                            border: '1px solid #1e3a5f',
+                            borderRadius: '8px',
+                            padding: '0.625rem 0.875rem',
+                          }}
+                        >
+                          <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 600 }}>{day}</span>
+                          <input
+                            type="time"
+                            value={localT}
+                            onChange={(e) => setDayTimes((dt) => ({ ...dt, [day]: e.target.value }))}
+                            style={{ ...inputStyle, padding: '0.4rem 0.625rem' }}
+                          />
+                          {utcT && (
+                            <span style={{ color: '#6b88a8', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
+                              UTC {utcT}
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
+                  <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                    Set a different start time for each day. Times are stored in UTC and shown to students in their local timezone.
+                  </p>
                 </div>
-                {utcPreview && (
-                  <div style={{ marginTop: '0.625rem', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.625rem 0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ color: '#00C2A8', fontSize: '0.75rem', fontWeight: 700 }}>UTC</span>
-                    <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 600 }}>{utcPreview}</span>
-                    <span style={{ color: '#6b88a8', fontSize: '0.75rem' }}>— stored as UTC, displayed in each student&apos;s local timezone</span>
-                  </div>
-                )}
-              </div>
+              )}
 
               <div>
                 <label style={labelStyle}>Session Duration (minutes)</label>

@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@clerk/nextjs'
 import NavBar from '@/components/NavBar'
 
+interface ScheduleEntry { day: string; utcTime: string }
+
 interface Course {
   id: string
   title: string
@@ -13,8 +15,10 @@ interface Course {
   durationWeeks: number
   daysOfWeek: string[]
   startTimeUtc: string
+  scheduleJson: string
   sessionDurationMins: number
   feeUsd: number
+  topics: string[]
   status: string
   instructor: { firstName: string; lastName: string; qualifications?: string }
 }
@@ -112,6 +116,13 @@ export default function CourseDetailPage() {
   const color = subjectColors[course.subject] || '#00C2A8'
   const instructorPayout = (Number(course.feeUsd) * 0.8).toFixed(2)
 
+  let schedule: ScheduleEntry[] = []
+  try {
+    if (course.scheduleJson) schedule = JSON.parse(course.scheduleJson)
+  } catch { /* ignore */ }
+
+  const hasPerDaySchedule = schedule.length > 0
+
   return (
     <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
       {jsonLd && (
@@ -142,20 +153,68 @@ export default function CourseDetailPage() {
               <p style={{ color: '#a8c4e0', lineHeight: 1.7 }}>{course.description}</p>
             </div>
 
+            {course.topics && course.topics.length > 0 && (
+              <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+                <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>Topics Covered</h2>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                  {course.topics.map((topic) => (
+                    <span
+                      key={topic}
+                      style={{
+                        backgroundColor: '#0a2240',
+                        border: '1px solid #1e3a5f',
+                        borderRadius: '6px',
+                        padding: '0.3rem 0.7rem',
+                        fontSize: '0.8rem',
+                        color: '#a8c4e0',
+                      }}
+                    >
+                      {topic}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
               <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>Schedule</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {[
-                  { label: 'Days', value: course.daysOfWeek.join(', ') },
-                  { label: 'Time', value: `${course.startTimeUtc} UTC` },
-                  { label: 'Session Length', value: `${course.sessionDurationMins} minutes` },
-                  { label: 'Duration', value: `${course.durationWeeks} weeks` },
-                ].map((item) => (
-                  <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>{item.label}</span>
-                    <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>{item.value}</span>
-                  </div>
-                ))}
+                {hasPerDaySchedule ? (
+                  <>
+                    {schedule.map((entry) => (
+                      <div key={entry.day} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>{entry.day}</span>
+                        <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>{entry.utcTime} UTC</span>
+                      </div>
+                    ))}
+                    <div style={{ borderTop: '1px solid #1e3a5f', marginTop: '0.25rem', paddingTop: '0.5rem', display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Session Length</span>
+                      <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>{course.sessionDurationMins} minutes</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Duration</span>
+                      <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>{course.durationWeeks} weeks</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Meetings per week</span>
+                      <span style={{ color: '#F5C842', fontSize: '0.875rem', fontWeight: 600 }}>{schedule.length} session{schedule.length !== 1 ? 's' : ''}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {[
+                      { label: 'Days', value: course.daysOfWeek.join(', ') },
+                      { label: 'Time', value: `${course.startTimeUtc} UTC` },
+                      { label: 'Session Length', value: `${course.sessionDurationMins} minutes` },
+                      { label: 'Duration', value: `${course.durationWeeks} weeks` },
+                    ].map((item) => (
+                      <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>{item.label}</span>
+                        <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>{item.value}</span>
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
 
