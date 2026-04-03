@@ -66,6 +66,31 @@ export default function CourseDetailPage() {
     }
   }
 
+  const jsonLd = course ? {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: course.title,
+    description: course.description,
+    provider: {
+      '@type': 'Organization',
+      name: 'SciQuest Learning',
+      url: 'https://sciquestlearning.com',
+    },
+    instructor: {
+      '@type': 'Person',
+      name: `${course.instructor.firstName} ${course.instructor.lastName}`,
+    },
+    offers: {
+      '@type': 'Offer',
+      price: Number(course.feeUsd).toFixed(2),
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url: `https://sciquestlearning.com/courses/${course.id}`,
+    },
+    educationalLevel: 'Middle School, High School',
+    inLanguage: 'en',
+  } : null
+
   if (loading) {
     return (
       <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
@@ -89,6 +114,12 @@ export default function CourseDetailPage() {
 
   return (
     <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <NavBar />
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '3rem 1.5rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2rem', alignItems: 'start' }}>
@@ -202,7 +233,7 @@ export default function CourseDetailPage() {
               </p>
 
               <div style={{ borderTop: '1px solid #1e3a5f', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {['Live Zoom sessions', 'Email reminders 20 min before class', 'Direct access to your instructor', 'Zoom join link sent on enrollment'].map((benefit) => (
+                {['Live Google Meet sessions', 'Email reminders 20 min before class', 'Direct access to your instructor', 'Google Meet link sent on enrollment'].map((benefit) => (
                   <div key={benefit} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
                     <span style={{ color: '#00C2A8', fontWeight: 700, flexShrink: 0 }}>✓</span>
                     <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>{benefit}</span>
