@@ -24,20 +24,11 @@ export const metadata: Metadata = {
     siteName: 'SciQuest Learning',
     title: 'SciQuest Learning — Live Science & Math Classes for Grades 8–12',
     description: 'Live, interactive Google Meet science and math classes taught by verified educators. Biology, Chemistry, Physical Science, Mathematics — tailored for middle and high school students.',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'SciQuest Learning — Live Science & Math Classes',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SciQuest Learning — Live Science & Math Classes',
     description: 'Live Google Meet science and math classes for grades 8–12. Biology, Chemistry, Physical Science, Mathematics.',
-    images: ['/og-image.png'],
   },
   robots: {
     index: true,
