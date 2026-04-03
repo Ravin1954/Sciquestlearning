@@ -2,6 +2,8 @@ import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
+export const maxDuration = 30
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const subject = searchParams.get('subject')
