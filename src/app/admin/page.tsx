@@ -77,6 +77,8 @@ export default function AdminPage() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [rejectingId, setRejectingId] = useState<string | null>(null)
+  const [rejectRemark, setRejectRemark] = useState('')
   const [payoutLoading, setPayoutLoading] = useState<string | null>(null)
   const [payoutMsg, setPayoutMsg] = useState<{ id: string; success: boolean; text: string } | null>(null)
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
@@ -97,14 +99,20 @@ export default function AdminPage() {
     })
   }, [])
 
-  const handleAction = async (courseId: string, action: 'approve' | 'reject') => {
+  const handleAction = async (courseId: string, action: 'approve' | 'reject', remark?: string) => {
     setActionLoading(courseId + action)
-    await fetch(`/api/courses/${courseId}/${action}`, { method: 'POST' })
+    await fetch(`/api/courses/${courseId}/${action}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ remark }),
+    })
     const updated = await fetch('/api/admin/courses').then((r) => r.json())
     setCourses(updated)
     const m = await fetch('/api/admin/metrics').then((r) => r.json())
     setMetrics(m)
     setActionLoading(null)
+    setRejectingId(null)
+    setRejectRemark('')
   }
 
   const handlePayout = async (enrollmentId: string) => {
@@ -186,32 +194,61 @@ export default function AdminPage() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {pending.map((course) => (
-                  <div key={course.id} style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div>
-                      <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{course.title}</p>
-                      <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
-                        {course.subject.replace('_', ' ')} · {course.durationWeeks} weeks · ${Number(course.feeUsd).toFixed(2)}
-                      </p>
-                      <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
-                        by {course.instructor.firstName} {course.instructor.lastName} ({course.instructor.email})
-                      </p>
+                  <div key={course.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                      <div>
+                        <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{course.title}</p>
+                        <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                          {course.subject.replace('_', ' ')} · {course.durationWeeks} weeks · ${Number(course.feeUsd).toFixed(2)}
+                        </p>
+                        <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                          by {course.instructor.firstName} {course.instructor.lastName} ({course.instructor.email})
+                        </p>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          onClick={() => handleAction(course.id, 'approve')}
+                          disabled={actionLoading === course.id + 'approve'}
+                          style={S.btn('#0B1A2E', '#00C2A8')}
+                        >
+                          {actionLoading === course.id + 'approve' ? '...' : 'Approve'}
+                        </button>
+                        <button
+                          onClick={() => { setRejectingId(course.id); setRejectRemark('') }}
+                          disabled={actionLoading === course.id + 'reject'}
+                          style={S.btn('#e8edf5', '#7f1d1d')}
+                        >
+                          Reject
+                        </button>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button
-                        onClick={() => handleAction(course.id, 'approve')}
-                        disabled={actionLoading === course.id + 'approve'}
-                        style={S.btn('#0B1A2E', '#00C2A8')}
-                      >
-                        {actionLoading === course.id + 'approve' ? '...' : 'Approve'}
-                      </button>
-                      <button
-                        onClick={() => handleAction(course.id, 'reject')}
-                        disabled={actionLoading === course.id + 'reject'}
-                        style={S.btn('#e8edf5', '#7f1d1d')}
-                      >
-                        {actionLoading === course.id + 'reject' ? '...' : 'Reject'}
-                      </button>
-                    </div>
+                    {rejectingId === course.id && (
+                      <div style={{ borderTop: '1px solid #1e3a5f', paddingTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <p style={{ color: '#f87171', fontSize: '0.8rem', fontWeight: 600 }}>Add remarks for the instructor:</p>
+                        <textarea
+                          value={rejectRemark}
+                          onChange={(e) => setRejectRemark(e.target.value)}
+                          rows={3}
+                          placeholder="Explain what needs to be changed before resubmitting..."
+                          style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #7f1d1d', color: '#e8edf5', fontSize: '0.8rem', resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                        />
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                          <button
+                            onClick={() => handleAction(course.id, 'reject', rejectRemark)}
+                            disabled={actionLoading === course.id + 'reject'}
+                            style={{ ...S.btn('#e8edf5', '#7f1d1d'), opacity: actionLoading === course.id + 'reject' ? 0.5 : 1 }}
+                          >
+                            {actionLoading === course.id + 'reject' ? '...' : 'Confirm Reject'}
+                          </button>
+                          <button
+                            onClick={() => { setRejectingId(null); setRejectRemark('') }}
+                            style={{ ...S.btn('#a8c4e0', 'transparent'), border: '1px solid #1e3a5f' }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

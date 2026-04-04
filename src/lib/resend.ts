@@ -11,12 +11,17 @@ export async function sendCourseApprovalEmail(instructorEmail: string, courseTit
   })
 }
 
-export async function sendCourseRejectionEmail(instructorEmail: string, courseTitle: string) {
+export async function sendCourseRejectionEmail(instructorEmail: string, courseTitle: string, remark?: string) {
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: instructorEmail,
     subject: `Update on your course "${courseTitle}"`,
-    html: `<h2>Course Not Approved</h2><p>Unfortunately, your course <strong>${courseTitle}</strong> was not approved at this time. Please contact support for more details.</p>`,
+    html: `
+      <h2>Course Not Approved</h2>
+      <p>Unfortunately, your course <strong>${courseTitle}</strong> was not approved at this time.</p>
+      ${remark ? `<p><strong>Reason:</strong> ${remark}</p>` : ''}
+      <p>Please log in to your instructor dashboard to edit your course and resubmit it for review.</p>
+    `,
   })
 }
 

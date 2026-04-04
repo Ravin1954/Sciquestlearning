@@ -47,6 +47,7 @@ model Course {
   topics              String[]     @default([])
   scheduleJson        String       @default("")
   status              CourseStatus @default(PENDING)
+  rejectionRemark     String?
   zoomMeetingId       String?
   zoomJoinUrl         String?
   zoomStartUrl        String?

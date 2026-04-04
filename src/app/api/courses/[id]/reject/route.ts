@@ -13,6 +13,9 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   }
 
   const { id } = await params
+  const body = await _req.json().catch(() => ({}))
+  const remark: string = body.remark || ''
+
   const course = await prisma.course.findUnique({
     where: { id },
     include: { instructor: true },
@@ -20,8 +23,8 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   if (!course) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-  await prisma.course.update({ where: { id }, data: { status: 'REJECTED' } })
-  await sendCourseRejectionEmail(course.instructor.email, course.title)
+  await prisma.course.update({ where: { id }, data: { status: 'REJECTED', rejectionRemark: remark || null } })
+  await sendCourseRejectionEmail(course.instructor.email, course.title, remark)
 
   return NextResponse.json({ success: true })
 }

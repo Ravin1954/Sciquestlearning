@@ -16,6 +16,7 @@ interface Course {
   startTimeUtc: string
   sessionDurationMins: number
   zoomJoinUrl?: string
+  rejectionRemark?: string | null
   _count: { enrollments: number }
 }
 
@@ -78,6 +79,7 @@ export default function InstructorPage() {
   }
 
   const approved = courses.filter((c) => c.status === 'APPROVED')
+  const rejected = courses.filter((c) => c.status === 'REJECTED')
 
   return (
     <DashboardLayout role="instructor">
@@ -152,6 +154,44 @@ export default function InstructorPage() {
                       </a>
                     ) : (
                       <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>No meeting link</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Rejected Courses */}
+          {rejected.length > 0 && (
+            <div style={{ marginBottom: '2.5rem' }}>
+              <h2 style={{ ...S.h2, color: '#f87171' }}>
+                Action Required
+                <span style={{ backgroundColor: '#f87171', color: '#fff', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
+                  {rejected.length} rejected
+                </span>
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {rejected.map((c) => (
+                  <div key={c.id} style={{ ...S.card, border: '1px solid #7f1d1d' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: c.rejectionRemark ? '0.75rem' : 0 }}>
+                      <div>
+                        <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
+                        <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                          {c.subject.replace('_', ' ')} · {c.durationWeeks} weeks · ${Number(c.feeUsd).toFixed(2)}
+                        </p>
+                      </div>
+                      <Link
+                        href={`/instructor/courses/${c.id}/edit`}
+                        style={{ backgroundColor: '#F5C842', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}
+                      >
+                        Edit &amp; Resubmit →
+                      </Link>
+                    </div>
+                    {c.rejectionRemark && (
+                      <div style={{ backgroundColor: '#3d0f0f', border: '1px solid #7f1d1d', borderRadius: '8px', padding: '0.75rem' }}>
+                        <p style={{ color: '#f87171', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Admin remarks</p>
+                        <p style={{ color: '#fca5a5', fontSize: '0.875rem', lineHeight: 1.6 }}>{c.rejectionRemark}</p>
+                      </div>
                     )}
                   </div>
                 ))}
