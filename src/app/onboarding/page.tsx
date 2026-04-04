@@ -167,8 +167,12 @@ function OnboardingContent() {
       })
 
       if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Failed to save profile')
+        let errorMsg = 'Failed to save profile'
+        try {
+          const data = await res.json()
+          errorMsg = data.error || errorMsg
+        } catch { /* response wasn't JSON */ }
+        throw new Error(errorMsg)
       }
 
       await user?.reload()

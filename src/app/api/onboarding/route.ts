@@ -28,6 +28,7 @@ const ALLOWED_STUDENT_COUNTRIES = new Set([
 const ALLOWED_INSTRUCTOR_COUNTRIES = new Set(['United States'])
 
 export async function POST(req: Request) {
+  try {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -102,4 +103,9 @@ export async function POST(req: Request) {
   })
 
   return NextResponse.json({ success: true })
+  } catch (err: unknown) {
+    console.error('[onboarding] unexpected error:', err)
+    const message = err instanceof Error ? err.message : 'Internal server error'
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }
