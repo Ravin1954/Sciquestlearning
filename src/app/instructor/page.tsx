@@ -58,10 +58,19 @@ export default function InstructorPage() {
 
   const handleStripeConnect = async () => {
     setStripeLoading(true)
-    const res = await fetch('/api/stripe/connect', { method: 'POST' })
-    const { url } = await res.json()
-    if (url) window.location.href = url
-    setStripeLoading(false)
+    try {
+      const res = await fetch('/api/stripe/connect', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        alert(data.error || 'Failed to create Stripe link. Please try again.')
+        setStripeLoading(false)
+      }
+    } catch {
+      alert('Something went wrong. Please try again.')
+      setStripeLoading(false)
+    }
   }
 
   const handleDelete = async (courseId: string) => {
