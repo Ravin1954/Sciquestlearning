@@ -55,7 +55,7 @@ interface Enrollment {
   course: {
     title: string
     subject: string
-    instructor: { firstName: string; lastName: string; stripeAccountId: string | null }
+    instructor: { firstName: string; lastName: string; bankInfo: string | null }
   }
 }
 
@@ -312,7 +312,7 @@ export default function AdminPage() {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid #1e3a5f' }}>
-                      {['Student', 'Course', 'Instructor', 'Paid', 'Payout (80%)', 'Stripe', 'Action'].map((h) => (
+                      {['Student', 'Course', 'Instructor', 'Paid', 'Payout (80%)', 'Bank Details', 'Action'].map((h) => (
                         <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
                       ))}
                     </tr>
@@ -326,9 +326,10 @@ export default function AdminPage() {
                         <td style={{ padding: '0.75rem 1rem', color: '#F5C842', fontSize: '0.8rem', fontWeight: 600 }}>${Number(e.amountPaidUsd).toFixed(2)}</td>
                         <td style={{ padding: '0.75rem 1rem', color: '#00C2A8', fontSize: '0.8rem', fontWeight: 600 }}>${Number(e.instructorPayoutUsd).toFixed(2)}</td>
                         <td style={{ padding: '0.75rem 1rem', fontSize: '0.75rem' }}>
-                          {e.course.instructor.stripeAccountId
-                            ? <span style={{ color: '#00C2A8' }}>Connected</span>
-                            : <span style={{ color: '#f87171' }}>Not connected</span>}
+                          {e.course.instructor.bankInfo ? (() => {
+                            const b = JSON.parse(e.course.instructor.bankInfo)
+                            return <span style={{ color: '#e8edf5' }}>{b.bankName} ****{b.accountNumber.slice(-4)}</span>
+                          })() : <span style={{ color: '#f87171' }}>Not added</span>}
                         </td>
                         <td style={{ padding: '0.75rem 1rem' }}>
                           {payoutMsg?.id === e.id ? (
@@ -336,14 +337,14 @@ export default function AdminPage() {
                           ) : (
                             <button
                               onClick={() => handlePayout(e.id)}
-                              disabled={payoutLoading === e.id || !e.course.instructor.stripeAccountId}
+                              disabled={payoutLoading === e.id || !e.course.instructor.bankInfo}
                               style={{
                                 ...S.btn('#0B1A2E', '#00C2A8'),
-                                opacity: (!e.course.instructor.stripeAccountId || payoutLoading === e.id) ? 0.4 : 1,
-                                cursor: !e.course.instructor.stripeAccountId ? 'not-allowed' : 'pointer',
+                                opacity: (!e.course.instructor.bankInfo || payoutLoading === e.id) ? 0.4 : 1,
+                                cursor: !e.course.instructor.bankInfo ? 'not-allowed' : 'pointer',
                               }}
                             >
-                              {payoutLoading === e.id ? '...' : 'Pay Out'}
+                              {payoutLoading === e.id ? '...' : 'Mark Paid'}
                             </button>
                           )}
                         </td>

@@ -24,6 +24,15 @@ interface Earnings {
   grossRevenue: number
   netPayout: number
   platformFee: number
+  stripeConnected: boolean
+}
+
+interface BankInfo {
+  accountHolderName: string
+  bankName: string
+  routingNumber: string
+  accountNumber: string
+  accountType: string
 }
 
 const S = {
@@ -38,39 +47,52 @@ const S = {
 export default function InstructorPage() {
   const [courses, setCourses] = useState<Course[]>([])
   const [earnings, setEarnings] = useState<Earnings | null>(null)
-  const [hasStripe, setHasStripe] = useState(false)
-  const [stripeLoading, setStripeLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [bankInfo, setBankInfo] = useState<BankInfo | null>(null)
+  const [bankEditing, setBankEditing] = useState(false)
+  const [bankSaving, setBankSaving] = useState(false)
+  const [bankError, setBankError] = useState('')
+  const [bankForm, setBankForm] = useState({ accountHolderName: '', bankName: '', routingNumber: '', accountNumber: '', accountType: 'Checking' })
 
   useEffect(() => {
     Promise.all([
       fetch('/api/instructor/courses').then((r) => r.json()),
       fetch('/api/instructor/earnings').then((r) => r.json()),
-    ]).then(([c, e]) => {
+      fetch('/api/instructor/bank-details').then((r) => r.json()),
+    ]).then(([c, e, b]) => {
       setCourses(c)
       setEarnings(e)
-      setHasStripe(!!e.stripeConnected)
+      if (b.bankInfo) {
+        setBankInfo(b.bankInfo)
+        setBankForm(b.bankInfo)
+      }
       setLoading(false)
     })
   }, [])
 
-  const handleStripeConnect = async () => {
-    setStripeLoading(true)
+  const handleSaveBank = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setBankSaving(true)
+    setBankError('')
     try {
-      const res = await fetch('/api/stripe/connect', { method: 'POST' })
+      const res = await fetch('/api/instructor/bank-details', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bankForm),
+      })
       const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
+      if (res.ok) {
+        setBankInfo(bankForm)
+        setBankEditing(false)
       } else {
-        alert(data.error || 'Failed to create Stripe link. Please try again.')
-        setStripeLoading(false)
+        setBankError(data.error || 'Failed to save bank details')
       }
     } catch {
-      alert('Something went wrong. Please try again.')
-      setStripeLoading(false)
+      setBankError('Something went wrong. Please try again.')
     }
+    setBankSaving(false)
   }
 
   const handleDelete = async (courseId: string) => {
@@ -107,20 +129,68 @@ export default function InstructorPage() {
 
       {loading ? <p style={{ color: '#6b88a8' }}>Loading...</p> : (
         <>
-          {/* Stripe Connect Banner */}
-          {!hasStripe && (
-            <div style={{ backgroundColor: '#1a2d00', border: '1px solid #4a7c00', borderRadius: '12px', padding: '1.25rem 1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+          {/* Bank Details */}
+          {bankInfo && !bankEditing ? (
+            <div style={{ backgroundColor: '#003d35', border: '1px solid #00C2A8', borderRadius: '12px', padding: '1.25rem 1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
               <div>
-                <p style={{ color: '#a3e635', fontWeight: 600, marginBottom: '0.25rem' }}>Connect Stripe to Receive Payments</p>
-                <p style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Set up Stripe Connect to receive your 80% share of course fees automatically.</p>
+                <p style={{ color: '#00C2A8', fontWeight: 600, marginBottom: '0.25rem' }}>Bank Details Saved</p>
+                <p style={{ color: '#6b88a8', fontSize: '0.875rem' }}>
+                  {bankInfo.bankName} · {bankInfo.accountType} · ****{bankInfo.accountNumber.slice(-4)}
+                </p>
               </div>
               <button
-                onClick={handleStripeConnect}
-                disabled={stripeLoading}
-                style={{ backgroundColor: '#a3e635', color: '#0B1A2E', border: 'none', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem', whiteSpace: 'nowrap' }}
+                onClick={() => setBankEditing(true)}
+                style={{ backgroundColor: 'transparent', color: '#00C2A8', border: '1px solid #00C2A8', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}
               >
-                {stripeLoading ? 'Redirecting...' : 'Connect Stripe →'}
+                Edit
               </button>
+            </div>
+          ) : (
+            <div style={{ backgroundColor: '#1a1200', border: '1px solid #b45309', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <p style={{ color: '#fbbf24', fontWeight: 600, marginBottom: '0.25rem' }}>
+                {bankInfo ? 'Edit Bank Details' : 'Add Your Bank Details'}
+              </p>
+              <p style={{ color: '#6b88a8', fontSize: '0.875rem', marginBottom: '1.25rem' }}>
+                Enter your US bank account details so we can transfer your 80% payout after each course.
+              </p>
+              <form onSubmit={handleSaveBank} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  <div>
+                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Account Holder Name</p>
+                    <input required value={bankForm.accountHolderName} onChange={(e) => setBankForm((f) => ({ ...f, accountHolderName: e.target.value }))} placeholder="Full legal name" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Bank Name</p>
+                    <input required value={bankForm.bankName} onChange={(e) => setBankForm((f) => ({ ...f, bankName: e.target.value }))} placeholder="e.g. Bank of America" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Routing Number</p>
+                    <input required value={bankForm.routingNumber} onChange={(e) => setBankForm((f) => ({ ...f, routingNumber: e.target.value }))} placeholder="9-digit routing number" maxLength={9} style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Account Number</p>
+                    <input required value={bankForm.accountNumber} onChange={(e) => setBankForm((f) => ({ ...f, accountNumber: e.target.value }))} placeholder="Account number" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                  </div>
+                  <div>
+                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Account Type</p>
+                    <select required value={bankForm.accountType} onChange={(e) => setBankForm((f) => ({ ...f, accountType: e.target.value }))} style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }}>
+                      <option value="Checking">Checking</option>
+                      <option value="Savings">Savings</option>
+                    </select>
+                  </div>
+                </div>
+                {bankError && <p style={{ color: '#f87171', fontSize: '0.8rem' }}>{bankError}</p>}
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button type="submit" disabled={bankSaving} style={{ backgroundColor: '#fbbf24', color: '#0B1A2E', border: 'none', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem' }}>
+                    {bankSaving ? 'Saving...' : 'Save Bank Details'}
+                  </button>
+                  {bankInfo && (
+                    <button type="button" onClick={() => { setBankEditing(false); setBankForm(bankInfo) }} style={{ backgroundColor: 'transparent', color: '#6b88a8', border: '1px solid #1e3a5f', padding: '0.625rem 1rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              </form>
             </div>
           )}
 

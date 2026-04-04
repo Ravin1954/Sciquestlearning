@@ -19,6 +19,7 @@ model User {
   qualifications   String?
   subjects         String[]
   stripeAccountId  String?
+  bankInfo         String?
   // Student profile fields
   age              Int?
   gender           String?

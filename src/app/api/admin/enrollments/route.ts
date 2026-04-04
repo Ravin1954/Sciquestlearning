@@ -18,7 +18,7 @@ export async function GET() {
         select: {
           title: true,
           subject: true,
-          instructor: { select: { firstName: true, lastName: true, stripeAccountId: true } },
+          instructor: { select: { firstName: true, lastName: true, bankInfo: true } },
         },
       },
     },
