@@ -24,14 +24,27 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: 'Instructor access required' }, { status: 403 })
   }
 
-  const { accountHolderName, bankName, routingNumber, accountNumber, accountType } = await req.json()
+  const body = await req.json()
+  const { payoutMethod, paypalEmail, accountHolderName, bankName, routingNumber, accountNumber, accountType } = body
 
-  if (!accountHolderName || !bankName || !routingNumber || !accountNumber || !accountType) {
-    return NextResponse.json({ error: 'All fields are required' }, { status: 400 })
+  if (!payoutMethod) {
+    return NextResponse.json({ error: 'Payout method is required' }, { status: 400 })
   }
 
-  const bankInfo = JSON.stringify({ accountHolderName, bankName, routingNumber, accountNumber, accountType })
-  await prisma.user.update({ where: { id: user.id }, data: { bankInfo } })
+  if (payoutMethod === 'paypal') {
+    if (!paypalEmail) return NextResponse.json({ error: 'PayPal email is required' }, { status: 400 })
+  } else {
+    if (!accountHolderName || !bankName || !routingNumber || !accountNumber || !accountType) {
+      return NextResponse.json({ error: 'All bank fields are required' }, { status: 400 })
+    }
+  }
 
+  const bankInfo = JSON.stringify(
+    payoutMethod === 'paypal'
+      ? { payoutMethod, paypalEmail }
+      : { payoutMethod, accountHolderName, bankName, routingNumber, accountNumber, accountType }
+  )
+
+  await prisma.user.update({ where: { id: user.id }, data: { bankInfo } })
   return NextResponse.json({ success: true })
 }

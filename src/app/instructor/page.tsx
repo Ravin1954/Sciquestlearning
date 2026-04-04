@@ -28,11 +28,13 @@ interface Earnings {
 }
 
 interface BankInfo {
-  accountHolderName: string
-  bankName: string
-  routingNumber: string
-  accountNumber: string
-  accountType: string
+  payoutMethod: 'bank' | 'paypal'
+  paypalEmail?: string
+  accountHolderName?: string
+  bankName?: string
+  routingNumber?: string
+  accountNumber?: string
+  accountType?: string
 }
 
 const S = {
@@ -54,7 +56,7 @@ export default function InstructorPage() {
   const [bankEditing, setBankEditing] = useState(false)
   const [bankSaving, setBankSaving] = useState(false)
   const [bankError, setBankError] = useState('')
-  const [bankForm, setBankForm] = useState({ accountHolderName: '', bankName: '', routingNumber: '', accountNumber: '', accountType: 'Checking' })
+  const [bankForm, setBankForm] = useState<BankInfo>({ payoutMethod: 'bank', paypalEmail: '', accountHolderName: '', bankName: '', routingNumber: '', accountNumber: '', accountType: 'Checking' })
 
   useEffect(() => {
     Promise.all([
@@ -133,9 +135,11 @@ export default function InstructorPage() {
           {bankInfo && !bankEditing ? (
             <div style={{ backgroundColor: '#003d35', border: '1px solid #00C2A8', borderRadius: '12px', padding: '1.25rem 1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
               <div>
-                <p style={{ color: '#00C2A8', fontWeight: 600, marginBottom: '0.25rem' }}>Bank Details Saved</p>
+                <p style={{ color: '#00C2A8', fontWeight: 600, marginBottom: '0.25rem' }}>Payout Details Saved</p>
                 <p style={{ color: '#6b88a8', fontSize: '0.875rem' }}>
-                  {bankInfo.bankName} · {bankInfo.accountType} · ****{bankInfo.accountNumber.slice(-4)}
+                  {bankInfo.payoutMethod === 'paypal'
+                    ? `PayPal · ${bankInfo.paypalEmail}`
+                    : `${bankInfo.bankName} · ${bankInfo.accountType} · ****${bankInfo.accountNumber?.slice(-4)}`}
                 </p>
               </div>
               <button
@@ -148,41 +152,63 @@ export default function InstructorPage() {
           ) : (
             <div style={{ backgroundColor: '#1a1200', border: '1px solid #b45309', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
               <p style={{ color: '#fbbf24', fontWeight: 600, marginBottom: '0.25rem' }}>
-                {bankInfo ? 'Edit Bank Details' : 'Add Your Bank Details'}
+                {bankInfo ? 'Edit Payout Details' : 'Add Your Payout Details'}
               </p>
               <p style={{ color: '#6b88a8', fontSize: '0.875rem', marginBottom: '1.25rem' }}>
-                Enter your US bank account details so we can transfer your 80% payout after each course.
+                Choose how you'd like to receive your 80% payout after each course.
               </p>
               <form onSubmit={handleSaveBank} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                  <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Account Holder Name</p>
-                    <input required value={bankForm.accountHolderName} onChange={(e) => setBankForm((f) => ({ ...f, accountHolderName: e.target.value }))} placeholder="Full legal name" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
-                  </div>
-                  <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Bank Name</p>
-                    <input required value={bankForm.bankName} onChange={(e) => setBankForm((f) => ({ ...f, bankName: e.target.value }))} placeholder="e.g. Bank of America" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
-                  </div>
-                  <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Routing Number</p>
-                    <input required value={bankForm.routingNumber} onChange={(e) => setBankForm((f) => ({ ...f, routingNumber: e.target.value }))} placeholder="9-digit routing number" maxLength={9} style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
-                  </div>
-                  <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Account Number</p>
-                    <input required value={bankForm.accountNumber} onChange={(e) => setBankForm((f) => ({ ...f, accountNumber: e.target.value }))} placeholder="Account number" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
-                  </div>
-                  <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Account Type</p>
-                    <select required value={bankForm.accountType} onChange={(e) => setBankForm((f) => ({ ...f, accountType: e.target.value }))} style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }}>
-                      <option value="Checking">Checking</option>
-                      <option value="Savings">Savings</option>
-                    </select>
-                  </div>
+                {/* Payout method toggle */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.25rem' }}>
+                  {(['bank', 'paypal'] as const).map((method) => (
+                    <button
+                      key={method}
+                      type="button"
+                      onClick={() => setBankForm((f) => ({ ...f, payoutMethod: method }))}
+                      style={{ padding: '0.75rem', borderRadius: '8px', border: bankForm.payoutMethod === method ? '2px solid #fbbf24' : '2px solid #1e3a5f', backgroundColor: bankForm.payoutMethod === method ? '#2a1f00' : '#060f1a', color: bankForm.payoutMethod === method ? '#fbbf24' : '#6b88a8', cursor: 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
+                    >
+                      {method === 'paypal' ? 'PayPal' : 'Bank Transfer'}
+                    </button>
+                  ))}
                 </div>
+
+                {bankForm.payoutMethod === 'paypal' ? (
+                  <div>
+                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>PayPal Email</p>
+                    <input required value={bankForm.paypalEmail || ''} onChange={(e) => setBankForm((f) => ({ ...f, paypalEmail: e.target.value }))} type="email" placeholder="your@paypal.com" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    <div>
+                      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Account Holder Name</p>
+                      <input required value={bankForm.accountHolderName || ''} onChange={(e) => setBankForm((f) => ({ ...f, accountHolderName: e.target.value }))} placeholder="Full legal name" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                    </div>
+                    <div>
+                      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Bank Name</p>
+                      <input required value={bankForm.bankName || ''} onChange={(e) => setBankForm((f) => ({ ...f, bankName: e.target.value }))} placeholder="e.g. Bank of America" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                    </div>
+                    <div>
+                      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Routing Number</p>
+                      <input required value={bankForm.routingNumber || ''} onChange={(e) => setBankForm((f) => ({ ...f, routingNumber: e.target.value }))} placeholder="9-digit routing number" maxLength={9} style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                    </div>
+                    <div>
+                      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Account Number</p>
+                      <input required value={bankForm.accountNumber || ''} onChange={(e) => setBankForm((f) => ({ ...f, accountNumber: e.target.value }))} placeholder="Account number" style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                    </div>
+                    <div>
+                      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Account Type</p>
+                      <select required value={bankForm.accountType || 'Checking'} onChange={(e) => setBankForm((f) => ({ ...f, accountType: e.target.value }))} style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box' }}>
+                        <option value="Checking">Checking</option>
+                        <option value="Savings">Savings</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
                 {bankError && <p style={{ color: '#f87171', fontSize: '0.8rem' }}>{bankError}</p>}
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                   <button type="submit" disabled={bankSaving} style={{ backgroundColor: '#fbbf24', color: '#0B1A2E', border: 'none', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem' }}>
-                    {bankSaving ? 'Saving...' : 'Save Bank Details'}
+                    {bankSaving ? 'Saving...' : 'Save Payout Details'}
                   </button>
                   {bankInfo && (
                     <button type="button" onClick={() => { setBankEditing(false); setBankForm(bankInfo) }} style={{ backgroundColor: 'transparent', color: '#6b88a8', border: '1px solid #1e3a5f', padding: '0.625rem 1rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>

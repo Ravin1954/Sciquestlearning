@@ -328,7 +328,9 @@ export default function AdminPage() {
                         <td style={{ padding: '0.75rem 1rem', fontSize: '0.75rem' }}>
                           {e.course.instructor.bankInfo ? (() => {
                             const b = JSON.parse(e.course.instructor.bankInfo)
-                            return <span style={{ color: '#e8edf5' }}>{b.bankName} ****{b.accountNumber.slice(-4)}</span>
+                            return b.payoutMethod === 'paypal'
+                              ? <span style={{ color: '#e8edf5' }}>PayPal: {b.paypalEmail}</span>
+                              : <span style={{ color: '#e8edf5' }}>{b.bankName} ****{b.accountNumber.slice(-4)}</span>
                           })() : <span style={{ color: '#f87171' }}>Not added</span>}
                         </td>
                         <td style={{ padding: '0.75rem 1rem' }}>
