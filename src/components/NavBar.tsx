@@ -35,6 +35,13 @@ export default function NavBar() {
             >
               Browse Courses
             </Link>
+            <Link
+              href="/class-policies"
+              style={{ color: '#a8c4e0' }}
+              className="hover:text-white transition-colors text-sm font-medium"
+            >
+              Class Policies
+            </Link>
             {isSignedIn && (
               <Link
                 href="/dashboard"

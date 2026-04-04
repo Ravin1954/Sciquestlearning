@@ -290,6 +290,10 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer style={{ backgroundColor: '#060f1a', borderTop: '1px solid #1e3a5f', padding: '2rem 1.5rem', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+          <a href="/courses" style={{ color: '#6b88a8', fontSize: '0.8rem', textDecoration: 'none' }}>Browse Courses</a>
+          <a href="/class-policies" style={{ color: '#6b88a8', fontSize: '0.8rem', textDecoration: 'none' }}>Class Policies</a>
+        </div>
         <p style={{ color: '#6b88a8', fontSize: '0.875rem' }}>
           © 2026 SciQuest Learning. All rights reserved.
         </p>
