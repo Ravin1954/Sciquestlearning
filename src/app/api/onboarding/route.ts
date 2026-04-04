@@ -74,29 +74,39 @@ export async function POST(req: Request) {
         }
       : {}
 
-  await prisma.user.upsert({
-    where: { clerkId: userId },
-    update: {
-      role: dbRole,
-      timezone,
-      country,
-      qualifications: qualifications || null,
-      subjects: subjects || [],
-      ...studentFields,
-    },
-    create: {
-      clerkId: userId,
-      role: dbRole,
-      firstName,
-      lastName,
-      email,
-      timezone,
-      country,
-      qualifications: qualifications || null,
-      subjects: subjects || [],
-      ...studentFields,
-    },
+  const existingUser = await prisma.user.findFirst({
+    where: { OR: [{ clerkId: userId }, { email }] },
   })
+
+  if (existingUser) {
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: {
+        clerkId: userId,
+        role: dbRole,
+        timezone,
+        country,
+        qualifications: qualifications || null,
+        subjects: subjects || [],
+        ...studentFields,
+      },
+    })
+  } else {
+    await prisma.user.create({
+      data: {
+        clerkId: userId,
+        role: dbRole,
+        firstName,
+        lastName,
+        email,
+        timezone,
+        country,
+        qualifications: qualifications || null,
+        subjects: subjects || [],
+        ...studentFields,
+      },
+    })
+  }
 
   await clerk.users.updateUserMetadata(userId, {
     publicMetadata: { role },
