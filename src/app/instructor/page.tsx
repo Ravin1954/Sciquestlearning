@@ -51,7 +51,7 @@ export default function InstructorPage() {
     ]).then(([c, e]) => {
       setCourses(c)
       setEarnings(e)
-      setHasStripe(Number(e.grossRevenue) > 0)
+      setHasStripe(!!e.stripeConnected)
       setLoading(false)
     })
   }, [])

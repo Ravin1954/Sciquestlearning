@@ -27,5 +27,6 @@ export async function GET() {
     grossRevenue: totals._sum.amountPaidUsd || 0,
     netPayout: totals._sum.instructorPayoutUsd || 0,
     platformFee: totals._sum.platformFeeUsd || 0,
+    stripeConnected: !!user.stripeAccountId,
   })
 }
