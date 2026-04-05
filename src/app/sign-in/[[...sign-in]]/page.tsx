@@ -20,7 +20,7 @@ export default function SignInPage() {
         </h1>
         <p style={{ color: '#6b88a8', marginTop: '0.5rem' }}>Sign in to your account</p>
       </div>
-      <SignIn />
+      <SignIn forceRedirectUrl="/auth/redirect" />
     </div>
   )
 }

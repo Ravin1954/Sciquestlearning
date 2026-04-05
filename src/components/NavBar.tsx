@@ -44,7 +44,7 @@ export default function NavBar() {
             </Link>
             {isSignedIn && (
               <Link
-                href="/dashboard"
+                href="/auth/redirect"
                 style={{ color: '#a8c4e0' }}
                 className="hover:text-white transition-colors text-sm font-medium"
               >
@@ -57,7 +57,7 @@ export default function NavBar() {
             {isSignedIn ? (
               <UserButton />
             ) : (
-              <SignInButton mode="modal">
+              <SignInButton mode="modal" forceRedirectUrl="/auth/redirect">
                 <button
                   style={{ color: '#00C2A8', border: '1px solid #00C2A8' }}
                   className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-900 transition-colors"
