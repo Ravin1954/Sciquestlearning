@@ -9,6 +9,7 @@ interface Course {
   id: string
   title: string
   subject: string
+  courseType: 'LIVE' | 'SELF_PACED'
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
   feeUsd: number
   durationWeeks: number
@@ -16,6 +17,8 @@ interface Course {
   startTimeUtc: string
   sessionDurationMins: number
   zoomJoinUrl?: string
+  zoomStartUrl?: string
+  contentUrl?: string
   rejectionRemark?: string | null
   _count: { enrollments: number }
 }
@@ -248,18 +251,27 @@ export default function InstructorPage() {
                         {c.daysOfWeek.join(', ')} · {c.startTimeUtc} UTC · {c.sessionDurationMins} min · {c._count.enrollments} students
                       </p>
                     </div>
-                    {c.zoomJoinUrl ? (
-                      <a
-                        href={c.zoomJoinUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}
-                      >
-                        Start Class →
-                      </a>
-                    ) : (
-                      <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>No meeting link</span>
-                    )}
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                      {c.courseType === 'SELF_PACED' ? (
+                        c.contentUrl ? (
+                          <a href={c.contentUrl} target="_blank" rel="noopener noreferrer"
+                            style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                            Course Materials →
+                          </a>
+                        ) : (
+                          <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>No content URL</span>
+                        )
+                      ) : (
+                        c.zoomStartUrl ? (
+                          <a href={c.zoomStartUrl} target="_blank" rel="noopener noreferrer"
+                            style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                            Start Class →
+                          </a>
+                        ) : (
+                          <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Meeting link pending</span>
+                        )
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

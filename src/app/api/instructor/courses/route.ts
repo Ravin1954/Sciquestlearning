@@ -13,7 +13,23 @@ export async function GET() {
 
   const courses = await prisma.course.findMany({
     where: { instructorId: user.id },
-    include: { _count: { select: { enrollments: true } } },
+    select: {
+      id: true,
+      title: true,
+      subject: true,
+      courseType: true,
+      status: true,
+      feeUsd: true,
+      durationWeeks: true,
+      daysOfWeek: true,
+      startTimeUtc: true,
+      sessionDurationMins: true,
+      zoomJoinUrl: true,
+      zoomStartUrl: true,
+      contentUrl: true,
+      rejectionRemark: true,
+      _count: { select: { enrollments: true } },
+    },
     orderBy: { createdAt: 'desc' },
   })
 
