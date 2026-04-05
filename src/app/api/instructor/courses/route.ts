@@ -27,6 +27,7 @@ export async function GET() {
       zoomJoinUrl: true,
       zoomStartUrl: true,
       contentUrl: true,
+      topics: true,
       rejectionRemark: true,
       _count: { select: { enrollments: true } },
     },

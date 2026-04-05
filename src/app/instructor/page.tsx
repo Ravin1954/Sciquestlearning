@@ -19,6 +19,7 @@ interface Course {
   zoomJoinUrl?: string
   zoomStartUrl?: string
   contentUrl?: string
+  topics: string[]
   rejectionRemark?: string | null
   _count: { enrollments: number }
 }
@@ -330,24 +331,33 @@ export default function InstructorPage() {
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {courses.map((c) => (
-                  <div key={c.id} style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div>
-                      <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
-                      <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
-                        {c.subject.replace('_', ' ')} · {c.durationWeeks} weeks · ${Number(c.feeUsd).toFixed(2)} · {c._count.enrollments} enrolled
-                      </p>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <StatusBadge status={c.status} />
-                      {c._count.enrollments === 0 && (
-                        <button
-                          onClick={() => handleDelete(c.id)}
-                          disabled={deleteLoading === c.id}
-                          style={{ backgroundColor: 'transparent', color: '#f87171', border: '1px solid #f87171', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', opacity: deleteLoading === c.id ? 0.5 : 1 }}
-                        >
-                          {deleteLoading === c.id ? '...' : 'Delete'}
-                        </button>
-                      )}
+                  <div key={c.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
+                        <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                          {c.subject.replace('_', ' ')} · {c.durationWeeks} weeks · ${Number(c.feeUsd).toFixed(2)} · {c._count.enrollments} enrolled
+                        </p>
+                        {c.topics && c.topics.length > 0 && (
+                          <ol style={{ margin: '0.5rem 0 0 1rem', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                            {c.topics.map((topic, i) => (
+                              <li key={i} style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>{topic}</li>
+                            ))}
+                          </ol>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <StatusBadge status={c.status} />
+                        {c._count.enrollments === 0 && (
+                          <button
+                            onClick={() => handleDelete(c.id)}
+                            disabled={deleteLoading === c.id}
+                            style={{ backgroundColor: 'transparent', color: '#f87171', border: '1px solid #f87171', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', opacity: deleteLoading === c.id ? 0.5 : 1 }}
+                          >
+                            {deleteLoading === c.id ? '...' : 'Delete'}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
