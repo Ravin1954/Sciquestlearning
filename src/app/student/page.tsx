@@ -223,7 +223,7 @@ export default function StudentPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
                       {course.courseType === 'SELF_PACED' ? (
                         course.contentUrl ? (
-                          <a href={course.contentUrl} target="_blank" rel="noopener noreferrer"
+                          <a href={course.contentUrl.startsWith('http') ? course.contentUrl : `https://${course.contentUrl}`} target="_blank" rel="noopener noreferrer"
                             style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
                             Access Course →
                           </a>

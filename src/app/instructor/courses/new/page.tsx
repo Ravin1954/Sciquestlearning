@@ -155,6 +155,9 @@ export default function NewCoursePage() {
     if (courseType === 'SELF_PACED' && !form.contentUrl) {
       setError('Please provide a content URL for the self-paced course.'); return
     }
+    if (form.contentUrl && !form.contentUrl.startsWith('http://') && !form.contentUrl.startsWith('https://')) {
+      setError('Content URL must start with https:// (e.g. https://drive.google.com/...)'); return
+    }
 
     setLoading(true)
     setError('')

@@ -255,7 +255,7 @@ export default function InstructorPage() {
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                       {c.courseType === 'SELF_PACED' ? (
                         c.contentUrl ? (
-                          <a href={c.contentUrl} target="_blank" rel="noopener noreferrer"
+                          <a href={c.contentUrl.startsWith('http') ? c.contentUrl : `https://${c.contentUrl}`} target="_blank" rel="noopener noreferrer"
                             style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
                             Course Materials →
                           </a>
@@ -264,7 +264,7 @@ export default function InstructorPage() {
                         )
                       ) : (
                         c.zoomStartUrl ? (
-                          <a href={c.zoomStartUrl} target="_blank" rel="noopener noreferrer"
+                          <a href={c.zoomStartUrl.startsWith('http') ? c.zoomStartUrl : `https://${c.zoomStartUrl}`} target="_blank" rel="noopener noreferrer"
                             style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
                             Start Class →
                           </a>
