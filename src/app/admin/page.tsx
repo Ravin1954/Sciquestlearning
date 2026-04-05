@@ -83,6 +83,8 @@ export default function AdminPage() {
   const [payoutMsg, setPayoutMsg] = useState<{ id: string; success: boolean; text: string } | null>(null)
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [meetLoading, setMeetLoading] = useState<string | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -144,6 +146,19 @@ export default function AdminPage() {
     const updated = await fetch('/api/admin/courses').then((r) => r.json())
     setCourses(Array.isArray(updated) ? updated : [])
     setMeetLoading(null)
+  }
+
+  const handleForceDelete = async (courseId: string) => {
+    setDeleteLoading(courseId)
+    await fetch(`/api/admin/courses/${courseId}`, { method: 'DELETE' })
+    const [updated, m] = await Promise.all([
+      fetch('/api/admin/courses').then((r) => r.json()),
+      fetch('/api/admin/metrics').then((r) => r.json()),
+    ])
+    setCourses(Array.isArray(updated) ? updated : [])
+    setMetrics(m)
+    setDeleteLoading(null)
+    setConfirmDeleteId(null)
   }
 
   const pending = courses.filter((c) => c.status === 'PENDING')
@@ -448,7 +463,7 @@ export default function AdminPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #1e3a5f' }}>
-                    {['Title', 'Instructor', 'Subject', 'Fee', 'Enrollments', 'Status'].map((h) => (
+                    {['Title', 'Instructor', 'Subject', 'Fee', 'Enrollments', 'Status', ''].map((h) => (
                       <th key={h} style={{ padding: '0.875rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         {h}
                       </th>
@@ -464,6 +479,22 @@ export default function AdminPage() {
                       <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>${Number(c.feeUsd).toFixed(2)}</td>
                       <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{c._count.enrollments}</td>
                       <td style={{ padding: '0.875rem 1rem' }}><StatusBadge status={c.status} /></td>
+                      <td style={{ padding: '0.875rem 1rem' }}>
+                        {confirmDeleteId === c.id ? (
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <span style={{ color: '#f87171', fontSize: '0.75rem' }}>Sure?</span>
+                            <button onClick={() => handleForceDelete(c.id)} disabled={deleteLoading === c.id}
+                              style={{ ...S.btn('#fff', '#7f1d1d'), opacity: deleteLoading === c.id ? 0.5 : 1 }}>
+                              {deleteLoading === c.id ? '...' : 'Yes'}
+                            </button>
+                            <button onClick={() => setConfirmDeleteId(null)} style={S.btn('#a8c4e0', 'transparent')}>No</button>
+                          </div>
+                        ) : (
+                          <button onClick={() => setConfirmDeleteId(c.id)} style={S.btn('#f87171', 'transparent')}>
+                            Delete
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
