@@ -58,13 +58,6 @@ function localTimeToUtc(localTime: string, timezone: string): string {
   return `${String(utcDate.getUTCHours()).padStart(2, '0')}:${String(utcDate.getUTCMinutes()).padStart(2, '0')}`
 }
 
-function formatTime12h(time24: string): string {
-  if (!time24) return ''
-  const [h, m] = time24.split(':').map(Number)
-  const period = h >= 12 ? 'PM' : 'AM'
-  const h12 = h % 12 === 0 ? 12 : h % 12
-  return `${h12}:${String(m).padStart(2, '0')} ${period}`
-}
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -512,21 +505,27 @@ export default function NewCoursePage() {
             <input
               required
               type="number"
-              min="1"
+              min="0"
               step="0.01"
               value={form.feeUsd}
               onChange={set('feeUsd')}
-              placeholder="e.g. 149.00"
+              placeholder="0.00 for free, or e.g. 149.00"
               style={inputStyle}
             />
-            {form.feeUsd && (
+            {form.feeUsd !== '' && (
               <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1.5rem' }}>
-                <p style={{ color: '#00C2A8', fontSize: '0.75rem' }}>
-                  You receive: <strong>${(parseFloat(form.feeUsd) * 0.8).toFixed(2)}</strong> (80%)
-                </p>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem' }}>
-                  Platform fee: ${(parseFloat(form.feeUsd) * 0.2).toFixed(2)} (20%)
-                </p>
+                {parseFloat(form.feeUsd) === 0 ? (
+                  <p style={{ color: '#F5C842', fontSize: '0.75rem', fontWeight: 600 }}>Free course — students enroll at no charge</p>
+                ) : (
+                  <>
+                    <p style={{ color: '#00C2A8', fontSize: '0.75rem' }}>
+                      You receive: <strong>${(parseFloat(form.feeUsd) * 0.8).toFixed(2)}</strong> (80%)
+                    </p>
+                    <p style={{ color: '#6b88a8', fontSize: '0.75rem' }}>
+                      Platform fee: ${(parseFloat(form.feeUsd) * 0.2).toFixed(2)} (20%)
+                    </p>
+                  </>
+                )}
               </div>
             )}
           </div>

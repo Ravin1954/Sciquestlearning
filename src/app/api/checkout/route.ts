@@ -29,7 +29,23 @@ export async function POST(req: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const amountCents = Math.round(Number(course.feeUsd) * 100)
-  const platformFeeCents = Math.round(amountCents * 0.2) // 20% platform fee
+
+  // Free course — enroll directly without Stripe
+  if (amountCents === 0) {
+    await prisma.enrollment.create({
+      data: {
+        studentId: student.id,
+        courseId,
+        amountPaidUsd: 0,
+        instructorPayoutUsd: 0,
+        platformFeeUsd: 0,
+        zoomJoinUrl: course.zoomJoinUrl || null,
+        instructorPaidOut: true,
+        instructorPaidOutAt: new Date(),
+      },
+    })
+    return NextResponse.json({ url: `${appUrl}/student` })
+  }
 
   const session = await stripe.checkout.sessions.create({
     // 'card' covers Visa, Mastercard, Amex, Discover, Apple Pay, Google Pay
