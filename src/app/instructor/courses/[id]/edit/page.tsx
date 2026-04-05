@@ -83,6 +83,7 @@ export default function EditCoursePage() {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState('')
+  const [courseStatus, setCourseStatus] = useState<string>('')
   const [rejectionRemark, setRejectionRemark] = useState<string | null>(null)
   const [courseType, setCourseType] = useState<'LIVE' | 'SELF_PACED'>('LIVE')
   const [selectedDays, setSelectedDays] = useState<string[]>([])
@@ -106,10 +107,11 @@ export default function EditCoursePage() {
     fetch(`/api/courses/${id}`)
       .then((r) => r.json())
       .then((course) => {
-        if (!course || course.status !== 'REJECTED') {
+        if (!course || course.error) {
           router.push('/instructor')
           return
         }
+        setCourseStatus(course.status || '')
         setCourseType(course.courseType || 'LIVE')
         setSelectedDays(course.daysOfWeek || [])
         setTopics(course.topics || [])
@@ -229,7 +231,9 @@ export default function EditCoursePage() {
           Edit Course
         </h1>
         <p style={{ color: '#6b88a8', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-          Make your changes and resubmit for admin review.
+          {courseStatus === 'APPROVED'
+            ? 'Editing an approved course will send it back for admin review.'
+            : 'Make your changes and resubmit for admin review.'}
         </p>
 
         {rejectionRemark && (
@@ -419,7 +423,7 @@ export default function EditCoursePage() {
               disabled={loading}
               style={{ backgroundColor: loading ? '#005040' : '#00C2A8', color: '#0B1A2E', padding: '0.875rem 2rem', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}
             >
-              {loading ? 'Resubmitting...' : 'Resubmit for Review →'}
+              {loading ? 'Saving...' : courseStatus === 'REJECTED' ? 'Resubmit for Review →' : 'Save Changes →'}
             </button>
             <button
               type="button"

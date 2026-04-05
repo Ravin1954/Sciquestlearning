@@ -346,8 +346,14 @@ export default function InstructorPage() {
                           </ol>
                         )}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
                         <StatusBadge status={c.status} />
+                        <Link
+                          href={`/instructor/courses/${c.id}/edit`}
+                          style={{ backgroundColor: 'transparent', color: '#a8c4e0', border: '1px solid #1e3a5f', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none' }}
+                        >
+                          Edit
+                        </Link>
                         {c._count.enrollments === 0 && (
                           <button
                             onClick={() => handleDelete(c.id)}

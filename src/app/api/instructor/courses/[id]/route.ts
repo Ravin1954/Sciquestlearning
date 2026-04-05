@@ -16,10 +16,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (!course || course.instructorId !== user.id) {
     return NextResponse.json({ error: 'Course not found' }, { status: 404 })
   }
-  if (course.status !== 'REJECTED') {
-    return NextResponse.json({ error: 'Only rejected courses can be edited and resubmitted' }, { status: 400 })
-  }
-
   const body = await req.json()
   const {
     title, description, subject, courseType, gradeLevel,
