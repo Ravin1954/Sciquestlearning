@@ -68,6 +68,7 @@ model Enrollment {
   instructorPayoutUsd   Decimal   @db.Decimal(10, 2)
   platformFeeUsd        Decimal   @db.Decimal(10, 2)
   zoomJoinUrl           String?
+  selectedSessionsJson  String    @default("")
   enrolledAt            DateTime  @default(now())
   instructorPaidOut     Boolean   @default(false)
   instructorPaidOutAt   DateTime?

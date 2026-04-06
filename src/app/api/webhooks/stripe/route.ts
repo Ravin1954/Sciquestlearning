@@ -16,11 +16,11 @@ export async function POST(req: Request) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as {
-      metadata?: { courseId?: string; studentId?: string }
+      metadata?: { courseId?: string; studentId?: string; selectedSessionsJson?: string }
       payment_intent?: string
       amount_total?: number
     }
-    const { courseId, studentId } = session.metadata || {}
+    const { courseId, studentId, selectedSessionsJson } = session.metadata || {}
     if (!courseId || !studentId) return NextResponse.json({ ok: true })
 
     const course = await prisma.course.findUnique({ where: { id: courseId } })
@@ -43,13 +43,25 @@ export async function POST(req: Request) {
         instructorPayoutUsd: instructorPayout,
         platformFeeUsd: platformFee,
         zoomJoinUrl,
+        selectedSessionsJson: selectedSessionsJson || '',
       },
     })
 
     const accessLink = course.courseType === 'SELF_PACED' ? (course.contentUrl || '') : zoomJoinUrl
-    const schedule = course.courseType === 'LIVE'
-      ? `${course.daysOfWeek.join(', ')} at ${course.startTimeUtc} UTC`
-      : 'Self-paced — access anytime'
+    // Build schedule string from selected sessions if available
+    let schedule: string
+    if (selectedSessionsJson) {
+      try {
+        const sessions: string[] = JSON.parse(selectedSessionsJson)
+        schedule = sessions.join(', ')
+      } catch {
+        schedule = `${course.daysOfWeek.join(', ')} at ${course.startTimeUtc} UTC`
+      }
+    } else {
+      schedule = course.courseType === 'LIVE'
+        ? `${course.daysOfWeek.join(', ')} at ${course.startTimeUtc} UTC`
+        : 'Self-paced — access anytime'
+    }
     await sendEnrollmentConfirmationEmail(student.email, course.title, accessLink, schedule)
   }
 

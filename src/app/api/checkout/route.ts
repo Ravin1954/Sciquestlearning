@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { courseId } = await req.json()
+  const { courseId, selectedSessions } = await req.json()
   if (!courseId) return NextResponse.json({ error: 'courseId required' }, { status: 400 })
 
   const student = await prisma.user.findUnique({ where: { clerkId: userId } })
@@ -28,7 +28,14 @@ export async function POST(req: Request) {
   if (existing) return NextResponse.json({ error: 'Already enrolled' }, { status: 400 })
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  const amountCents = Math.round(Number(course.feeUsd) * 100)
+  const feePerSession = Number(course.feeUsd)
+
+  // For LIVE courses with sessions, multiply by session count
+  const sessions: string[] = Array.isArray(selectedSessions) ? selectedSessions : []
+  const sessionCount = sessions.length > 0 ? sessions.length : 1
+  const totalFee = feePerSession * sessionCount
+  const amountCents = Math.round(totalFee * 100)
+  const selectedSessionsJson = sessions.length > 0 ? JSON.stringify(sessions) : ''
 
   // Free course — enroll directly without Stripe
   if (amountCents === 0) {
@@ -40,6 +47,7 @@ export async function POST(req: Request) {
         instructorPayoutUsd: 0,
         platformFeeUsd: 0,
         zoomJoinUrl: course.zoomJoinUrl || null,
+        selectedSessionsJson,
         instructorPaidOut: true,
         instructorPaidOutAt: new Date(),
       },
@@ -47,34 +55,37 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: `${appUrl}/student` })
   }
 
-  const session = await stripe.checkout.sessions.create({
-    // 'card' covers Visa, Mastercard, Amex, Discover, Apple Pay, Google Pay
-    // — Stripe Checkout displays all applicable methods automatically
-    payment_method_types: ['card'],
+  const sessionLabel = sessionCount === 1
+    ? sessions[0] || course.title
+    : `${sessionCount} sessions`
 
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
     customer_email: student.email,
     billing_address_collection: 'auto',
-
     line_items: [
       {
         price_data: {
           currency: 'usd',
           product_data: {
             name: course.title,
-            description: `${course.subject.replace('_', ' ')} · ${course.durationWeeks} weeks · ${course.daysOfWeek.join(', ')} at ${course.startTimeUtc} UTC`,
+            description: sessionCount > 1
+              ? `${sessionCount} sessions × $${feePerSession.toFixed(2)}/session`
+              : sessionLabel,
           },
-          unit_amount: amountCents,
+          unit_amount: feePerSession * 100 | 0,
         },
-        quantity: 1,
+        quantity: sessionCount,
       },
     ],
     mode: 'payment',
     success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}/courses/${courseId}`,
-    metadata: { courseId, studentId: student.id },
-    // Full payment goes to platform account.
-    // Instructor 80% is held and transferred manually after the course starts
-    // to allow for cancellations and refunds before the course begins.
+    metadata: {
+      courseId,
+      studentId: student.id,
+      selectedSessionsJson,
+    },
   })
 
   return NextResponse.json({ url: session.url })
