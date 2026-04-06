@@ -85,12 +85,13 @@ export default function NewCoursePage() {
   const [courseType, setCourseType] = useState<'LIVE' | 'SELF_PACED'>('LIVE')
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [timezone, setTimezone] = useState('America/New_York')
-  // Per-day local times: { Monday: '09:00', Wednesday: '14:00' }
-  const [dayTimes, setDayTimes] = useState<Record<string, string>>({})
+  // Per-day local times: { Monday: ['09:00', '14:00'], Wednesday: ['10:00'] }
+  const [dayTimes, setDayTimes] = useState<Record<string, string[]>>({})
   // Topics
   const [topics, setTopics] = useState<string[]>([])
   const [topicInput, setTopicInput] = useState('')
 
+  const [durationUnit, setDurationUnit] = useState<'WEEKS' | 'DAYS'>('WEEKS')
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -108,9 +109,28 @@ export default function NewCoursePage() {
         setDayTimes((dt) => { const next = { ...dt }; delete next[day]; return next })
         return prev.filter((d) => d !== day)
       } else {
-        setDayTimes((dt) => ({ ...dt, [day]: '' }))
+        setDayTimes((dt) => ({ ...dt, [day]: [''] }))
         return [...prev, day]
       }
+    })
+  }
+
+  const addTimeSlot = (day: string) => {
+    setDayTimes((dt) => ({ ...dt, [day]: [...(dt[day] || []), ''] }))
+  }
+
+  const removeTimeSlot = (day: string, idx: number) => {
+    setDayTimes((dt) => {
+      const times = dt[day].filter((_, i) => i !== idx)
+      return { ...dt, [day]: times.length > 0 ? times : [''] }
+    })
+  }
+
+  const updateTimeSlot = (day: string, idx: number, value: string) => {
+    setDayTimes((dt) => {
+      const times = [...(dt[day] || [])]
+      times[idx] = value
+      return { ...dt, [day]: times }
     })
   }
 
@@ -129,21 +149,24 @@ export default function NewCoursePage() {
 
   const removeTopic = (t: string) => setTopics((prev) => prev.filter((x) => x !== t))
 
-  // Build schedule for submission and display
+  // Build schedule for submission
   const buildSchedule = () =>
-    DAYS.filter((d) => selectedDays.includes(d)).map((day) => ({
-      day,
-      localTime: dayTimes[day] || '',
-      utcTime: localTimeToUtc(dayTimes[day] || '', timezone),
-    }))
+    DAYS.filter((d) => selectedDays.includes(d)).map((day) => {
+      const times = (dayTimes[day] || ['']).filter(Boolean)
+      return {
+        day,
+        localTimes: times,
+        utcTimes: times.map((t) => localTimeToUtc(t, timezone)),
+      }
+    })
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (courseType === 'LIVE') {
       if (selectedDays.length === 0) { setError('Select at least one class day.'); return }
-      const missingTime = selectedDays.find((d) => !dayTimes[d])
-      if (missingTime) { setError(`Please set a start time for ${missingTime}.`); return }
+      const missingTime = selectedDays.find((d) => !dayTimes[d] || dayTimes[d].every((t) => !t))
+      if (missingTime) { setError(`Please set at least one start time for ${missingTime}.`); return }
     }
     if (courseType === 'SELF_PACED' && !form.contentUrl) {
       setError('Please provide a content URL for the self-paced course.'); return
@@ -156,8 +179,7 @@ export default function NewCoursePage() {
     setError('')
 
     const schedule = buildSchedule()
-    // Use first day's UTC time as startTimeUtc for reminder cron compatibility
-    const startTimeUtc = schedule.length > 0 ? schedule[0].utcTime : ''
+    const startTimeUtc = schedule.length > 0 && schedule[0].utcTimes.length > 0 ? schedule[0].utcTimes[0] : ''
     const scheduleJson = courseType === 'LIVE' ? JSON.stringify(schedule) : ''
 
     const res = await fetch('/api/courses', {
@@ -166,6 +188,7 @@ export default function NewCoursePage() {
       body: JSON.stringify({
         ...form,
         courseType,
+        durationUnit,
         gradeLevel: form.gradeLevel,
         daysOfWeek: courseType === 'LIVE' ? selectedDays : [],
         startTimeUtc,
@@ -342,20 +365,42 @@ export default function NewCoursePage() {
           </div>
 
           {/* Duration */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div>
-              <label style={labelStyle}>Duration (weeks)</label>
-              <input
-                required
-                type="number"
-                min="1"
-                max="52"
-                value={form.durationWeeks}
-                onChange={set('durationWeeks')}
-                placeholder="e.g. 8"
-                style={inputStyle}
-              />
+          <div>
+            <label style={labelStyle}>Duration</label>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.625rem' }}>
+              {(['WEEKS', 'DAYS'] as const).map((unit) => (
+                <button
+                  key={unit}
+                  type="button"
+                  onClick={() => setDurationUnit(unit)}
+                  style={{
+                    padding: '0.4rem 1rem',
+                    borderRadius: '6px',
+                    border: durationUnit === unit ? '1px solid #00C2A8' : '1px solid #1e3a5f',
+                    backgroundColor: durationUnit === unit ? '#003d35' : '#060f1a',
+                    color: durationUnit === unit ? '#00C2A8' : '#6b88a8',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  {unit === 'WEEKS' ? 'Weeks' : 'Days'}
+                </button>
+              ))}
             </div>
+            <input
+              required
+              type="number"
+              min="1"
+              max={durationUnit === 'WEEKS' ? 52 : 365}
+              value={form.durationWeeks}
+              onChange={set('durationWeeks')}
+              placeholder={durationUnit === 'WEEKS' ? 'e.g. 8' : 'e.g. 1'}
+              style={inputStyle}
+            />
+            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+              {durationUnit === 'DAYS' && parseInt(form.durationWeeks) === 1 ? 'Single-day course' : `Number of ${durationUnit.toLowerCase()} the course runs`}
+            </p>
           </div>
 
           {/* LIVE-only fields */}
@@ -419,42 +464,60 @@ export default function NewCoursePage() {
                       </select>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
                     {DAYS.filter((d) => selectedDays.includes(d)).map((day) => {
-                      const localT = dayTimes[day] || ''
-                      const utcT = localT ? localTimeToUtc(localT, timezone) : ''
+                      const times = dayTimes[day] || ['']
                       return (
                         <div
                           key={day}
                           style={{
-                            display: 'grid',
-                            gridTemplateColumns: '120px 1fr auto',
-                            gap: '0.75rem',
-                            alignItems: 'center',
                             backgroundColor: '#060f1a',
                             border: '1px solid #1e3a5f',
                             borderRadius: '8px',
-                            padding: '0.625rem 0.875rem',
+                            padding: '0.75rem 0.875rem',
                           }}
                         >
-                          <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 600 }}>{day}</span>
-                          <input
-                            type="time"
-                            value={localT}
-                            onChange={(e) => setDayTimes((dt) => ({ ...dt, [day]: e.target.value }))}
-                            style={{ ...inputStyle, padding: '0.4rem 0.625rem' }}
-                          />
-                          {utcT && (
-                            <span style={{ color: '#6b88a8', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
-                              UTC {utcT}
-                            </span>
-                          )}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 600 }}>{day}</span>
+                            <button
+                              type="button"
+                              onClick={() => addTimeSlot(day)}
+                              style={{ background: 'none', border: '1px solid #1e3a5f', color: '#00C2A8', borderRadius: '5px', padding: '0.2rem 0.5rem', fontSize: '0.75rem', cursor: 'pointer' }}
+                            >
+                              + Add time
+                            </button>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                            {times.map((t, idx) => {
+                              const utcT = t ? localTimeToUtc(t, timezone) : ''
+                              return (
+                                <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '0.5rem', alignItems: 'center' }}>
+                                  <input
+                                    type="time"
+                                    value={t}
+                                    onChange={(e) => updateTimeSlot(day, idx, e.target.value)}
+                                    style={{ ...inputStyle, padding: '0.4rem 0.625rem' }}
+                                  />
+                                  {utcT && <span style={{ color: '#6b88a8', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>UTC {utcT}</span>}
+                                  {times.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => removeTimeSlot(day, idx)}
+                                      style={{ background: 'none', border: 'none', color: '#6b88a8', cursor: 'pointer', fontSize: '1rem', padding: '0 0.25rem' }}
+                                    >
+                                      ×
+                                    </button>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
                         </div>
                       )
                     })}
                   </div>
                   <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
-                    Set a different start time for each day. Times are stored in UTC and shown to students in their local timezone.
+                    Set one or more start times per day. Use &quot;+ Add time&quot; for multiple sessions on the same day.
                   </p>
                 </div>
               )}

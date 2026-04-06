@@ -19,7 +19,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const body = await req.json()
   const {
     title, description, subject, courseType, gradeLevel,
-    durationWeeks, daysOfWeek, startTimeUtc, sessionDurationMins,
+    durationWeeks, durationUnit, daysOfWeek, startTimeUtc, sessionDurationMins,
     feeUsd, contentUrl, topics, scheduleJson,
   } = body
 
@@ -32,6 +32,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       courseType,
       gradeLevel: gradeLevel || '',
       durationWeeks: durationWeeks ? parseInt(durationWeeks) : 0,
+      durationUnit: durationUnit || 'WEEKS',
       daysOfWeek: daysOfWeek || [],
       startTimeUtc: startTimeUtc || '',
       sessionDurationMins: sessionDurationMins ? parseInt(sessionDurationMins) : 0,
