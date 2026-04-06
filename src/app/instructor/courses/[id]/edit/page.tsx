@@ -13,10 +13,10 @@ const SUBJECTS = [
 ]
 
 const GRADE_LEVELS: Record<string, string[]> = {
-  BIOLOGY: ['9th Grade', '10th Grade'],
-  PHYSICAL_SCIENCE: ['8th Grade'],
-  CHEMISTRY: ['10th Grade'],
-  MATHEMATICS: ['8th Grade', '9th Grade', '10th Grade', '11th Grade', '12th Grade'],
+  BIOLOGY: ['Middle School', 'High School'],
+  PHYSICAL_SCIENCE: ['Middle School', 'High School'],
+  CHEMISTRY: ['Middle School', 'High School'],
+  MATHEMATICS: ['Middle School', 'High School'],
 }
 
 const TIMEZONES = [
