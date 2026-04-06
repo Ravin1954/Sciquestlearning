@@ -41,7 +41,8 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     },
   })
 
-  await sendCourseApprovalEmail(course.instructor.email, course.title)
+  sendCourseApprovalEmail(course.instructor.email, course.title)
+    .catch((err) => console.error('[email] course approval email failed:', err))
 
   return NextResponse.json({ success: true })
 }

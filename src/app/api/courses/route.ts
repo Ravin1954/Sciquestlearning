@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { sendAdminNewCourseEmail } from '@/lib/resend'
 
 export const maxDuration = 30
 
@@ -71,6 +72,14 @@ export async function POST(req: Request) {
       status: 'PENDING',
     },
   })
+
+  // Notify admin of new submission (non-blocking)
+  sendAdminNewCourseEmail(
+    `${user.firstName} ${user.lastName}`,
+    user.email,
+    title,
+    subject,
+  ).catch((err) => console.error('[email] admin new course notification failed:', err))
 
   return NextResponse.json(course, { status: 201 })
 }

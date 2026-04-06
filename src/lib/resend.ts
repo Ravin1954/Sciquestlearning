@@ -2,12 +2,47 @@ import { Resend } from 'resend'
 
 export const resend = new Resend(process.env.RESEND_API_KEY)
 
+export async function sendAdminNewCourseEmail(
+  instructorName: string,
+  instructorEmail: string,
+  courseTitle: string,
+  subject: string,
+) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@sciquestlearning.com'
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: adminEmail,
+    subject: `New course pending approval: "${courseTitle}"`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">New Course Submitted for Approval</h2>
+        <p>An instructor has submitted a new course for your review.</p>
+        <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Course Title</td><td style="padding:0.5rem;">${courseTitle}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Subject</td><td style="padding:0.5rem;">${subject}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Instructor</td><td style="padding:0.5rem;">${instructorName}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Instructor Email</td><td style="padding:0.5rem;">${instructorEmail}</td></tr>
+        </table>
+        <p><a href="https://sciquestlearning.com/admin" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">Review in Admin Dashboard →</a></p>
+        <p style="margin-top:2rem; color:#666;">SciQuest Learning Platform</p>
+      </div>
+    `,
+  })
+}
+
 export async function sendCourseApprovalEmail(instructorEmail: string, courseTitle: string) {
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: instructorEmail,
     subject: `Your course "${courseTitle}" has been approved!`,
-    html: `<h2>Course Approved</h2><p>Your course <strong>${courseTitle}</strong> has been approved and is now live on SciQuest Learning.</p>`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Course Approved!</h2>
+        <p>Great news! Your course <strong>${courseTitle}</strong> has been reviewed and approved. It is now live on SciQuest Learning and visible to students.</p>
+        <p><a href="https://sciquestlearning.com/instructor" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">View Your Dashboard →</a></p>
+        <p style="margin-top:2rem; color:#666;">Thank you for teaching with SciQuest Learning!</p>
+      </div>
+    `,
   })
 }
 

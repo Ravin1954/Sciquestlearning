@@ -24,7 +24,9 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   if (!course) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   await prisma.course.update({ where: { id }, data: { status: 'REJECTED', rejectionRemark: remark || null } })
-  await sendCourseRejectionEmail(course.instructor.email, course.title, remark)
+
+  sendCourseRejectionEmail(course.instructor.email, course.title, remark)
+    .catch((err) => console.error('[email] course rejection email failed:', err))
 
   return NextResponse.json({ success: true })
 }
