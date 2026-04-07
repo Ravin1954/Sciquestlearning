@@ -65,28 +65,32 @@ export default function CourseDetailPage() {
   const [error, setError] = useState('')
   const [sessions, setSessions] = useState<Session[]>([])
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set())
+  const [enrolledSessions, setEnrolledSessions] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    fetch(`/api/courses/${id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        setCourse(data)
-        // Parse available sessions from scheduleJson
-        if (data.scheduleJson) {
-          try {
-            const schedule: ScheduleEntry[] = JSON.parse(data.scheduleJson)
-            const parsed: Session[] = []
-            schedule.forEach((entry) => {
-              const times = entry.utcTimes || (entry.utcTime ? [entry.utcTime] : [])
-              times.forEach((t) => {
-                parsed.push({ day: entry.day, utcTime: t, label: `${entry.day} — ${formatUtcTime(t)}` })
-              })
+    Promise.all([
+      fetch(`/api/courses/${id}`).then((r) => r.json()),
+      fetch(`/api/courses/${id}/my-sessions`).then((r) => r.json()).catch(() => ({ enrolledSessions: [] })),
+    ]).then(([data, myData]) => {
+      setCourse(data)
+      const alreadyEnrolled: string[] = myData.enrolledSessions || []
+      setEnrolledSessions(new Set(alreadyEnrolled))
+
+      if (data.scheduleJson) {
+        try {
+          const schedule: ScheduleEntry[] = JSON.parse(data.scheduleJson)
+          const parsed: Session[] = []
+          schedule.forEach((entry) => {
+            const times = entry.utcTimes || (entry.utcTime ? [entry.utcTime] : [])
+            times.forEach((t) => {
+              parsed.push({ day: entry.day, utcTime: t, label: `${entry.day} — ${formatUtcTime(t)}` })
             })
-            setSessions(parsed)
-          } catch { /* ignore */ }
-        }
-        setLoading(false)
-      })
+          })
+          setSessions(parsed)
+        } catch { /* ignore */ }
+      }
+      setLoading(false)
+    })
   }, [id])
 
   const toggleSession = (label: string) => {
@@ -98,7 +102,7 @@ export default function CourseDetailPage() {
     })
   }
 
-  const selectAll = () => setSelectedSessions(new Set(sessions.map((s) => s.label)))
+  const selectAll = () => setSelectedSessions(new Set(sessions.filter((s) => !enrolledSessions.has(s.label)).map((s) => s.label)))
   const clearAll = () => setSelectedSessions(new Set())
 
   const feePerSession = course ? Number(course.feeUsd) : 0
@@ -231,10 +235,11 @@ export default function CourseDetailPage() {
                   </div>
                 </div>
                 <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.875rem' }}>
-                  Each session is <strong style={{ color: '#F5C842' }}>${feePerSession.toFixed(2)}</strong>. Select the sessions you want to attend and pay for them all at once.
+                  Each session is <strong style={{ color: '#F5C842' }}>${feePerSession.toFixed(2)}</strong>. Select sessions and pay now, or come back later to add more.
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   {sessions.map((s) => {
+                    const alreadyPaid = enrolledSessions.has(s.label)
                     const checked = selectedSessions.has(s.label)
                     return (
                       <label
@@ -245,22 +250,24 @@ export default function CourseDetailPage() {
                           gap: '0.75rem',
                           padding: '0.625rem 0.875rem',
                           borderRadius: '8px',
-                          border: checked ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                          backgroundColor: checked ? '#003d35' : '#060f1a',
-                          cursor: 'pointer',
+                          border: alreadyPaid ? '1px solid #1e4a1e' : checked ? '1px solid #00C2A8' : '1px solid #1e3a5f',
+                          backgroundColor: alreadyPaid ? '#0a200a' : checked ? '#003d35' : '#060f1a',
+                          cursor: alreadyPaid ? 'default' : 'pointer',
+                          opacity: alreadyPaid ? 0.8 : 1,
                         }}
                       >
                         <input
                           type="checkbox"
-                          checked={checked}
-                          onChange={() => toggleSession(s.label)}
-                          style={{ accentColor: '#00C2A8', width: '16px', height: '16px' }}
+                          checked={alreadyPaid || checked}
+                          disabled={alreadyPaid}
+                          onChange={() => !alreadyPaid && toggleSession(s.label)}
+                          style={{ accentColor: alreadyPaid ? '#22c55e' : '#00C2A8', width: '16px', height: '16px' }}
                         />
-                        <span style={{ color: checked ? '#00C2A8' : '#a8c4e0', fontSize: '0.875rem', fontWeight: checked ? 600 : 400 }}>
+                        <span style={{ color: alreadyPaid ? '#22c55e' : checked ? '#00C2A8' : '#a8c4e0', fontSize: '0.875rem', fontWeight: (alreadyPaid || checked) ? 600 : 400 }}>
                           {s.label}
                         </span>
-                        <span style={{ marginLeft: 'auto', color: '#6b88a8', fontSize: '0.8rem' }}>
-                          ${feePerSession.toFixed(2)}
+                        <span style={{ marginLeft: 'auto', color: alreadyPaid ? '#22c55e' : '#6b88a8', fontSize: '0.8rem', fontWeight: alreadyPaid ? 600 : 400 }}>
+                          {alreadyPaid ? '✓ Paid' : `$${feePerSession.toFixed(2)}`}
                         </span>
                       </label>
                     )
@@ -324,9 +331,14 @@ export default function CourseDetailPage() {
                 </p>
               )}
 
+              {enrolledSessions.size > 0 && (
+                <p style={{ color: '#22c55e', fontSize: '0.8rem', marginBottom: '0.5rem', fontWeight: 600 }}>
+                  ✓ {enrolledSessions.size} session{enrolledSessions.size !== 1 ? 's' : ''} already paid
+                </p>
+              )}
               <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
                 {isLive && hasSessions
-                  ? 'Select sessions above then enroll'
+                  ? enrolledSessions.size > 0 ? 'Select more sessions to add' : 'Select sessions above then enroll'
                   : 'One-time course fee'}
               </p>
 

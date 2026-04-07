@@ -21,17 +21,32 @@ export async function POST(req: Request) {
   if (!course) return NextResponse.json({ error: 'Course not found' }, { status: 404 })
   if (course.instructorId === student.id) return NextResponse.json({ error: 'You cannot enroll in your own course' }, { status: 403 })
 
-  // Prevent duplicate enrollment
-  const existing = await prisma.enrollment.findFirst({
-    where: { studentId: student.id, courseId },
-  })
-  if (existing) return NextResponse.json({ error: 'Already enrolled' }, { status: 400 })
+  const sessions: string[] = Array.isArray(selectedSessions) ? selectedSessions : []
+
+  // For courses with sessions: check which sessions are already paid
+  if (sessions.length > 0) {
+    const existingEnrollments = await prisma.enrollment.findMany({
+      where: { studentId: student.id, courseId },
+      select: { selectedSessionsJson: true },
+    })
+    const alreadyEnrolled: string[] = []
+    for (const e of existingEnrollments) {
+      if (e.selectedSessionsJson) {
+        try { alreadyEnrolled.push(...JSON.parse(e.selectedSessionsJson)) } catch { /* ignore */ }
+      }
+    }
+    const alreadyPaid = sessions.filter((s) => alreadyEnrolled.includes(s))
+    if (alreadyPaid.length > 0) {
+      return NextResponse.json({ error: `Already enrolled in: ${alreadyPaid.join(', ')}` }, { status: 400 })
+    }
+  } else {
+    // No sessions specified (self-paced or full course) — block full duplicates
+    const existing = await prisma.enrollment.findFirst({ where: { studentId: student.id, courseId } })
+    if (existing) return NextResponse.json({ error: 'Already enrolled' }, { status: 400 })
+  }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const feePerSession = Number(course.feeUsd)
-
-  // For LIVE courses with sessions, multiply by session count
-  const sessions: string[] = Array.isArray(selectedSessions) ? selectedSessions : []
   const sessionCount = sessions.length > 0 ? sessions.length : 1
   const totalFee = feePerSession * sessionCount
   const amountCents = Math.round(totalFee * 100)
@@ -55,10 +70,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: `${appUrl}/student` })
   }
 
-  const sessionLabel = sessionCount === 1
-    ? sessions[0] || course.title
-    : `${sessionCount} sessions`
-
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     customer_email: student.email,
@@ -71,9 +82,9 @@ export async function POST(req: Request) {
             name: course.title,
             description: sessionCount > 1
               ? `${sessionCount} sessions × $${feePerSession.toFixed(2)}/session`
-              : sessionLabel,
+              : sessions[0] || course.title,
           },
-          unit_amount: feePerSession * 100 | 0,
+          unit_amount: Math.round(feePerSession * 100),
         },
         quantity: sessionCount,
       },
