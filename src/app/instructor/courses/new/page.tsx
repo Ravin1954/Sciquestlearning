@@ -598,7 +598,7 @@ export default function NewCoursePage() {
               step="0.01"
               value={form.feeUsd}
               onChange={set('feeUsd')}
-              placeholder={feeType === 'PER_SESSION' ? 'e.g. 40.00 per session' : 'e.g. 149.00 for full course'}
+              placeholder={feeType === 'PER_SESSION' ? 'Enter fee per session' : 'Enter total course fee'}
               style={inputStyle}
             />
             {form.feeUsd !== '' && (

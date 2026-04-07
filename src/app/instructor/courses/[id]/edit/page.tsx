@@ -499,7 +499,7 @@ export default function EditCoursePage() {
                 </button>
               ))}
             </div>
-            <input required type="number" min="0" step="0.01" value={form.feeUsd} onChange={set('feeUsd')} placeholder={feeType === 'PER_SESSION' ? 'e.g. 40.00 per session' : 'e.g. 149.00 for full course'} style={inputStyle} />
+            <input required type="number" min="0" step="0.01" value={form.feeUsd} onChange={set('feeUsd')} placeholder={feeType === 'PER_SESSION' ? 'Enter fee per session' : 'Enter total course fee'} style={inputStyle} />
             {form.feeUsd && parseFloat(form.feeUsd) > 0 && (
               <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1.5rem' }}>
                 <p style={{ color: '#00C2A8', fontSize: '0.75rem' }}>You receive: <strong>${(parseFloat(form.feeUsd) * 0.8).toFixed(2)}</strong> (80%){feeType === 'PER_SESSION' ? ' per session' : ' of full course fee'}</p>
