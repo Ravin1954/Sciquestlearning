@@ -38,6 +38,26 @@ const TIMEZONES = [
   'Pacific/Auckland',
 ]
 
+const DAY_INDEX: Record<string, number> = {
+  Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6,
+}
+
+function nextDateForDay(dayName: string): string {
+  const target = DAY_INDEX[dayName]
+  const today = new Date()
+  const todayDay = today.getDay()
+  const diff = (target - todayDay + 7) % 7 || 7
+  const next = new Date(today)
+  next.setDate(today.getDate() + diff)
+  return next.toISOString().split('T')[0]
+}
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return ''
+  const d = new Date(dateStr + 'T00:00:00')
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+}
+
 function localTimeToUtc(localTime: string, timezone: string): string {
   if (!localTime) return ''
   const [hours, minutes] = localTime.split(':').map(Number)
@@ -87,6 +107,8 @@ export default function NewCoursePage() {
   const [timezone, setTimezone] = useState('America/New_York')
   // Per-day local times: { Monday: ['09:00', '14:00'], Wednesday: ['10:00'] }
   const [dayTimes, setDayTimes] = useState<Record<string, string[]>>({})
+  // Per-day dates (auto-computed from next occurrence of that weekday)
+  const [dayDates, setDayDates] = useState<Record<string, string>>({})
   // Topics
   const [topics, setTopics] = useState<string[]>([])
   const [topicInput, setTopicInput] = useState('')
@@ -107,13 +129,23 @@ export default function NewCoursePage() {
 
   const toggleDay = (day: string) => {
     setSelectedDays((prev) => {
+      let next: string[]
       if (prev.includes(day)) {
-        setDayTimes((dt) => { const next = { ...dt }; delete next[day]; return next })
-        return prev.filter((d) => d !== day)
+        setDayTimes((dt) => { const n = { ...dt }; delete n[day]; return n })
+        setDayDates((dd) => { const n = { ...dd }; delete n[day]; return n })
+        next = prev.filter((d) => d !== day)
       } else {
         setDayTimes((dt) => ({ ...dt, [day]: [''] }))
-        return [...prev, day]
+        setDayDates((dd) => ({ ...dd, [day]: nextDateForDay(day) }))
+        next = [...prev, day]
       }
+      // Set startDate to the earliest selected day date
+      const allDates = DAYS.filter((d) => next.includes(d)).map((d) =>
+        d === day && !prev.includes(day) ? nextDateForDay(d) : dayDates[d] || nextDateForDay(d)
+      )
+      const earliest = allDates.sort()[0] || ''
+      setForm((f) => ({ ...f, startDate: earliest }))
+      return next
     })
   }
 
@@ -157,6 +189,7 @@ export default function NewCoursePage() {
       const times = (dayTimes[day] || ['']).filter(Boolean)
       return {
         day,
+        date: dayDates[day] || '',
         localTimes: times,
         utcTimes: times.map((t) => localTimeToUtc(t, timezone)),
       }
@@ -407,21 +440,41 @@ export default function NewCoursePage() {
             </p>
           </div>
 
-          {/* Start Date */}
-          <div>
-            <label style={labelStyle}>Course Start Date</label>
-            <input
-              required
-              type="date"
-              value={form.startDate}
-              onChange={set('startDate')}
-              min={new Date().toISOString().split('T')[0]}
-              style={{ ...inputStyle, colorScheme: 'dark' }}
-            />
-            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
-              The date the first session takes place.
-            </p>
-          </div>
+          {/* Course Calendar — shown once days are selected */}
+          {selectedDays.length > 0 && (
+            <div>
+              <label style={labelStyle}>Course Calendar</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {DAYS.filter((d) => selectedDays.includes(d)).map((day) => (
+                  <div key={day} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.625rem 0.875rem' }}>
+                    <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 600, width: '100px' }}>{day}</span>
+                    <input
+                      type="date"
+                      value={dayDates[day] || ''}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => {
+                        const newDate = e.target.value
+                        setDayDates((dd) => ({ ...dd, [day]: newDate }))
+                        // Update startDate to earliest
+                        const allDates = DAYS.filter((d) => selectedDays.includes(d)).map((d) => d === day ? newDate : dayDates[d] || '')
+                        const earliest = allDates.filter(Boolean).sort()[0] || ''
+                        setForm((f) => ({ ...f, startDate: earliest }))
+                      }}
+                      style={{ ...inputStyle, flex: 1, colorScheme: 'dark', padding: '0.4rem 0.625rem' }}
+                    />
+                    {dayDates[day] && (
+                      <span style={{ color: '#00C2A8', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
+                        {formatDate(dayDates[day])}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                Dates are auto-set to the next upcoming occurrence. You can adjust them if needed.
+              </p>
+            </div>
+          )}
 
           {/* LIVE-only fields */}
           {courseType === 'LIVE' && (
