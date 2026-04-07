@@ -47,11 +47,8 @@ export default function CoursesPage() {
 
   const GRADE_OPTIONS = [
     { value: '', label: 'All Grades' },
-    { value: '8th Grade', label: '8th Grade' },
-    { value: '9th Grade', label: '9th Grade' },
-    { value: '10th Grade', label: '10th Grade' },
-    { value: '11th Grade', label: '11th Grade' },
-    { value: '12th Grade', label: '12th Grade' },
+    { value: 'Middle School', label: 'Middle School' },
+    { value: 'High School', label: 'High School' },
   ]
 
   useEffect(() => {
