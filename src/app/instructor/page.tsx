@@ -263,14 +263,17 @@ export default function InstructorPage() {
                           <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>No content URL</span>
                         )
                       ) : (
-                        c.zoomStartUrl ? (
-                          <a href={c.zoomStartUrl.startsWith('http') ? c.zoomStartUrl : `https://${c.zoomStartUrl}`} target="_blank" rel="noopener noreferrer"
-                            style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
-                            Start Class →
-                          </a>
-                        ) : (
-                          <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Meeting link pending</span>
-                        )
+                        (() => {
+                          const meetLink = c.zoomJoinUrl || c.zoomStartUrl
+                          return meetLink ? (
+                            <a href={meetLink.startsWith('http') ? meetLink : `https://${meetLink}`} target="_blank" rel="noopener noreferrer"
+                              style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                              Start Class →
+                            </a>
+                          ) : (
+                            <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Meeting link pending</span>
+                          )
+                        })()
                       )}
                     </div>
                   </div>

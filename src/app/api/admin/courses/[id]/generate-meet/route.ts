@@ -21,7 +21,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
 
   await prisma.course.update({
     where: { id },
-    data: { zoomJoinUrl: meetingUrl },
+    data: { zoomJoinUrl: meetingUrl, zoomStartUrl: meetingUrl },
   })
 
   // Update all existing enrollments for this course with the new Meet link

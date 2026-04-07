@@ -37,7 +37,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     where: { id },
     data: {
       status: 'APPROVED',
-      ...(course.courseType === 'LIVE' && meetingUrl ? { zoomJoinUrl: meetingUrl } : {}),
+      ...(course.courseType === 'LIVE' && meetingUrl ? { zoomJoinUrl: meetingUrl, zoomStartUrl: meetingUrl } : {}),
     },
   })
 
