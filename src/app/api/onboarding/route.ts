@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const { role, timezone, country, qualifications, subjects, age, gender, fathersName, mothersName } = body
+  const { role, firstName: bodyFirstName, lastName: bodyLastName, timezone, country, qualifications, subjects, age, gender, fathersName, mothersName } = body
 
   if (!role || !timezone) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -58,8 +58,8 @@ export async function POST(req: Request) {
   const clerk = await clerkClient()
   const clerkUser = await clerk.users.getUser(userId)
 
-  const firstName = clerkUser.firstName || ''
-  const lastName = clerkUser.lastName || ''
+  const firstName = bodyFirstName || clerkUser.firstName || ''
+  const lastName = bodyLastName || clerkUser.lastName || ''
   const email = clerkUser.emailAddresses[0]?.emailAddress || ''
 
   const dbRole = role === 'instructor' ? 'INSTRUCTOR' : 'STUDENT'
@@ -83,6 +83,8 @@ export async function POST(req: Request) {
       where: { id: existingUser.id },
       data: {
         clerkId: userId,
+        firstName,
+        lastName,
         role: dbRole,
         timezone,
         country,

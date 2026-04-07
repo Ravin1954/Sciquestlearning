@@ -155,6 +155,8 @@ function OnboardingContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           role,
+          firstName,
+          lastName,
           timezone,
           country,
           subjects: selectedSubjects,
