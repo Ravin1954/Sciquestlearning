@@ -103,6 +103,7 @@ export default function EditCoursePage() {
     sessionDurationMins: '',
     feeUsd: '',
     contentUrl: '',
+    startDate: '',
   })
 
   useEffect(() => {
@@ -129,6 +130,7 @@ export default function EditCoursePage() {
           sessionDurationMins: course.sessionDurationMins?.toString() || '',
           feeUsd: Number(course.feeUsd).toFixed(2),
           contentUrl: course.contentUrl || '',
+          startDate: course.startDate || '',
         })
         // Pre-fill day times from scheduleJson
         if (course.scheduleJson) {
@@ -233,6 +235,7 @@ export default function EditCoursePage() {
         startTimeUtc,
         topics,
         scheduleJson,
+        startDate: form.startDate,
       }),
     })
 
@@ -386,6 +389,21 @@ export default function EditCoursePage() {
             <input required type="number" min="1" max={durationUnit === 'WEEKS' ? 52 : 365} value={form.durationWeeks} onChange={set('durationWeeks')} placeholder={durationUnit === 'WEEKS' ? 'e.g. 8' : 'e.g. 1'} style={inputStyle} />
             <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               {durationUnit === 'DAYS' && parseInt(form.durationWeeks) === 1 ? 'Single-day course' : `Number of ${durationUnit.toLowerCase()} the course runs`}
+            </p>
+          </div>
+
+          {/* Start Date */}
+          <div>
+            <label style={labelStyle}>Course Start Date</label>
+            <input
+              required
+              type="date"
+              value={form.startDate}
+              onChange={set('startDate')}
+              style={{ ...inputStyle, colorScheme: 'dark' }}
+            />
+            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+              The date the first session takes place.
             </p>
           </div>
 

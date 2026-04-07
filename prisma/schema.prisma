@@ -40,6 +40,7 @@ model Course {
   courseType          CourseType   @default(LIVE)
   durationWeeks       Int          @default(0)
   durationUnit        String       @default("WEEKS")
+  startDate           String       @default("")
   daysOfWeek          String[]
   startTimeUtc        String       @default("")
   sessionDurationMins Int          @default(0)

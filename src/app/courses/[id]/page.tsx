@@ -22,6 +22,7 @@ interface Course {
   subject: string
   courseType: string
   feeType?: string
+  startDate?: string
   durationWeeks: number
   durationUnit?: string
   daysOfWeek: string[]
@@ -293,6 +294,14 @@ export default function CourseDetailPage() {
             <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
               <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>Course Details</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {course.startDate && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Start Date</span>
+                    <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
+                      {new Date(course.startDate + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </span>
+                  </div>
+                )}
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Duration</span>
                   <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>{durationLabel}</span>

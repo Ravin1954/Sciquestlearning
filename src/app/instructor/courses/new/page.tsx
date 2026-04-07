@@ -102,6 +102,7 @@ export default function NewCoursePage() {
     sessionDurationMins: '',
     feeUsd: '',
     contentUrl: '',
+    startDate: '',
   })
 
   const toggleDay = (day: string) => {
@@ -196,6 +197,7 @@ export default function NewCoursePage() {
         startTimeUtc,
         topics,
         scheduleJson,
+        startDate: form.startDate,
       }),
     })
 
@@ -402,6 +404,22 @@ export default function NewCoursePage() {
             />
             <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               {durationUnit === 'DAYS' && parseInt(form.durationWeeks) === 1 ? 'Single-day course' : `Number of ${durationUnit.toLowerCase()} the course runs`}
+            </p>
+          </div>
+
+          {/* Start Date */}
+          <div>
+            <label style={labelStyle}>Course Start Date</label>
+            <input
+              required
+              type="date"
+              value={form.startDate}
+              onChange={set('startDate')}
+              min={new Date().toISOString().split('T')[0]}
+              style={{ ...inputStyle, colorScheme: 'dark' }}
+            />
+            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+              The date the first session takes place.
             </p>
           </div>
 
