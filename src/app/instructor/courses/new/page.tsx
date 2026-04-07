@@ -527,12 +527,11 @@ export default function NewCoursePage() {
                 <input
                   required
                   type="number"
-                  min="30"
-                  max="180"
-                  step="15"
+                  min="1"
+                  max="480"
                   value={form.sessionDurationMins}
                   onChange={set('sessionDurationMins')}
-                  placeholder="e.g. 60"
+                  placeholder="e.g. 40"
                   style={inputStyle}
                 />
               </div>
@@ -564,7 +563,7 @@ export default function NewCoursePage() {
 
           {/* Fee */}
           <div>
-            <label style={labelStyle}>Course Fee (USD)</label>
+            <label style={labelStyle}>Fee per Session (USD)</label>
             <input
               required
               type="number"
@@ -572,7 +571,7 @@ export default function NewCoursePage() {
               step="0.01"
               value={form.feeUsd}
               onChange={set('feeUsd')}
-              placeholder="0.00 for free, or e.g. 149.00"
+              placeholder="0.00 for free, or e.g. 40.00"
               style={inputStyle}
             />
             {form.feeUsd !== '' && (

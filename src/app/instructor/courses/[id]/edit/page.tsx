@@ -455,7 +455,7 @@ export default function EditCoursePage() {
 
               <div>
                 <label style={labelStyle}>Session Duration (minutes)</label>
-                <input required type="number" min="30" max="180" step="15" value={form.sessionDurationMins} onChange={set('sessionDurationMins')} placeholder="e.g. 60" style={inputStyle} />
+                <input required type="number" min="1" max="480" value={form.sessionDurationMins} onChange={set('sessionDurationMins')} placeholder="e.g. 40" style={inputStyle} />
               </div>
             </>
           )}
@@ -470,8 +470,8 @@ export default function EditCoursePage() {
 
           {/* Fee */}
           <div>
-            <label style={labelStyle}>Course Fee (USD)</label>
-            <input required type="number" min="1" step="0.01" value={form.feeUsd} onChange={set('feeUsd')} placeholder="e.g. 149.00" style={inputStyle} />
+            <label style={labelStyle}>Fee per Session (USD)</label>
+            <input required type="number" min="0" step="0.01" value={form.feeUsd} onChange={set('feeUsd')} placeholder="e.g. 40.00" style={inputStyle} />
             {form.feeUsd && (
               <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1.5rem' }}>
                 <p style={{ color: '#00C2A8', fontSize: '0.75rem' }}>You receive: <strong>${(parseFloat(form.feeUsd) * 0.8).toFixed(2)}</strong> (80%)</p>
