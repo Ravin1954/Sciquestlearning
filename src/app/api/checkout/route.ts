@@ -47,7 +47,9 @@ export async function POST(req: Request) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const feePerSession = Number(course.feeUsd)
-  const sessionCount = sessions.length > 0 ? sessions.length : 1
+  const isLumpSum = course.feeType === 'LUMP_SUM'
+  // Lump sum: always qty 1 regardless of sessions selected
+  const sessionCount = isLumpSum ? 1 : (sessions.length > 0 ? sessions.length : 1)
   const totalFee = feePerSession * sessionCount
   const amountCents = Math.round(totalFee * 100)
   const selectedSessionsJson = sessions.length > 0 ? JSON.stringify(sessions) : ''
@@ -80,9 +82,11 @@ export async function POST(req: Request) {
           currency: 'usd',
           product_data: {
             name: course.title,
-            description: sessionCount > 1
-              ? `${sessionCount} sessions × $${feePerSession.toFixed(2)}/session`
-              : sessions[0] || course.title,
+            description: isLumpSum
+              ? `Full course fee — ${sessions.length > 0 ? sessions.join(', ') : 'all sessions'}`
+              : sessionCount > 1
+                ? `${sessionCount} sessions × $${feePerSession.toFixed(2)}/session`
+                : sessions[0] || course.title,
           },
           unit_amount: Math.round(feePerSession * 100),
         },

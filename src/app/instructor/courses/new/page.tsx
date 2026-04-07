@@ -92,6 +92,7 @@ export default function NewCoursePage() {
   const [topicInput, setTopicInput] = useState('')
 
   const [durationUnit, setDurationUnit] = useState<'WEEKS' | 'DAYS'>('WEEKS')
+  const [feeType, setFeeType] = useState<'PER_SESSION' | 'LUMP_SUM'>('PER_SESSION')
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -189,6 +190,7 @@ export default function NewCoursePage() {
         ...form,
         courseType,
         durationUnit,
+        feeType,
         gradeLevel: form.gradeLevel,
         daysOfWeek: courseType === 'LIVE' ? selectedDays : [],
         startTimeUtc,
@@ -563,7 +565,32 @@ export default function NewCoursePage() {
 
           {/* Fee */}
           <div>
-            <label style={labelStyle}>Fee per Session (USD)</label>
+            <label style={labelStyle}>Course Fee</label>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.625rem' }}>
+              {([
+                { value: 'PER_SESSION', label: 'Per Session', desc: 'Students pay per session they attend' },
+                { value: 'LUMP_SUM', label: 'Lump Sum', desc: 'One flat fee covers the entire course' },
+              ] as const).map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setFeeType(opt.value)}
+                  style={{
+                    flex: 1,
+                    padding: '0.625rem 0.75rem',
+                    borderRadius: '8px',
+                    border: feeType === opt.value ? '1px solid #00C2A8' : '1px solid #1e3a5f',
+                    backgroundColor: feeType === opt.value ? '#003d35' : '#060f1a',
+                    color: feeType === opt.value ? '#00C2A8' : '#6b88a8',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <p style={{ fontWeight: 700, fontSize: '0.825rem', marginBottom: '0.15rem' }}>{opt.label}</p>
+                  <p style={{ fontSize: '0.7rem', color: feeType === opt.value ? '#00a88f' : '#4a6080' }}>{opt.desc}</p>
+                </button>
+              ))}
+            </div>
             <input
               required
               type="number"
@@ -571,7 +598,7 @@ export default function NewCoursePage() {
               step="0.01"
               value={form.feeUsd}
               onChange={set('feeUsd')}
-              placeholder="0.00 for free, or e.g. 40.00"
+              placeholder={feeType === 'PER_SESSION' ? 'e.g. 40.00 per session' : 'e.g. 149.00 for full course'}
               style={inputStyle}
             />
             {form.feeUsd !== '' && (
@@ -582,9 +609,10 @@ export default function NewCoursePage() {
                   <>
                     <p style={{ color: '#00C2A8', fontSize: '0.75rem' }}>
                       You receive: <strong>${(parseFloat(form.feeUsd) * 0.8).toFixed(2)}</strong> (80%)
+                      {feeType === 'PER_SESSION' ? ' per session' : ' of full course fee'}
                     </p>
                     <p style={{ color: '#6b88a8', fontSize: '0.75rem' }}>
-                      Platform fee: ${(parseFloat(form.feeUsd) * 0.2).toFixed(2)} (20%)
+                      Platform: ${(parseFloat(form.feeUsd) * 0.2).toFixed(2)} (20%)
                     </p>
                   </>
                 )}

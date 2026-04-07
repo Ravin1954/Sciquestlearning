@@ -44,6 +44,7 @@ model Course {
   startTimeUtc        String       @default("")
   sessionDurationMins Int          @default(0)
   feeUsd              Decimal      @db.Decimal(10, 2)
+  feeType             String       @default("PER_SESSION")
   contentUrl          String?
   gradeLevel          String       @default("")
   topics              String[]     @default([])

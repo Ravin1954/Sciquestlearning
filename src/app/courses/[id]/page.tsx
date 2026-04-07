@@ -21,6 +21,7 @@ interface Course {
   description: string
   subject: string
   courseType: string
+  feeType?: string
   durationWeeks: number
   durationUnit?: string
   daysOfWeek: string[]
@@ -107,7 +108,7 @@ export default function CourseDetailPage() {
 
   const feePerSession = course ? Number(course.feeUsd) : 0
   const sessionCount = selectedSessions.size
-  const totalFee = feePerSession * sessionCount
+  const totalFee = (course?.feeType === 'LUMP_SUM') ? feePerSession : feePerSession * sessionCount
 
   const handleEnroll = async () => {
     if (!isSignedIn) { router.push('/sign-in'); return }
@@ -177,6 +178,7 @@ export default function CourseDetailPage() {
 
   const isLive = course.courseType === 'LIVE'
   const hasSessions = sessions.length > 0
+  const isLumpSum = course.feeType === 'LUMP_SUM'
 
   return (
     <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
@@ -235,7 +237,10 @@ export default function CourseDetailPage() {
                   </div>
                 </div>
                 <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.875rem' }}>
-                  Each session is <strong style={{ color: '#F5C842' }}>${feePerSession.toFixed(2)}</strong>. Select sessions and pay now, or come back later to add more.
+                  {isLumpSum
+                    ? <>One flat fee of <strong style={{ color: '#F5C842' }}>${feePerSession.toFixed(2)}</strong> covers the entire course. Select the sessions you plan to attend.</>
+                    : <>Each session is <strong style={{ color: '#F5C842' }}>${feePerSession.toFixed(2)}</strong>. Select sessions and pay now, or come back later to add more.</>
+                  }
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   {sessions.map((s) => {
@@ -275,8 +280,10 @@ export default function CourseDetailPage() {
                 </div>
                 {sessionCount > 0 && (
                   <div style={{ marginTop: '0.875rem', padding: '0.75rem', backgroundColor: '#0a2240', borderRadius: '8px', border: '1px solid #1e3a5f', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ color: '#a8c4e0', fontSize: '0.875rem' }}>{sessionCount} session{sessionCount !== 1 ? 's' : ''} selected</span>
-                    <span style={{ color: '#F5C842', fontWeight: 700, fontSize: '1.1rem' }}>${totalFee.toFixed(2)} total</span>
+                    <span style={{ color: '#a8c4e0', fontSize: '0.875rem' }}>
+                      {isLumpSum ? 'Full course fee' : `${sessionCount} session${sessionCount !== 1 ? 's' : ''} selected`}
+                    </span>
+                    <span style={{ color: '#F5C842', fontWeight: 700, fontSize: '1.1rem' }}>${totalFee.toFixed(2)}</span>
                   </div>
                 )}
               </div>
@@ -322,10 +329,12 @@ export default function CourseDetailPage() {
             <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
               <p style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#F5C842', marginBottom: '0.1rem' }}>
                 ${feePerSession.toFixed(2)}
-                <span style={{ fontSize: '1rem', fontWeight: 400, color: '#6b88a8' }}> / session</span>
+                <span style={{ fontSize: '1rem', fontWeight: 400, color: '#6b88a8' }}>
+                  {isLumpSum ? ' full course' : ' / session'}
+                </span>
               </p>
 
-              {sessionCount > 0 && (
+              {sessionCount > 0 && !isLumpSum && (
                 <p style={{ color: '#00C2A8', fontSize: '0.9rem', fontWeight: 600, marginBottom: '0.5rem' }}>
                   {sessionCount} session{sessionCount !== 1 ? 's' : ''} → <strong>${totalFee.toFixed(2)}</strong> total
                 </p>
@@ -383,9 +392,11 @@ export default function CourseDetailPage() {
                     ? 'Sign In to Enroll →'
                     : isLive && hasSessions && sessionCount === 0
                       ? 'Select Sessions Above'
-                      : sessionCount > 0
-                        ? `Enroll in ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} →`
-                        : 'Enroll Now →'}
+                      : isLumpSum && sessionCount > 0
+                        ? `Enroll — Pay $${totalFee.toFixed(2)} →`
+                        : sessionCount > 0
+                          ? `Enroll in ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} →`
+                          : 'Enroll Now →'}
               </button>
 
               <p style={{ textAlign: 'center', color: '#6b88a8', fontSize: '0.75rem', marginBottom: '1rem' }}>
