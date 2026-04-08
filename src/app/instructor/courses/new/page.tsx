@@ -401,8 +401,8 @@ export default function NewCoursePage() {
             </div>
           </div>
 
-          {/* Duration */}
-          <div>
+          {/* Duration — hidden for self-paced (lifetime access) */}
+          {courseType === 'LIVE' && <div>
             <label style={labelStyle}>Duration</label>
             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.625rem' }}>
               {(['WEEKS', 'DAYS'] as const).map((unit) => (
@@ -438,7 +438,7 @@ export default function NewCoursePage() {
             <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               {durationUnit === 'DAYS' && parseInt(form.durationWeeks) === 1 ? 'Single-day course' : `Number of ${durationUnit.toLowerCase()} the course runs`}
             </p>
-          </div>
+          </div>}
 
           {/* Course Calendar — shown once days are selected */}
           {selectedDays.length > 0 && (
