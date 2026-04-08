@@ -41,6 +41,53 @@ interface BankInfo {
   accountType?: string
 }
 
+const DAY_INDEX: Record<string, number> = {
+  Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3,
+  Thursday: 4, Friday: 5, Saturday: 6,
+}
+
+// Returns minutes until next scheduled session (negative if in the past today)
+function minutesUntilNextSession(daysOfWeek: string[], startTimeUtc: string): number {
+  if (!daysOfWeek.length || !startTimeUtc) return Infinity
+  const [h, m] = startTimeUtc.split(':').map(Number)
+  const now = new Date()
+  const nowUtcMins = now.getUTCHours() * 60 + now.getUTCMinutes()
+  const sessionMins = h * 60 + m
+  const todayDay = now.getUTCDay()
+
+  let minDiff = Infinity
+  for (const day of daysOfWeek) {
+    const target = DAY_INDEX[day] ?? -1
+    if (target < 0) continue
+    let dayDiff = target - todayDay
+    if (dayDiff < 0) dayDiff += 7
+    const totalMins = dayDiff * 1440 + (sessionMins - nowUtcMins)
+    if (totalMins < minDiff) minDiff = totalMins
+  }
+  return minDiff
+}
+
+function nextSessionLabel(daysOfWeek: string[], startTimeUtc: string): string {
+  if (!daysOfWeek.length || !startTimeUtc) return ''
+  const [h, m] = startTimeUtc.split(':').map(Number)
+  const now = new Date()
+  const todayDay = now.getUTCDay()
+  let minDiff = Infinity
+  let nextDay = ''
+  for (const day of daysOfWeek) {
+    const target = DAY_INDEX[day] ?? -1
+    if (target < 0) continue
+    let dayDiff = target - todayDay
+    if (dayDiff <= 0) dayDiff += 7
+    if (dayDiff < minDiff) { minDiff = dayDiff; nextDay = day }
+  }
+  const d = new Date()
+  d.setUTCDate(d.getUTCDate() + minDiff)
+  d.setUTCHours(h, m, 0, 0)
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
+    ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' }) + ' UTC'
+}
+
 const S = {
   card: { backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' } as React.CSSProperties,
   label: { color: '#6b88a8', fontSize: '0.75rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.25rem' },
@@ -244,40 +291,51 @@ export default function InstructorPage() {
             <div style={{ marginBottom: '2.5rem' }}>
               <h2 style={S.h2}>Upcoming Classes</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {approved.map((c) => (
-                  <div key={c.id} style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div>
-                      <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
-                      <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
-                        {c.daysOfWeek.join(', ')} · {c.startTimeUtc} UTC · {c.sessionDurationMins} min · {c._count.enrollments} students
-                      </p>
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      {c.courseType === 'SELF_PACED' ? (
-                        c.contentUrl ? (
-                          <a href={c.contentUrl.startsWith('http') ? c.contentUrl : `https://${c.contentUrl}`} target="_blank" rel="noopener noreferrer"
-                            style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
-                            Course Materials →
-                          </a>
-                        ) : (
-                          <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>No content URL</span>
-                        )
-                      ) : (
-                        (() => {
-                          const meetLink = c.zoomJoinUrl || c.zoomStartUrl
-                          return meetLink ? (
-                            <a href={meetLink.startsWith('http') ? meetLink : `https://${meetLink}`} target="_blank" rel="noopener noreferrer"
-                              style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
-                              Start Class →
+                {approved.map((c) => {
+                  const minsUntil = c.courseType === 'LIVE' ? minutesUntilNextSession(c.daysOfWeek, c.startTimeUtc) : Infinity
+                  const isClassTime = minsUntil <= 30 && minsUntil >= -60
+                  const nextLabel = c.courseType === 'LIVE' && !isClassTime ? nextSessionLabel(c.daysOfWeek, c.startTimeUtc) : ''
+                  const meetLink = c.zoomJoinUrl || c.zoomStartUrl
+                  return (
+                    <div key={c.id} style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', borderColor: isClassTime ? '#00C2A8' : '#1e3a5f' }}>
+                      <div>
+                        <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
+                        <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                          {c.daysOfWeek.join(', ')} · {c.startTimeUtc} UTC · {c.sessionDurationMins} min · {c._count.enrollments} students
+                        </p>
+                        {nextLabel && (
+                          <p style={{ color: '#F5C842', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                            Next session: {nextLabel}
+                          </p>
+                        )}
+                        {isClassTime && (
+                          <p style={{ color: '#00C2A8', fontSize: '0.75rem', fontWeight: 700, marginTop: '0.25rem' }}>
+                            🟢 Class is live now!
+                          </p>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {c.courseType === 'SELF_PACED' ? (
+                          c.contentUrl ? (
+                            <a href={c.contentUrl.startsWith('http') ? c.contentUrl : `https://${c.contentUrl}`} target="_blank" rel="noopener noreferrer"
+                              style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                              Course Materials →
                             </a>
                           ) : (
-                            <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Meeting link pending</span>
+                            <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>No content URL</span>
                           )
-                        })()
-                      )}
+                        ) : meetLink ? (
+                          <a href={meetLink.startsWith('http') ? meetLink : `https://${meetLink}`} target="_blank" rel="noopener noreferrer"
+                            style={{ backgroundColor: isClassTime ? '#00C2A8' : '#1e3a5f', color: isClassTime ? '#0B1A2E' : '#6b88a8', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                            {isClassTime ? 'Start Class →' : 'Open Meet Link'}
+                          </a>
+                        ) : (
+                          <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Meeting link pending</span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
