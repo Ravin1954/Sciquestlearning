@@ -41,6 +41,15 @@ interface BankInfo {
   accountType?: string
 }
 
+function formatLocalTime(utcTime: string): string {
+  if (!utcTime) return ''
+  const [h, m] = utcTime.split(':').map(Number)
+  const d = new Date()
+  d.setUTCHours(h, m, 0, 0)
+  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }) +
+    ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone.replace('_', ' ')
+}
+
 const DAY_INDEX: Record<string, number> = {
   Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3,
   Thursday: 4, Friday: 5, Saturday: 6,
@@ -301,7 +310,7 @@ export default function InstructorPage() {
                       <div>
                         <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
                         <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
-                          {c.daysOfWeek.join(', ')} · {c.startTimeUtc} UTC · {c.sessionDurationMins} min · {c._count.enrollments} students
+                          {c.daysOfWeek.join(', ')} · {formatLocalTime(c.startTimeUtc)} · {c.sessionDurationMins} min · {c._count.enrollments} students
                         </p>
                         {nextLabel && (
                           <p style={{ color: '#F5C842', fontSize: '0.75rem', marginTop: '0.25rem' }}>

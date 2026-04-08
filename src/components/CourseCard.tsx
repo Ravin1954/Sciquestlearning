@@ -1,6 +1,14 @@
 import Link from 'next/link'
 import StatusBadge from './StatusBadge'
 
+function formatLocalTime(utcTime: string): string {
+  if (!utcTime) return ''
+  const [h, m] = utcTime.split(':').map(Number)
+  const d = new Date()
+  d.setUTCHours(h, m, 0, 0)
+  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
+}
+
 interface CourseCardProps {
   course: {
     id: string
@@ -137,7 +145,7 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
           <>
             <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
               <span style={{ color: '#6b88a8' }}>Schedule: </span>
-              {course.daysOfWeek.join(', ')} at {course.startTimeUtc} UTC
+              {course.daysOfWeek.join(', ')} at {formatLocalTime(course.startTimeUtc)}
             </p>
             <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
               <span style={{ color: '#6b88a8' }}>Session: </span>

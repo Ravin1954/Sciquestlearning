@@ -70,7 +70,7 @@ function formatUtcTime(utc: string) {
   const [h, m] = utc.split(':').map(Number)
   const date = new Date()
   date.setUTCHours(h, m, 0, 0)
-  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' }) + ' UTC'
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
 }
 
 export default function CoursePageClient() {
