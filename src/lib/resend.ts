@@ -137,8 +137,8 @@ export async function sendSessionWarningEmail(
           <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Day</td><td style="padding:0.5rem;">${sessionDay}</td></tr>
           <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Time</td><td style="padding:0.5rem;">${sessionTime} UTC</td></tr>
         </table>
-        <p>If no students enroll in the next 6 hours, this session will be <strong>automatically cancelled</strong>.</p>
-        <p>You can add more dates and times to attract students:</p>
+        <p>If no students enroll in the next 6 hours, <strong>this session (and all future sessions of this course)</strong> will be automatically cancelled.</p>
+        <p>You can add more dates and times or promote your course to attract students:</p>
         <p><a href="https://sciquestlearning.com/instructor" style="background:#F5C842; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">Update Your Course →</a></p>
         <p style="margin-top:2rem; color:#666;">SciQuest Learning Team</p>
       </div>
