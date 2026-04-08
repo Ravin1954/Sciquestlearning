@@ -46,8 +46,7 @@ function formatLocalTime(utcTime: string): string {
   const [h, m] = utcTime.split(':').map(Number)
   const d = new Date()
   d.setUTCHours(h, m, 0, 0)
-  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }) +
-    ' ' + Intl.DateTimeFormat().resolvedOptions().timeZone.replace('_', ' ')
+  return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true, timeZoneName: 'short' })
 }
 
 const DAY_INDEX: Record<string, number> = {
@@ -93,8 +92,8 @@ function nextSessionLabel(daysOfWeek: string[], startTimeUtc: string): string {
   const d = new Date()
   d.setUTCDate(d.getUTCDate() + minDiff)
   d.setUTCHours(h, m, 0, 0)
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
-    ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' }) + ' UTC'
+  return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) +
+    ' at ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
 }
 
 const S = {
