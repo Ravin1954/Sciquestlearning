@@ -1,11 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useAuth } from '@clerk/nextjs'
+import { useAuth, useUser } from '@clerk/nextjs'
 import { UserButton, SignInButton } from '@clerk/nextjs'
 
 export default function NavBar() {
   const { isSignedIn } = useAuth()
+  const { user } = useUser()
+  const role = user?.publicMetadata?.role as string | undefined
+  const isInstructor = role === 'instructor' || role === 'admin'
 
   return (
     <nav
@@ -35,13 +38,15 @@ export default function NavBar() {
             >
               Browse Courses
             </Link>
-            <Link
-              href="/class-policies"
-              style={{ color: '#a8c4e0' }}
-              className="hover:text-white transition-colors text-sm font-medium"
-            >
-              Class Policies
-            </Link>
+            {(!isSignedIn || isInstructor) && (
+              <Link
+                href="/class-policies"
+                style={{ color: '#a8c4e0' }}
+                className="hover:text-white transition-colors text-sm font-medium"
+              >
+                Class Policies
+              </Link>
+            )}
             {isSignedIn && (
               <Link
                 href="/auth/redirect"

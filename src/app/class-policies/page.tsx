@@ -1,5 +1,5 @@
 import NavBar from '@/components/NavBar'
-import Link from 'next/link'
+import InstructorCTA from './InstructorCTA'
 
 export const metadata = {
   title: 'Class Policies — SciQuest Learning',
@@ -223,18 +223,8 @@ export default function ClassPoliciesPage() {
           </div>
         </section>
 
-        {/* CTA for instructors */}
-        <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', textAlign: 'center' }}>
-          <p style={{ color: '#a8c4e0', marginBottom: '1rem', fontSize: '0.9rem' }}>
-            Ready to submit a course? Make sure your listing follows all the requirements above.
-          </p>
-          <Link
-            href="/instructor/courses/new"
-            style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.75rem 2rem', borderRadius: '10px', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', display: 'inline-block' }}
-          >
-            Create a Course →
-          </Link>
-        </div>
+        {/* CTA for instructors only */}
+        <InstructorCTA />
 
       </div>
     </div>
