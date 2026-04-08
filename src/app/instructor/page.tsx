@@ -410,7 +410,7 @@ export default function InstructorPage() {
                       <div style={{ flex: 1 }}>
                         <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
                         <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
-                          {c.subject.replace('_', ' ')} · {c.durationWeeks} weeks · ${Number(c.feeUsd).toFixed(2)} · {c._count.enrollments} enrolled
+                          {c.subject.replace('_', ' ')} · ${Number(c.feeUsd).toFixed(2)} · {c._count.enrollments} enrolled
                         </p>
                         {c.topics && c.topics.length > 0 && (
                           <ol style={{ margin: '0.5rem 0 0 1rem', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
