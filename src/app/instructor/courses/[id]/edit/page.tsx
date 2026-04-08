@@ -451,18 +451,14 @@ export default function EditCoursePage() {
                             </button>
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                            {times.map((t, idx) => {
-                              const utcT = t ? localTimeToUtc(t, timezone) : ''
-                              return (
-                                <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: '0.5rem', alignItems: 'center' }}>
-                                  <input type="time" value={t} onChange={(e) => updateTimeSlot(day, idx, e.target.value)} style={{ ...inputStyle, padding: '0.4rem 0.625rem' }} />
-                                  {utcT && <span style={{ color: '#6b88a8', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>UTC {utcT}</span>}
-                                  {times.length > 1 && (
-                                    <button type="button" onClick={() => removeTimeSlot(day, idx)} style={{ background: 'none', border: 'none', color: '#6b88a8', cursor: 'pointer', fontSize: '1rem', padding: '0 0.25rem' }}>×</button>
-                                  )}
-                                </div>
-                              )
-                            })}
+                            {times.map((t, idx) => (
+                              <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.5rem', alignItems: 'center' }}>
+                                <input type="time" value={t} onChange={(e) => updateTimeSlot(day, idx, e.target.value)} style={{ ...inputStyle, padding: '0.4rem 0.625rem' }} />
+                                {times.length > 1 && (
+                                  <button type="button" onClick={() => removeTimeSlot(day, idx)} style={{ background: 'none', border: 'none', color: '#6b88a8', cursor: 'pointer', fontSize: '1rem', padding: '0 0.25rem' }}>×</button>
+                                )}
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )

@@ -23,6 +23,15 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     feeUsd, contentUrl, topics, scheduleJson, recordingsJson,
   } = body
 
+  // Only reset to PENDING if content fields changed — schedule/date changes don't need re-approval
+  const contentChanged =
+    title !== course.title ||
+    description !== course.description ||
+    subject !== course.subject ||
+    courseType !== course.courseType ||
+    parseFloat(feeUsd) !== Number(course.feeUsd) ||
+    (contentUrl || null) !== course.contentUrl
+
   const updated = await prisma.course.update({
     where: { id },
     data: {
@@ -43,8 +52,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       topics: Array.isArray(topics) ? topics : [],
       scheduleJson: scheduleJson || '',
       recordingsJson: recordingsJson || '[]',
-      status: 'PENDING',
-      rejectionRemark: null,
+      ...(contentChanged ? { status: 'PENDING', rejectionRemark: null } : {}),
     },
   })
 
