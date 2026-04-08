@@ -20,7 +20,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const {
     title, description, subject, courseType, gradeLevel,
     durationWeeks, durationUnit, feeType, startDate, daysOfWeek, startTimeUtc, sessionDurationMins,
-    feeUsd, contentUrl, topics, scheduleJson,
+    feeUsd, contentUrl, topics, scheduleJson, recordingsJson,
   } = body
 
   const updated = await prisma.course.update({
@@ -42,6 +42,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       contentUrl: contentUrl || null,
       topics: Array.isArray(topics) ? topics : [],
       scheduleJson: scheduleJson || '',
+      recordingsJson: recordingsJson || '[]',
       status: 'PENDING',
       rejectionRemark: null,
     },

@@ -20,6 +20,7 @@ interface Course {
   zoomStartUrl?: string
   contentUrl?: string
   topics: string[]
+  recordingsJson?: string
   rejectionRemark?: string | null
   _count: { enrollments: number }
 }
@@ -111,6 +112,10 @@ export default function InstructorPage() {
   const [loading, setLoading] = useState(true)
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [recordingCourseId, setRecordingCourseId] = useState<string | null>(null)
+  const [recordingLabel, setRecordingLabel] = useState('')
+  const [recordingUrl, setRecordingUrl] = useState('')
+  const [recordingSaving, setRecordingSaving] = useState(false)
   const [bankInfo, setBankInfo] = useState<BankInfo | null>(null)
   const [bankEditing, setBankEditing] = useState(false)
   const [bankSaving, setBankSaving] = useState(false)
@@ -417,6 +422,14 @@ export default function InstructorPage() {
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
                         <StatusBadge status={c.status} />
+                        {c.status === 'APPROVED' && (
+                          <button
+                            onClick={() => setRecordingCourseId(recordingCourseId === c.id ? null : c.id)}
+                            style={{ backgroundColor: 'transparent', color: '#a855f7', border: '1px solid #a855f7', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                          >
+                            📹 Recordings
+                          </button>
+                        )}
                         <Link
                           href={`/instructor/courses/${c.id}/edit`}
                           style={{ backgroundColor: 'transparent', color: '#a8c4e0', border: '1px solid #1e3a5f', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none' }}
@@ -434,6 +447,66 @@ export default function InstructorPage() {
                         )}
                       </div>
                     </div>
+
+                    {/* Recordings panel */}
+                    {recordingCourseId === c.id && (() => {
+                      const recs: { label: string; url: string }[] = (() => { try { return JSON.parse(c.recordingsJson || '[]') } catch { return [] } })()
+                      return (
+                        <div style={{ borderTop: '1px solid #1e3a5f', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                          <p style={{ color: '#a855f7', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem' }}>📹 Session Recordings</p>
+                          {recs.length > 0 && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.75rem' }}>
+                              {recs.map((r, i) => (
+                                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.5rem 0.875rem' }}>
+                                  <div>
+                                    <span style={{ color: '#e8edf5', fontSize: '0.8rem', fontWeight: 600 }}>{r.label}</span>
+                                    <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: '#a855f7', fontSize: '0.75rem', marginLeft: '0.75rem', textDecoration: 'none' }}>View →</a>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={async () => {
+                                      const updated = recs.filter((_, idx) => idx !== i)
+                                      await fetch(`/api/instructor/courses/${c.id}/recordings`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ recordingsJson: JSON.stringify(updated) }) })
+                                      setCourses((prev) => prev.map((x) => x.id === c.id ? { ...x, recordingsJson: JSON.stringify(updated) } : x))
+                                    }}
+                                    style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: '0.75rem' }}
+                                  >Remove</button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            <input
+                              placeholder="Label (e.g. Apr 12 — Cell Biology)"
+                              value={recordingLabel}
+                              onChange={(e) => setRecordingLabel(e.target.value)}
+                              style={{ flex: 1, minWidth: '180px', padding: '0.5rem 0.75rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.8rem' }}
+                            />
+                            <input
+                              placeholder="Google Drive / YouTube link"
+                              value={recordingUrl}
+                              onChange={(e) => setRecordingUrl(e.target.value)}
+                              style={{ flex: 2, minWidth: '220px', padding: '0.5rem 0.75rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.8rem' }}
+                            />
+                            <button
+                              disabled={recordingSaving || !recordingLabel.trim() || !recordingUrl.trim()}
+                              onClick={async () => {
+                                setRecordingSaving(true)
+                                const updated = [...recs, { label: recordingLabel.trim(), url: recordingUrl.trim() }]
+                                await fetch(`/api/instructor/courses/${c.id}/recordings`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ recordingsJson: JSON.stringify(updated) }) })
+                                setCourses((prev) => prev.map((x) => x.id === c.id ? { ...x, recordingsJson: JSON.stringify(updated) } : x))
+                                setRecordingLabel('')
+                                setRecordingUrl('')
+                                setRecordingSaving(false)
+                              }}
+                              style={{ backgroundColor: '#a855f7', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', opacity: (!recordingLabel.trim() || !recordingUrl.trim()) ? 0.5 : 1 }}
+                            >
+                              {recordingSaving ? 'Saving...' : '+ Add'}
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })()}
                   </div>
                 ))}
               </div>

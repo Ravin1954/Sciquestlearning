@@ -32,6 +32,7 @@ interface Course {
   feeUsd: number
   topics: string[]
   status: string
+  recordingsJson?: string
   instructor: { firstName: string; lastName: string; qualifications?: string }
 }
 
@@ -349,6 +350,29 @@ export default function CoursePageClient() {
                 <p style={{ color: '#a8c4e0', lineHeight: 1.7, fontSize: '0.9rem' }}>{course.instructor.qualifications}</p>
               </div>
             )}
+
+            {/* Session Recordings — only for enrolled students */}
+            {enrolledSessions.size > 0 && (() => {
+              const recs: { label: string; url: string }[] = (() => { try { return JSON.parse(course.recordingsJson || '[]') } catch { return [] } })()
+              if (recs.length === 0) return null
+              return (
+                <div style={{ backgroundColor: '#0f2240', border: '1px solid #a855f7', borderRadius: '12px', padding: '1.5rem', marginTop: '1.5rem' }}>
+                  <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>
+                    📹 Session Recordings
+                  </h2>
+                  <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.875rem' }}>Available to enrolled students only.</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {recs.map((r, i) => (
+                      <a key={i} href={r.url} target="_blank" rel="noopener noreferrer"
+                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.625rem 0.875rem', textDecoration: 'none' }}>
+                        <span style={{ color: '#e8edf5', fontSize: '0.875rem' }}>{r.label}</span>
+                        <span style={{ color: '#a855f7', fontSize: '0.8rem', fontWeight: 600 }}>Watch →</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
           </div>
 
           {/* Enrollment Card */}
