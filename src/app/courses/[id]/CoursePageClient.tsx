@@ -33,6 +33,7 @@ interface Course {
   topics: string[]
   status: string
   recordingsJson?: string
+  cancelledSessionsJson?: string
   instructor: { firstName: string; lastName: string; qualifications?: string }
 }
 
@@ -243,6 +244,12 @@ export default function CoursePageClient() {
                   {sessions.map((s) => {
                     const alreadyPaid = enrolledSessions.has(s.label)
                     const checked = selectedSessions.has(s.label)
+                    // Check if this session is cancelled (key format: "Day|HH:MM")
+                    const cancelledKeys: string[] = (() => { try { return JSON.parse(course.cancelledSessionsJson || '[]') } catch { return [] } })()
+                    const isCancelled = cancelledKeys.some((k) => {
+                      const [kDay, kTime] = k.split('|')
+                      return s.label.startsWith(kDay) && s.utcTime === kTime
+                    })
                     return (
                       <label
                         key={s.label}
@@ -252,24 +259,24 @@ export default function CoursePageClient() {
                           gap: '0.75rem',
                           padding: '0.625rem 0.875rem',
                           borderRadius: '8px',
-                          border: alreadyPaid ? '1px solid #1e4a1e' : checked ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                          backgroundColor: alreadyPaid ? '#0a200a' : checked ? '#003d35' : '#060f1a',
-                          cursor: alreadyPaid ? 'default' : 'pointer',
-                          opacity: alreadyPaid ? 0.8 : 1,
+                          border: isCancelled ? '1px solid #3d1a1a' : alreadyPaid ? '1px solid #1e4a1e' : checked ? '1px solid #00C2A8' : '1px solid #1e3a5f',
+                          backgroundColor: isCancelled ? '#1a0a0a' : alreadyPaid ? '#0a200a' : checked ? '#003d35' : '#060f1a',
+                          cursor: (alreadyPaid || isCancelled) ? 'default' : 'pointer',
+                          opacity: isCancelled ? 0.5 : alreadyPaid ? 0.8 : 1,
                         }}
                       >
                         <input
                           type="checkbox"
                           checked={alreadyPaid || checked}
-                          disabled={alreadyPaid}
-                          onChange={() => !alreadyPaid && toggleSession(s.label)}
+                          disabled={alreadyPaid || isCancelled}
+                          onChange={() => !alreadyPaid && !isCancelled && toggleSession(s.label)}
                           style={{ accentColor: alreadyPaid ? '#22c55e' : '#00C2A8', width: '16px', height: '16px' }}
                         />
-                        <span style={{ color: alreadyPaid ? '#22c55e' : checked ? '#00C2A8' : '#a8c4e0', fontSize: '0.875rem', fontWeight: (alreadyPaid || checked) ? 600 : 400 }}>
-                          {s.label}
+                        <span style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : checked ? '#00C2A8' : '#a8c4e0', fontSize: '0.875rem', fontWeight: (alreadyPaid || checked) ? 600 : 400 }}>
+                          {s.label} {isCancelled ? '— Cancelled' : ''}
                         </span>
-                        <span style={{ marginLeft: 'auto', color: alreadyPaid ? '#22c55e' : '#6b88a8', fontSize: '0.8rem', fontWeight: alreadyPaid ? 600 : 400 }}>
-                          {alreadyPaid ? '✓ Paid' : `$${feePerSession.toFixed(2)}`}
+                        <span style={{ marginLeft: 'auto', color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : '#6b88a8', fontSize: '0.8rem', fontWeight: alreadyPaid ? 600 : 400 }}>
+                          {isCancelled ? '✗' : alreadyPaid ? '✓ Paid' : `$${feePerSession.toFixed(2)}`}
                         </span>
                       </label>
                     )
