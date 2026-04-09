@@ -111,7 +111,7 @@ export default function AdminUsersPage() {
                   return (
                     <tr key={u.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid #1e3a5f' : 'none' }}>
                       <td style={{ padding: '0.875rem 1rem', color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
-                        {u.firstName} {u.lastName}
+                        {(u.firstName || u.lastName) ? `${u.firstName} ${u.lastName}`.trim() : <span style={{ color: '#6b88a8', fontStyle: 'italic' }}>No name</span>}
                       </td>
                       <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u.email}</td>
                       <td style={{ padding: '0.875rem 1rem' }}>

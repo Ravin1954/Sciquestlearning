@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { type, data } = body
 
-  if (type === 'user.created') {
+  if (type === 'user.created' || type === 'user.updated') {
     const { id, first_name, last_name, email_addresses, public_metadata } = data
     const email = email_addresses?.[0]?.email_address
     if (!email) return NextResponse.json({ ok: true })
@@ -14,7 +14,12 @@ export async function POST(req: Request) {
 
     await prisma.user.upsert({
       where: { clerkId: id },
-      update: {},
+      update: {
+        firstName: first_name || '',
+        lastName: last_name || '',
+        email,
+        role: role.toUpperCase() as 'ADMIN' | 'INSTRUCTOR' | 'STUDENT',
+      },
       create: {
         clerkId: id,
         role: role.toUpperCase() as 'ADMIN' | 'INSTRUCTOR' | 'STUDENT',
