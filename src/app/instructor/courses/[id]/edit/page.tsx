@@ -392,8 +392,8 @@ export default function EditCoursePage() {
             </p>
           </div>}
 
-          {/* Start Date */}
-          <div>
+          {/* Start Date — LIVE only */}
+          {courseType === 'LIVE' && <div>
             <label style={labelStyle}>Course Start Date</label>
             <input
               required
@@ -405,7 +405,7 @@ export default function EditCoursePage() {
             <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               The date the first session takes place.
             </p>
-          </div>
+          </div>}
 
           {/* LIVE fields */}
           {courseType === 'LIVE' && (
