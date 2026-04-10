@@ -12,23 +12,22 @@ export async function GET(req: Request) {
   const courseType = searchParams.get('courseType')
   const gradeLevel = searchParams.get('gradeLevel')
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const where: any = { status: 'APPROVED' }
-  if (subject) where.subject = subject
-  if (duration) where.durationWeeks = parseInt(duration)
-  if (courseType) where.courseType = courseType
-  if (gradeLevel) where.gradeLevel = gradeLevel
-
   try {
     const courses = await prisma.course.findMany({
-      where,
+      where: {
+        status: 'APPROVED',
+        ...(courseType ? { courseType: courseType as 'LIVE' | 'SELF_PACED' } : {}),
+        ...(subject ? { subject: subject as 'BIOLOGY' | 'PHYSICAL_SCIENCE' | 'CHEMISTRY' | 'MATHEMATICS' } : {}),
+        ...(gradeLevel ? { gradeLevel } : {}),
+        ...(duration ? { durationWeeks: parseInt(duration) } : {}),
+      },
       include: { instructor: { select: { firstName: true, lastName: true } } },
       orderBy: { createdAt: 'desc' },
     })
     return NextResponse.json(courses)
   } catch (err) {
     console.error('[courses GET]', err)
-    return NextResponse.json([], { status: 200 })
+    return NextResponse.json({ error: String(err) }, { status: 500 })
   }
 }
 
