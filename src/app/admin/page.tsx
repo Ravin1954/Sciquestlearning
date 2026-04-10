@@ -469,7 +469,7 @@ export default function AdminPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #1e3a5f' }}>
-                    {['Title', 'Instructor', 'Subject', 'Fee', 'Enrollments', 'Status', ''].map((h) => (
+                    {['Title', 'Instructor', 'Subject', 'Type', 'Fee', 'Enrollments', 'Status', ''].map((h) => (
                       <th key={h} style={{ padding: '0.875rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                         {h}
                       </th>
@@ -482,6 +482,7 @@ export default function AdminPage() {
                       <td style={{ padding: '0.875rem 1rem', color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>{c.title}</td>
                       <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{c.instructor.firstName} {c.instructor.lastName}</td>
                       <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{c.subject.replace('_', ' ')}</td>
+                      <td style={{ padding: '0.875rem 1rem', fontSize: '0.75rem', fontWeight: 600, color: c.courseType === 'SELF_PACED' ? '#00C2A8' : '#F5C842' }}>{c.courseType === 'SELF_PACED' ? 'Self-Paced' : 'Live'}</td>
                       <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>${Number(c.feeUsd).toFixed(2)}</td>
                       <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{c._count.enrollments}</td>
                       <td style={{ padding: '0.875rem 1rem' }}><StatusBadge status={c.status} /></td>
