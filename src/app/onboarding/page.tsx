@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@clerk/nextjs'
+import StepIndicator from '@/components/StepIndicator'
 
 const TIMEZONES = [
   'UTC',
@@ -229,11 +230,14 @@ function OnboardingContent() {
           <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.5rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.375rem' }}>
             {role === 'instructor' ? 'Complete Your Instructor Profile' : 'Student Registration'}
           </h1>
-          <p style={{ color: '#6b88a8', fontSize: '0.875rem' }}>
+          <p style={{ color: '#6b88a8', fontSize: '0.875rem', marginBottom: '1.25rem' }}>
             {role === 'instructor'
               ? 'Tell students about your qualifications and what you teach.'
               : 'Create your student profile to browse and enroll in courses.'}
           </p>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <StepIndicator currentStep={2} role={role} />
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
