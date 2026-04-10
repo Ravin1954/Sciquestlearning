@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { sendNewUserNotificationEmail } from '@/lib/resend'
 
 export async function POST(req: Request) {
   const body = await req.json()
@@ -28,6 +29,14 @@ export async function POST(req: Request) {
         email,
       },
     })
+
+    // Notify admin of new registration
+    if (type === 'user.created') {
+      const name = [first_name, last_name].filter(Boolean).join(' ')
+      sendNewUserNotificationEmail(name, email, role).catch(
+        (err) => console.error('[email] new user notification failed:', err)
+      )
+    }
   }
 
   return NextResponse.json({ ok: true })
