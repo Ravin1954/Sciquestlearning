@@ -39,6 +39,9 @@ export async function POST(req: Request) {
   if (!user || user.role !== 'INSTRUCTOR') {
     return NextResponse.json({ error: 'Instructor access required' }, { status: 403 })
   }
+  if (user.instructorStatus !== 'APPROVED') {
+    return NextResponse.json({ error: 'Your instructor account is pending admin approval. You will receive an email once approved.' }, { status: 403 })
+  }
 
   const body = await req.json()
   const {

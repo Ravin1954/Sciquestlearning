@@ -16,9 +16,11 @@ model User {
   email            String       @unique
   timezone         String       @default("UTC")
   country          String       @default("")
-  qualifications   String?
-  aboutMe          String?
-  certificatesUrl  String?
+  qualifications      String?
+  aboutMe             String?
+  certificatesUrl     String?
+  instructorStatus    InstructorStatus @default(NOT_APPLICABLE)
+  rejectionRemark     String?
   subjects         String[]
   stripeAccountId  String?
   bankInfo         String?
@@ -113,4 +115,11 @@ enum CourseStatus {
 enum CourseType {
   LIVE
   SELF_PACED
+}
+
+enum InstructorStatus {
+  NOT_APPLICABLE
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
 }

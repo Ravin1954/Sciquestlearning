@@ -112,6 +112,7 @@ export default function InstructorPage() {
   const [loading, setLoading] = useState(true)
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [instructorStatus, setInstructorStatus] = useState<string>('APPROVED')
   const [recordingCourseId, setRecordingCourseId] = useState<string | null>(null)
   const [recordingLabel, setRecordingLabel] = useState('')
   const [recordingUrl, setRecordingUrl] = useState('')
@@ -127,13 +128,15 @@ export default function InstructorPage() {
       fetch('/api/instructor/courses').then((r) => r.json()),
       fetch('/api/instructor/earnings').then((r) => r.json()),
       fetch('/api/instructor/bank-details').then((r) => r.json()),
-    ]).then(([c, e, b]) => {
+      fetch('/api/instructor/profile').then((r) => r.json()),
+    ]).then(([c, e, b, p]) => {
       setCourses(c)
       setEarnings(e)
       if (b.bankInfo) {
         setBankInfo(b.bankInfo)
         setBankForm(b.bankInfo)
       }
+      setInstructorStatus(p.instructorStatus || 'PENDING_REVIEW')
       setLoading(false)
     })
   }, [])
@@ -180,6 +183,24 @@ export default function InstructorPage() {
 
   return (
     <DashboardLayout role="instructor">
+      {instructorStatus === 'PENDING_REVIEW' && (
+        <div style={{ backgroundColor: '#3d2a00', border: '1px solid #F5C842', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+          <span style={{ fontSize: '1.25rem' }}>⏳</span>
+          <div>
+            <p style={{ color: '#F5C842', fontWeight: 700, marginBottom: '0.25rem' }}>Account Pending Approval</p>
+            <p style={{ color: '#a8c4e0', fontSize: '0.875rem' }}>Your instructor application is under review. You will receive an email once the admin approves your account. You can then start creating courses.</p>
+          </div>
+        </div>
+      )}
+      {instructorStatus === 'REJECTED' && (
+        <div style={{ backgroundColor: '#3d0f0f', border: '1px solid #f87171', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
+          <span style={{ fontSize: '1.25rem' }}>❌</span>
+          <div>
+            <p style={{ color: '#f87171', fontWeight: 700, marginBottom: '0.25rem' }}>Application Not Approved</p>
+            <p style={{ color: '#a8c4e0', fontSize: '0.875rem' }}>Your instructor application was not approved. Please contact us via the <a href="/contact" style={{ color: '#00C2A8' }}>Contact Us</a> page for more information.</p>
+          </div>
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div>
           <h1 style={S.h1}>Instructor Dashboard</h1>

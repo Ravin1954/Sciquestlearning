@@ -4,6 +4,22 @@ import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import StatusBadge from '@/components/StatusBadge'
 
+interface Instructor {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  country: string
+  qualifications: string | null
+  aboutMe: string | null
+  certificatesUrl: string | null
+  subjects: string[]
+  instructorStatus: 'NOT_APPLICABLE' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED'
+  rejectionRemark: string | null
+  createdAt: string
+  _count: { courses: number }
+}
+
 interface Metrics {
   totalStudents: number
   totalInstructors: number
@@ -85,6 +101,10 @@ export default function AdminPage() {
   const [meetLoading, setMeetLoading] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [instructors, setInstructors] = useState<Instructor[]>([])
+  const [instructorActionLoading, setInstructorActionLoading] = useState<string | null>(null)
+  const [rejectingInstructorId, setRejectingInstructorId] = useState<string | null>(null)
+  const [instructorRejectRemark, setInstructorRejectRemark] = useState('')
 
   useEffect(() => {
     Promise.all([
@@ -92,14 +112,30 @@ export default function AdminPage() {
       fetch('/api/admin/courses').then((r) => r.json()),
       fetch('/api/admin/enrollments').then((r) => r.json()),
       fetch('/api/admin/feedback').then((r) => r.json()),
-    ]).then(([m, c, e, f]) => {
+      fetch('/api/admin/instructors').then((r) => r.json()),
+    ]).then(([m, c, e, f, i]) => {
       setMetrics(m)
       setCourses(Array.isArray(c) ? c : [])
       setEnrollments(Array.isArray(e) ? e : [])
       setFeedbacks(Array.isArray(f) ? f : [])
+      setInstructors(Array.isArray(i) ? i : [])
       setLoading(false)
     })
   }, [])
+
+  const handleInstructorAction = async (instructorId: string, action: 'approve' | 'reject', remark?: string) => {
+    setInstructorActionLoading(instructorId + action)
+    await fetch('/api/admin/instructors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ instructorId, action, remark }),
+    })
+    const updated = await fetch('/api/admin/instructors').then((r) => r.json())
+    setInstructors(Array.isArray(updated) ? updated : [])
+    setInstructorActionLoading(null)
+    setRejectingInstructorId(null)
+    setInstructorRejectRemark('')
+  }
 
   const handleAction = async (courseId: string, action: 'approve' | 'reject', remark?: string) => {
     setActionLoading(courseId + action)
@@ -196,6 +232,83 @@ export default function AdminPage() {
               </div>
             ))}
           </div>
+
+          {/* Instructor Review Queue */}
+          {(() => {
+            const pendingInstructors = instructors.filter(i => i.instructorStatus === 'PENDING_REVIEW')
+            return (
+              <div style={{ marginBottom: '2.5rem' }}>
+                <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#e8edf5', marginBottom: '1rem' }}>
+                  Instructor Applications{' '}
+                  {pendingInstructors.length > 0 && (
+                    <span style={{ backgroundColor: '#F5C842', color: '#0B1A2E', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700 }}>
+                      {pendingInstructors.length}
+                    </span>
+                  )}
+                </h2>
+                {pendingInstructors.length === 0 ? (
+                  <div style={{ ...S.card, textAlign: 'center', color: '#6b88a8', padding: '2rem' }}>
+                    No pending instructor applications.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {pendingInstructors.map((inst) => (
+                      <div key={inst.id} style={{ ...S.card }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ color: '#e8edf5', fontWeight: 700, fontSize: '1rem', marginBottom: '0.25rem' }}>
+                              {inst.firstName} {inst.lastName}
+                            </p>
+                            <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.5rem' }}>{inst.email} · {inst.country}</p>
+                            {inst.aboutMe && <p style={{ color: '#a8c4e0', fontSize: '0.85rem', marginBottom: '0.5rem' }}><strong>About:</strong> {inst.aboutMe}</p>}
+                            {inst.qualifications && <p style={{ color: '#a8c4e0', fontSize: '0.85rem', marginBottom: '0.5rem' }}><strong>Qualifications:</strong> {inst.qualifications}</p>}
+                            {inst.subjects.length > 0 && <p style={{ color: '#a8c4e0', fontSize: '0.85rem', marginBottom: '0.5rem' }}><strong>Subjects:</strong> {inst.subjects.join(', ')}</p>}
+                            {inst.certificatesUrl && (
+                              <a href={inst.certificatesUrl} target="_blank" rel="noreferrer"
+                                style={{ color: '#00C2A8', fontSize: '0.85rem', fontWeight: 600 }}>
+                                📎 View Certificates / Resume →
+                              </a>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', minWidth: '160px' }}>
+                            {rejectingInstructorId === inst.id ? (
+                              <>
+                                <textarea
+                                  placeholder="Reason for rejection..."
+                                  value={instructorRejectRemark}
+                                  onChange={(e) => setInstructorRejectRemark(e.target.value)}
+                                  rows={3}
+                                  style={{ padding: '0.5rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.8rem', resize: 'vertical' }}
+                                />
+                                <button onClick={() => handleInstructorAction(inst.id, 'reject', instructorRejectRemark)}
+                                  disabled={instructorActionLoading === inst.id + 'reject'}
+                                  style={S.btn('#fff', '#7f1d1d')}>
+                                  {instructorActionLoading === inst.id + 'reject' ? '...' : 'Confirm Reject'}
+                                </button>
+                                <button onClick={() => setRejectingInstructorId(null)} style={S.btn('#a8c4e0', 'transparent')}>Cancel</button>
+                              </>
+                            ) : (
+                              <>
+                                <button onClick={() => handleInstructorAction(inst.id, 'approve')}
+                                  disabled={instructorActionLoading === inst.id + 'approve'}
+                                  style={S.btn('#0B1A2E', '#00C2A8')}>
+                                  {instructorActionLoading === inst.id + 'approve' ? '...' : '✓ Approve'}
+                                </button>
+                                <button onClick={() => setRejectingInstructorId(inst.id)}
+                                  style={S.btn('#f87171', 'transparent')}>
+                                  ✗ Reject
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })()}
 
           {/* Approval Queue */}
           <div style={{ marginBottom: '2.5rem' }}>

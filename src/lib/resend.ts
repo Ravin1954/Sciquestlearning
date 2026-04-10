@@ -174,6 +174,39 @@ export async function sendSessionCancelledEmail(
   })
 }
 
+export async function sendInstructorApprovalEmail(email: string, firstName: string) {
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: email,
+    subject: 'Your SciQuest instructor account has been approved!',
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Welcome to SciQuest Learning, ${firstName}!</h2>
+        <p>Great news — your instructor application has been <strong style="color:#00C2A8;">approved</strong>. You can now log in and start creating courses.</p>
+        <p><a href="https://sciquestlearning.com/instructor" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">Go to Instructor Dashboard →</a></p>
+        <p style="margin-top:2rem; color:#666;">Welcome aboard — we're excited to have you teach with SciQuest Learning!</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendInstructorRejectionEmail(email: string, firstName: string, remark?: string) {
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: email,
+    subject: 'Update on your SciQuest instructor application',
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Hi ${firstName},</h2>
+        <p>Thank you for applying to teach on SciQuest Learning. After reviewing your application, we are unable to approve your instructor account at this time.</p>
+        ${remark ? `<p><strong>Reason:</strong> ${remark}</p>` : ''}
+        <p>If you believe this is a mistake or would like to provide additional information, please contact us at <a href="https://sciquestlearning.com/contact">sciquestlearning.com/contact</a>.</p>
+        <p style="margin-top:2rem; color:#666;">Thank you for your interest in SciQuest Learning.</p>
+      </div>
+    `,
+  })
+}
+
 export async function sendEnrollmentNotificationEmail(
   studentName: string,
   studentEmail: string,
@@ -208,19 +241,21 @@ export async function sendNewUserNotificationEmail(
   role: string,
 ) {
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@sciquestlearning.com'
+  const isInstructor = role.toLowerCase() === 'instructor'
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: adminEmail,
     subject: `New ${role} registered: ${name || email}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
-        <h2 style="color: #0B1A2E;">New User Registered</h2>
+        <h2 style="color: #0B1A2E;">New ${role} Registered</h2>
         <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
           <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Name</td><td style="padding:0.5rem;">${name || '—'}</td></tr>
           <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Email</td><td style="padding:0.5rem;">${email}</td></tr>
           <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Role</td><td style="padding:0.5rem;">${role}</td></tr>
         </table>
-        <p><a href="https://sciquestlearning.com/admin/users" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">View in Admin Dashboard →</a></p>
+        ${isInstructor ? `<p style="color:#e65c00; font-weight:600;">⚠️ This instructor requires your approval before they can create courses. Please review their profile in the admin dashboard.</p>` : ''}
+        <p><a href="https://sciquestlearning.com/admin" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">${isInstructor ? 'Review Instructor Application →' : 'View in Admin Dashboard →'}</a></p>
         <p style="margin-top:2rem; color:#666;">SciQuest Learning Platform</p>
       </div>
     `,

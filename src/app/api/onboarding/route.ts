@@ -83,6 +83,8 @@ export async function POST(req: Request) {
     where: { OR: [{ clerkId: userId }, { email }] },
   })
 
+  const instructorFields = dbRole === 'INSTRUCTOR' ? { instructorStatus: 'PENDING_REVIEW' as const } : {}
+
   if (existingUser) {
     await prisma.user.update({
       where: { id: existingUser.id },
@@ -98,6 +100,7 @@ export async function POST(req: Request) {
         certificatesUrl: certificatesUrl || null,
         subjects: subjects || [],
         ...studentFields,
+        ...instructorFields,
       },
     })
   } else {
@@ -115,6 +118,7 @@ export async function POST(req: Request) {
         certificatesUrl: certificatesUrl || null,
         subjects: subjects || [],
         ...studentFields,
+        ...instructorFields,
       },
     })
   }
