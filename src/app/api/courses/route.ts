@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { CourseType, Subject } from '@prisma/client'
 import { sendAdminNewCourseEmail } from '@/lib/resend'
 
 export const maxDuration = 30
@@ -13,18 +14,22 @@ export async function GET(req: Request) {
   const gradeLevel = searchParams.get('gradeLevel')
 
   const where: Record<string, unknown> = { status: 'APPROVED' }
-  if (subject) where.subject = subject
+  if (subject && subject in Subject) where.subject = subject as Subject
   if (duration) where.durationWeeks = parseInt(duration)
-  if (courseType) where.courseType = courseType
+  if (courseType && courseType in CourseType) where.courseType = courseType as CourseType
   if (gradeLevel) where.gradeLevel = gradeLevel
 
-  const courses = await prisma.course.findMany({
-    where,
-    include: { instructor: { select: { firstName: true, lastName: true } } },
-    orderBy: { createdAt: 'desc' },
-  })
-
-  return NextResponse.json(courses)
+  try {
+    const courses = await prisma.course.findMany({
+      where,
+      include: { instructor: { select: { firstName: true, lastName: true } } },
+      orderBy: { createdAt: 'desc' },
+    })
+    return NextResponse.json(courses)
+  } catch (err) {
+    console.error('[courses GET]', err)
+    return NextResponse.json([], { status: 200 })
+  }
 }
 
 export async function POST(req: Request) {
