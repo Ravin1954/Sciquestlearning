@@ -63,7 +63,8 @@ function CoursesContent() {
     setLoading(true)
     fetch(`/api/courses?${params}`)
       .then((r) => r.json())
-      .then((data) => { setCourses(data); setLoading(false) })
+      .then((data) => { setCourses(Array.isArray(data) ? data : []); setLoading(false) })
+      .catch(() => { setCourses([]); setLoading(false) })
   }, [subject, gradeLevel, activeTab])
 
   const filtered = courses.filter((c) =>
