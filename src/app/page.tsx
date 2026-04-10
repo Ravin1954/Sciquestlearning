@@ -198,6 +198,41 @@ export default function HomePage() {
                 </p>
               </div>
             ))}
+
+            {/* Self-Paced card */}
+            <Link
+              href="/courses?type=SELF_PACED"
+              style={{ textDecoration: 'none' }}
+            >
+              <div
+                style={{
+                  backgroundColor: '#0f2240',
+                  border: '2px solid #00C2A8',
+                  borderRadius: '12px',
+                  padding: '1.75rem',
+                  textAlign: 'center',
+                  height: '100%',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎓</div>
+                <h3
+                  style={{
+                    fontFamily: 'Fraunces, serif',
+                    color: '#00C2A8',
+                    fontSize: '1.125rem',
+                    fontWeight: 600,
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  Self-Paced Courses
+                </h3>
+                <p style={{ color: '#6b88a8', fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '1rem' }}>
+                  Learn at your own pace with pre-recorded lessons and lifetime access — no fixed schedule needed.
+                </p>
+                <span style={{ color: '#00C2A8', fontSize: '0.8rem', fontWeight: 600 }}>Browse Self-Paced →</span>
+              </div>
+            </Link>
           </div>
         </div>
       </section>

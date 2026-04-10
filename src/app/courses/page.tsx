@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import NavBar from '@/components/NavBar'
 import CourseCard from '@/components/CourseCard'
 
@@ -38,9 +39,12 @@ const filterStyle: React.CSSProperties = {
 }
 
 export default function CoursesPage() {
+  const searchParams = useSearchParams()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'LIVE' | 'SELF_PACED'>('LIVE')
+  const [activeTab, setActiveTab] = useState<'LIVE' | 'SELF_PACED'>(
+    searchParams.get('type') === 'SELF_PACED' ? 'SELF_PACED' : 'LIVE'
+  )
   const [subject, setSubject] = useState('')
   const [gradeLevel, setGradeLevel] = useState('')
   const [search, setSearch] = useState('')
