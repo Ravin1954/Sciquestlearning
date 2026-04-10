@@ -59,7 +59,12 @@ const STUDENT_COUNTRIES = [
   ...EUROPEAN_COUNTRIES,
 ].sort()
 
-const INSTRUCTOR_COUNTRIES = ['United States']
+const INSTRUCTOR_COUNTRIES = [
+  'United States', 'Canada', 'United Kingdom', 'Australia', 'India',
+  'Philippines', 'South Korea', 'China', 'Mexico',
+  ...CARIBBEAN_COUNTRIES,
+  ...EUROPEAN_COUNTRIES,
+].sort()
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -108,6 +113,10 @@ function OnboardingContent() {
 
   // Instructor fields
   const [qualifications, setQualifications] = useState('')
+  const [aboutMe, setAboutMe] = useState('')
+  const [certificatesUrl, setCertificatesUrl] = useState('')
+  const [instructorFirstName, setInstructorFirstName] = useState('')
+  const [instructorLastName, setInstructorLastName] = useState('')
 
   // Student fields
   const [firstName, setFirstName] = useState('')
@@ -122,8 +131,8 @@ function OnboardingContent() {
 
   useEffect(() => {
     if (!user) return
-    if (user.firstName) setFirstName(user.firstName)
-    if (user.lastName) setLastName(user.lastName)
+    if (user.firstName) { setFirstName(user.firstName); setInstructorFirstName(user.firstName) }
+    if (user.lastName) { setLastName(user.lastName); setInstructorLastName(user.lastName) }
 
     const existingRole = user.publicMetadata?.role as string | undefined
     if (existingRole === 'admin') router.replace('/admin')
@@ -155,12 +164,14 @@ function OnboardingContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           role,
-          firstName,
-          lastName,
+          firstName: role === 'instructor' ? instructorFirstName : firstName,
+          lastName: role === 'instructor' ? instructorLastName : lastName,
           timezone,
           country,
           subjects: selectedSubjects,
           qualifications: role === 'instructor' ? qualifications : undefined,
+          aboutMe: role === 'instructor' ? aboutMe : undefined,
+          certificatesUrl: role === 'instructor' ? certificatesUrl : undefined,
           age: role === 'student' ? age : undefined,
           gender: role === 'student' ? gender : undefined,
           fathersName: role === 'student' ? fathersName : undefined,
@@ -275,33 +286,21 @@ function OnboardingContent() {
           <div>
             <p style={sectionLabel}>Location</p>
             <label style={labelStyle}>Country</label>
-            {role === 'instructor' ? (
-              <>
-                <div style={{ ...inputStyle, display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'default' }}>
-                  <span>🇺🇸</span>
-                  <span>United States</span>
-                </div>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
-                  Instructors must be based in the US and hold a US bank account to receive payouts via Stripe.
-                </p>
-              </>
-            ) : (
-              <>
-                <select
-                  required
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  style={inputStyle}
-                >
-                  <option value="">Select your country</option>
-                  {countryOptions.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
-                  SciQuest Learning is available in the US, Canada, Mexico, Philippines, Caribbean, China, South Korea, and Europe.
-                </p>
-              </>
+            <select
+              required
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              style={inputStyle}
+            >
+              <option value="">Select your country</option>
+              {countryOptions.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            {role === 'instructor' && (
+              <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                Instructor payouts via Stripe are currently supported for US-based instructors only.
+              </p>
             )}
           </div>
 
@@ -356,17 +355,57 @@ function OnboardingContent() {
 
           {/* INSTRUCTOR FIELDS */}
           {role === 'instructor' && (
-            <div>
-              <p style={sectionLabel}>Professional Background</p>
-              <label style={labelStyle}>Qualifications & Teaching Experience</label>
-              <textarea
-                required
-                value={qualifications}
-                onChange={(e) => setQualifications(e.target.value)}
-                placeholder="Describe your degrees, certifications, years of experience, and teaching style..."
-                rows={4}
-                style={{ ...inputStyle, resize: 'vertical' }}
-              />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <p style={sectionLabel}>Personal Information</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={labelStyle}>First Name</label>
+                  <input required value={instructorFirstName} onChange={(e) => setInstructorFirstName(e.target.value)} placeholder="e.g. Sarah" style={inputStyle} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Last Name</label>
+                  <input required value={instructorLastName} onChange={(e) => setInstructorLastName(e.target.value)} placeholder="e.g. Johnson" style={inputStyle} />
+                </div>
+              </div>
+
+              <p style={{ ...sectionLabel, marginTop: '0.5rem' }}>Professional Background</p>
+
+              <div>
+                <label style={labelStyle}>About Me</label>
+                <textarea
+                  required
+                  value={aboutMe}
+                  onChange={(e) => setAboutMe(e.target.value)}
+                  placeholder="Tell students about yourself — your teaching philosophy, experience, and what makes your classes unique..."
+                  rows={3}
+                  style={{ ...inputStyle, resize: 'vertical' }}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Qualifications & Teaching Experience</label>
+                <textarea
+                  required
+                  value={qualifications}
+                  onChange={(e) => setQualifications(e.target.value)}
+                  placeholder="Describe your degrees, certifications, years of experience, and teaching style..."
+                  rows={3}
+                  style={{ ...inputStyle, resize: 'vertical' }}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Degrees & Teaching Certificates</label>
+                <input
+                  value={certificatesUrl}
+                  onChange={(e) => setCertificatesUrl(e.target.value)}
+                  placeholder="Paste a Google Drive link to your certificates/degrees (optional)"
+                  style={inputStyle}
+                />
+                <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                  Upload your documents to Google Drive and share the link here. This helps us verify your credentials.
+                </p>
+              </div>
             </div>
           )}
 

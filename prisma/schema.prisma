@@ -17,6 +17,8 @@ model User {
   timezone         String       @default("UTC")
   country          String       @default("")
   qualifications   String?
+  aboutMe          String?
+  certificatesUrl  String?
   subjects         String[]
   stripeAccountId  String?
   bankInfo         String?

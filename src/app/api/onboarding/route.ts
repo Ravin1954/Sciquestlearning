@@ -25,7 +25,12 @@ const ALLOWED_STUDENT_COUNTRIES = new Set([
   ...EUROPE,
 ])
 
-const ALLOWED_INSTRUCTOR_COUNTRIES = new Set(['United States'])
+const ALLOWED_INSTRUCTOR_COUNTRIES = new Set([
+  'United States', 'Canada', 'United Kingdom', 'Australia', 'India',
+  'Philippines', 'South Korea', 'China', 'Mexico',
+  ...CARIBBEAN,
+  ...EUROPE,
+])
 
 export async function POST(req: Request) {
   try {
@@ -33,7 +38,7 @@ export async function POST(req: Request) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const { role, firstName: bodyFirstName, lastName: bodyLastName, timezone, country, qualifications, subjects, age, gender, fathersName, mothersName } = body
+  const { role, firstName: bodyFirstName, lastName: bodyLastName, timezone, country, qualifications, aboutMe, certificatesUrl, subjects, age, gender, fathersName, mothersName } = body
 
   if (!role || !timezone) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -89,6 +94,8 @@ export async function POST(req: Request) {
         timezone,
         country,
         qualifications: qualifications || null,
+        aboutMe: aboutMe || null,
+        certificatesUrl: certificatesUrl || null,
         subjects: subjects || [],
         ...studentFields,
       },
@@ -104,6 +111,8 @@ export async function POST(req: Request) {
         timezone,
         country,
         qualifications: qualifications || null,
+        aboutMe: aboutMe || null,
+        certificatesUrl: certificatesUrl || null,
         subjects: subjects || [],
         ...studentFields,
       },
