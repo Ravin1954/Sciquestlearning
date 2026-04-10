@@ -1,7 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { CourseType, Subject } from '@prisma/client'
 import { sendAdminNewCourseEmail } from '@/lib/resend'
 
 export const maxDuration = 30
@@ -13,10 +12,11 @@ export async function GET(req: Request) {
   const courseType = searchParams.get('courseType')
   const gradeLevel = searchParams.get('gradeLevel')
 
-  const where: Record<string, unknown> = { status: 'APPROVED' }
-  if (subject && subject in Subject) where.subject = subject as Subject
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: any = { status: 'APPROVED' }
+  if (subject) where.subject = subject
   if (duration) where.durationWeeks = parseInt(duration)
-  if (courseType && courseType in CourseType) where.courseType = courseType as CourseType
+  if (courseType) where.courseType = courseType
   if (gradeLevel) where.gradeLevel = gradeLevel
 
   try {
