@@ -47,6 +47,13 @@ export default function NavBar() {
                 Class Policies
               </Link>
             )}
+            <Link
+              href="/contact"
+              style={{ color: '#a8c4e0' }}
+              className="hover:text-white transition-colors text-sm font-medium"
+            >
+              Contact Us
+            </Link>
             {isSignedIn && (
               <Link
                 href="/auth/redirect"

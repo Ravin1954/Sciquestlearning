@@ -174,6 +174,34 @@ export async function sendSessionCancelledEmail(
   })
 }
 
+export async function sendContactFormEmail(
+  name: string,
+  email: string,
+  role: string,
+  message: string,
+) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@sciquestlearning.com'
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: adminEmail,
+    replyTo: email,
+    subject: `[Contact Form] Message from ${name} (${role})`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">New Contact Form Message</h2>
+        <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Name</td><td style="padding:0.5rem;">${name}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Email</td><td style="padding:0.5rem;">${email}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Role</td><td style="padding:0.5rem;">${role}</td></tr>
+        </table>
+        <h3 style="color:#0B1A2E;">Message:</h3>
+        <p style="background:#f5f5f5; padding:1rem; border-radius:8px; white-space:pre-wrap;">${message}</p>
+        <p style="margin-top:1.5rem; color:#666; font-size:0.85rem;">Reply directly to this email to respond to ${name}.</p>
+      </div>
+    `,
+  })
+}
+
 export async function sendReminderEmail(
   email: string,
   courseTitle: string,
