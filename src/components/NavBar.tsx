@@ -32,13 +32,6 @@ export default function NavBar() {
 
           <div className="hidden md:flex items-center gap-6">
             <Link
-              href="/"
-              style={{ color: '#a8c4e0' }}
-              className="hover:text-white transition-colors text-sm font-medium"
-            >
-              Home
-            </Link>
-            <Link
               href="/courses"
               style={{ color: '#a8c4e0' }}
               className="hover:text-white transition-colors text-sm font-medium"
