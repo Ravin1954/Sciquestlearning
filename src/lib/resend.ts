@@ -174,6 +174,34 @@ export async function sendSessionCancelledEmail(
   })
 }
 
+export async function sendEnrollmentNotificationEmail(
+  studentName: string,
+  studentEmail: string,
+  courseTitle: string,
+  amountPaid: number,
+) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@sciquestlearning.com'
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: adminEmail,
+    subject: `New enrollment: ${studentName} enrolled in "${courseTitle}"`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">New Enrollment</h2>
+        <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Student</td><td style="padding:0.5rem;">${studentName}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Email</td><td style="padding:0.5rem;">${studentEmail}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Course</td><td style="padding:0.5rem;">${courseTitle}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Amount Paid</td><td style="padding:0.5rem;">$${amountPaid.toFixed(2)}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Platform Fee (20%)</td><td style="padding:0.5rem;">$${(amountPaid * 0.2).toFixed(2)}</td></tr>
+        </table>
+        <p><a href="https://sciquestlearning.com/admin" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">View in Admin Dashboard →</a></p>
+        <p style="margin-top:2rem; color:#666;">SciQuest Learning Platform</p>
+      </div>
+    `,
+  })
+}
+
 export async function sendNewUserNotificationEmail(
   name: string,
   email: string,

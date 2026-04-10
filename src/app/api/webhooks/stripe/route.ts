@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/db'
-import { sendEnrollmentConfirmationEmail } from '@/lib/resend'
+import { sendEnrollmentConfirmationEmail, sendEnrollmentNotificationEmail } from '@/lib/resend'
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -63,6 +63,14 @@ export async function POST(req: Request) {
         : 'Self-paced — access anytime'
     }
     await sendEnrollmentConfirmationEmail(student.email, course.title, accessLink, schedule)
+
+    // Notify admin of new enrollment
+    sendEnrollmentNotificationEmail(
+      `${student.firstName} ${student.lastName}`,
+      student.email,
+      course.title,
+      amountPaid,
+    ).catch((err) => console.error('[email] enrollment notification failed:', err))
   }
 
   return NextResponse.json({ ok: true })
