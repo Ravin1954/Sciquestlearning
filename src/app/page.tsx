@@ -169,7 +169,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1rem' }}>
             {subjects.map((subject) => (
               <div
                 key={subject.name}
@@ -177,23 +177,23 @@ export default function HomePage() {
                   backgroundColor: '#0f2240',
                   border: '1px solid #1e3a5f',
                   borderRadius: '12px',
-                  padding: '1.75rem',
+                  padding: '1.25rem 1rem',
                   textAlign: 'center',
                 }}
               >
-                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{subject.icon}</div>
+                <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>{subject.icon}</div>
                 <h3
                   style={{
                     fontFamily: 'Fraunces, serif',
                     color: subject.color,
-                    fontSize: '1.125rem',
+                    fontSize: '1rem',
                     fontWeight: 600,
-                    marginBottom: '0.5rem',
+                    marginBottom: '0.375rem',
                   }}
                 >
                   {subject.name}
                 </h3>
-                <p style={{ color: '#6b88a8', fontSize: '0.875rem', lineHeight: 1.6 }}>
+                <p style={{ color: '#6b88a8', fontSize: '0.8rem', lineHeight: 1.5 }}>
                   {subject.description}
                 </p>
               </div>
@@ -209,28 +209,28 @@ export default function HomePage() {
                   backgroundColor: '#0f2240',
                   border: '2px solid #00C2A8',
                   borderRadius: '12px',
-                  padding: '1.75rem',
+                  padding: '1.25rem 1rem',
                   textAlign: 'center',
                   height: '100%',
                   boxSizing: 'border-box',
                 }}
               >
-                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎓</div>
+                <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>🎓</div>
                 <h3
                   style={{
                     fontFamily: 'Fraunces, serif',
                     color: '#00C2A8',
-                    fontSize: '1.125rem',
+                    fontSize: '1rem',
                     fontWeight: 600,
-                    marginBottom: '0.5rem',
+                    marginBottom: '0.375rem',
                   }}
                 >
                   Self-Paced Courses
                 </h3>
-                <p style={{ color: '#6b88a8', fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-                  Learn at your own pace with pre-recorded lessons and lifetime access — no fixed schedule needed.
+                <p style={{ color: '#6b88a8', fontSize: '0.8rem', lineHeight: 1.5, marginBottom: '0.75rem' }}>
+                  Learn at your own pace with pre-recorded lessons and lifetime access.
                 </p>
-                <span style={{ color: '#00C2A8', fontSize: '0.8rem', fontWeight: 600 }}>Browse Self-Paced →</span>
+                <span style={{ color: '#00C2A8', fontSize: '0.78rem', fontWeight: 600 }}>Browse Self-Paced →</span>
               </div>
             </Link>
           </div>
