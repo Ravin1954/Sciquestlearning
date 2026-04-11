@@ -141,7 +141,7 @@ export default function MyCoursesPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {approved.map((c) => {
                   const minsUntil = c.courseType === 'LIVE' ? minutesUntilNextSession(c.daysOfWeek, c.startTimeUtc) : Infinity
-                  const isClassTime = minsUntil <= 30 && minsUntil >= -60
+                  const isClassTime = minsUntil <= 30 && minsUntil >= -60 && c._count.enrollments > 0
                   const nextLabel = c.courseType === 'LIVE' && !isClassTime ? nextSessionLabel(c.daysOfWeek, c.startTimeUtc) : ''
                   const meetLink = c.zoomJoinUrl || c.zoomStartUrl
                   return (

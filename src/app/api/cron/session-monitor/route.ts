@@ -3,10 +3,10 @@ import { prisma } from '@/lib/db'
 import { sendSessionWarningEmail, sendSessionCancelledEmail } from '@/lib/resend'
 
 // Called by Railway cron every hour
-// At 24h before first session: warn instructor if 0 students enrolled
-// At 18h before first session: auto-cancel
+// At 24h before a session: if 0 students enrolled, notify instructor AND cancel immediately
 //   - Multi-week course (durationWeeks > 1): cancel ALL sessions
 //   - Single session course: cancel just that slot
+// Course remains active — instructor can reschedule
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -110,40 +110,17 @@ export async function GET(req: Request) {
     const entries = parseSchedule(course.scheduleJson, course.daysOfWeek, course.startTimeUtc)
     const isMultiWeek = course.durationWeeks > 1
 
-    // --- 24h warning (1430–1450 min away) ---
-    const warningSessions = getSessionsInWindow(entries, 1430, 1450, now)
-    for (const s of warningSessions) {
-      const key = `${s.day}|${s.utcTime}`
-      if (cancelled.includes(key)) continue
-      if (enrollmentCount === 0) {
-        // For multi-week: only warn on the very first session
-        if (isMultiWeek) {
-          const earliest = getEarliestSession(entries, now)
-          if (!earliest || earliest.day !== s.day || earliest.utcTime !== s.utcTime) continue
-        }
-        await sendSessionWarningEmail(
-          course.instructor.email,
-          course.instructor.firstName,
-          course.title,
-          s.day,
-          s.utcTime,
-        ).catch((e) => console.error('[warning email]', e))
-        warnings++
-      }
-    }
-
-    // --- 18h auto-cancel (1070–1090 min away) ---
-    const cancelSessions = getSessionsInWindow(entries, 1070, 1090, now)
+    // --- 24h check: if 0 students enrolled, cancel immediately and notify instructor ---
+    const cancelSessions = getSessionsInWindow(entries, 1430, 1450, now)
     for (const s of cancelSessions) {
       const key = `${s.day}|${s.utcTime}`
       if (cancelled.includes(key)) continue
       if (enrollmentCount === 0) {
         if (isMultiWeek) {
-          // Only trigger on the first session — then cancel ALL sessions
+          // Only trigger on the very first session — cancel ALL sessions of the course
           const earliest = getEarliestSession(entries, now)
           if (!earliest || earliest.day !== s.day || earliest.utcTime !== s.utcTime) continue
 
-          // Cancel every session key for this course
           const allKeys = getAllSessionKeys(entries)
           const newCancelled = [...new Set([...cancelled, ...allKeys])]
           await prisma.course.update({
@@ -154,11 +131,11 @@ export async function GET(req: Request) {
             course.instructor.email,
             course.instructor.firstName,
             course.title,
-            `All sessions (${course.durationWeeks}-week course)`,
+            `All scheduled sessions (${course.durationWeeks}-week course)`,
             s.utcTime,
           ).catch((e) => console.error('[cancel email]', e))
         } else {
-          // Single session course — cancel just this slot
+          // Single-week or one-off — cancel just this session slot
           cancelled.push(key)
           await prisma.course.update({
             where: { id: course.id },
@@ -173,6 +150,7 @@ export async function GET(req: Request) {
           ).catch((e) => console.error('[cancel email]', e))
         }
         cancellations++
+        warnings++
       }
     }
   }

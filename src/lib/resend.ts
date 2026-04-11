@@ -156,18 +156,18 @@ export async function sendSessionCancelledEmail(
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: instructorEmail,
-    subject: `Session cancelled — no students enrolled: ${courseTitle}`,
+    subject: `Session cancelled — no students enrolled 24h before class: ${courseTitle}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
         <h2 style="color: #0B1A2E;">Hi ${instructorFirstName},</h2>
-        <p>The following session has been <strong>automatically cancelled</strong> because no students enrolled:</p>
+        <p>The following session has been <strong>automatically cancelled</strong> because no students were enrolled 24 hours before the scheduled class time:</p>
         <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
           <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Course</td><td style="padding:0.5rem;">${courseTitle}</td></tr>
-          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Day</td><td style="padding:0.5rem;">${sessionDay}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Session</td><td style="padding:0.5rem;">${sessionDay}</td></tr>
           <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Time</td><td style="padding:0.5rem;">${sessionTime} UTC</td></tr>
         </table>
-        <p>Your course remains active. You can add new dates and times for future sessions anytime.</p>
-        <p><a href="https://sciquestlearning.com/instructor" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">Manage Your Courses →</a></p>
+        <p><strong>Your course remains active.</strong> You can log in and update the schedule with new dates and times to open it up for future enrollments.</p>
+        <p><a href="https://sciquestlearning.com/instructor/courses" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">Update Your Schedule →</a></p>
         <p style="margin-top:2rem; color:#666;">SciQuest Learning Team</p>
       </div>
     `,
