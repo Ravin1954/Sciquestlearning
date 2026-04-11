@@ -28,6 +28,20 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('')
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
+
+  const handleDelete = async (userId: string) => {
+    setDeleteLoading(userId)
+    await fetch('/api/admin/users', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    })
+    setUsers((prev) => prev.filter((u) => u.id !== userId))
+    setDeleteLoading(null)
+    setConfirmDeleteId(null)
+  }
 
   useEffect(() => {
     fetch('/api/admin/users').then((r) => r.json()).then((data) => {
@@ -95,7 +109,7 @@ export default function AdminUsersPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #1e3a5f' }}>
-                {['Name', 'Email', 'Role', 'Joined', 'Enrollments', 'Courses'].map((h) => (
+                {['Name', 'Email', 'Role', 'Joined', 'Enrollments', 'Courses', ''].map((h) => (
                   <th key={h} style={{ padding: '0.875rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     {h}
                   </th>
@@ -127,6 +141,33 @@ export default function AdminUsersPage() {
                       </td>
                       <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem', textAlign: 'center' }}>
                         {u._count.courses > 0 ? u._count.courses : '—'}
+                      </td>
+                      <td style={{ padding: '0.875rem 1rem' }}>
+                        {confirmDeleteId === u.id ? (
+                          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                            <span style={{ color: '#f87171', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>Sure?</span>
+                            <button
+                              onClick={() => handleDelete(u.id)}
+                              disabled={deleteLoading === u.id}
+                              style={{ backgroundColor: '#7f1d1d', color: '#fff', border: 'none', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', opacity: deleteLoading === u.id ? 0.5 : 1 }}
+                            >
+                              {deleteLoading === u.id ? '...' : 'Yes'}
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(null)}
+                              style={{ backgroundColor: 'transparent', color: '#a8c4e0', border: '1px solid #1e3a5f', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}
+                            >
+                              No
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteId(u.id)}
+                            style={{ backgroundColor: 'transparent', color: '#f87171', border: '1px solid #f87171', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}
+                          >
+                            Delete
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )
