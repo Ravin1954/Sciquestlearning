@@ -32,54 +32,37 @@ const SUBJECT_LABELS: Record<string, string> = {
   MATHEMATICS: 'Mathematics',
 }
 
-// Caribbean countries eligible for US payment remittance (Cuba and Haiti excluded)
-// Cuba: OFAC sanctioned — US payments illegal
-// Haiti: banking system too unreliable for consistent remittance
-const CARIBBEAN_INSTRUCTOR = [
-  'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Dominica',
-  'Dominican Republic', 'Grenada', 'Jamaica', 'Puerto Rico',
-  'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines',
-  'Trinidad and Tobago',
-]
-
-// European countries with no US banking restrictions
-// Ukraine excluded due to active conflict zone banking restrictions
-const EUROPEAN_INSTRUCTOR = [
-  'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
-  'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
-  'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland',
-  'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania', 'Luxembourg',
-  'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia',
-  'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino', 'Serbia', 'Slovakia',
-  'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'United Kingdom',
-]
-
 const STUDENT_COUNTRIES = [
   'United States', 'Canada', 'Mexico', 'China', 'Philippines', 'South Korea',
-  'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Cuba', 'Dominica',
-  'Dominican Republic', 'Grenada', 'Haiti', 'Jamaica', 'Puerto Rico',
-  'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines',
-  'Trinidad and Tobago',
-  'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
-  'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
-  'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland',
-  'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania', 'Luxembourg',
-  'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia',
-  'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino', 'Serbia', 'Slovakia',
-  'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Ukraine', 'United Kingdom',
+  'Australia', 'New Zealand', 'India', 'Japan', 'Singapore', 'Malaysia',
+  'Thailand', 'Indonesia', 'Hong Kong', 'United Arab Emirates',
+  'United Kingdom', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus',
+  'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany',
+  'Greece', 'Hungary', 'Iceland', 'Ireland', 'Italy', 'Latvia', 'Lithuania',
+  'Luxembourg', 'Malta', 'Netherlands', 'Norway', 'Poland', 'Portugal',
+  'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
+  'Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru',
+  'South Africa', 'Kenya', 'Ghana', 'Nigeria',
+  'Jamaica', 'Trinidad and Tobago', 'Dominican Republic', 'Bahamas',
 ].sort()
 
-// Instructor countries: only where US banks can legally remit payments
-// Excluded: Cuba (OFAC), Haiti (banking failure), Ukraine (conflict restrictions),
-// China (government forex controls block USD receipt)
+// Instructor countries = Stripe Connect supported countries
+// Stripe handles all payout compliance — if Stripe supports it, we can pay there
+// Full list: https://stripe.com/global
 const INSTRUCTOR_COUNTRIES = [
-  'United States', 'Canada', 'Mexico', 'United Kingdom', 'Australia',
-  'India', 'Philippines', 'South Korea', 'New Zealand', 'Singapore',
-  'Japan', 'Malaysia', 'Thailand', 'Indonesia', 'Bangladesh', 'Sri Lanka',
-  'Pakistan', 'Nepal', 'Kenya', 'Ghana', 'Nigeria', 'South Africa',
-  'Brazil', 'Colombia', 'Argentina', 'Chile', 'Peru',
-  ...CARIBBEAN_INSTRUCTOR,
-  ...EUROPEAN_INSTRUCTOR,
+  'United States', 'Canada', 'Mexico',
+  'United Kingdom', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus',
+  'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany',
+  'Greece', 'Hungary', 'Ireland', 'Italy', 'Latvia', 'Liechtenstein',
+  'Lithuania', 'Luxembourg', 'Malta', 'Netherlands', 'Norway', 'Poland',
+  'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
+  'Australia', 'New Zealand',
+  'India', 'Japan', 'Singapore', 'Malaysia', 'Thailand', 'Indonesia', 'Hong Kong',
+  'South Korea', 'Philippines',
+  'United Arab Emirates',
+  'Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru',
+  'South Africa', 'Kenya', 'Ghana', 'Nigeria',
+  'Jamaica', 'Trinidad and Tobago', 'Dominican Republic', 'Bahamas',
 ].sort()
 
 const inputStyle: React.CSSProperties = {
