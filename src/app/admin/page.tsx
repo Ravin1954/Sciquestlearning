@@ -20,6 +20,18 @@ interface Instructor {
   _count: { courses: number }
 }
 
+interface UserRecord {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN'
+  country: string
+  createdAt: string
+  instructorStatus?: string
+  _count: { enrollments: number; courses: number }
+}
+
 interface Metrics {
   totalStudents: number
   totalInstructors: number
@@ -105,6 +117,7 @@ export default function AdminPage() {
   const [instructorActionLoading, setInstructorActionLoading] = useState<string | null>(null)
   const [rejectingInstructorId, setRejectingInstructorId] = useState<string | null>(null)
   const [instructorRejectRemark, setInstructorRejectRemark] = useState('')
+  const [allUsers, setAllUsers] = useState<UserRecord[]>([])
 
   useEffect(() => {
     Promise.all([
@@ -113,12 +126,14 @@ export default function AdminPage() {
       fetch('/api/admin/enrollments').then((r) => r.json()),
       fetch('/api/admin/feedback').then((r) => r.json()),
       fetch('/api/admin/instructors').then((r) => r.json()),
-    ]).then(([m, c, e, f, i]) => {
+      fetch('/api/admin/users').then((r) => r.json()),
+    ]).then(([m, c, e, f, i, u]) => {
       setMetrics(m)
       setCourses(Array.isArray(c) ? c : [])
       setEnrollments(Array.isArray(e) ? e : [])
       setFeedbacks(Array.isArray(f) ? f : [])
       setInstructors(Array.isArray(i) ? i : [])
+      setAllUsers(Array.isArray(u) ? u : [])
       setLoading(false)
     })
   }, [])
@@ -572,6 +587,107 @@ export default function AdminPage() {
               </div>
             )}
           </div>
+
+          {/* All Instructors */}
+          {(() => {
+            const allInstructors = allUsers.filter((u) => u.role === 'INSTRUCTOR')
+            return (
+              <div style={{ marginBottom: '2.5rem' }}>
+                <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#e8edf5', marginBottom: '1rem' }}>
+                  All Instructors
+                  <span style={{ backgroundColor: '#1a2d4a', color: '#a8c4e0', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
+                    {allInstructors.length}
+                  </span>
+                </h2>
+                {allInstructors.length === 0 ? (
+                  <div style={{ ...S.card, textAlign: 'center', color: '#6b88a8', padding: '2rem' }}>No instructors registered yet.</div>
+                ) : (
+                  <div style={{ ...S.card, padding: 0, overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid #1e3a5f', backgroundColor: '#0a1d35' }}>
+                          {['Name', 'Email', 'Country', 'Status', 'Courses', 'Joined'].map((h) => (
+                            <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allInstructors.map((u, i) => (
+                          <tr key={u.id} style={{ borderBottom: i < allInstructors.length - 1 ? '1px solid #1e3a5f' : 'none' }}>
+                            <td style={{ padding: '0.75rem 1rem', color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
+                              {u.firstName || u.lastName ? `${u.firstName} ${u.lastName}`.trim() : '—'}
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u.email}</td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u.country || '—'}</td>
+                            <td style={{ padding: '0.75rem 1rem' }}>
+                              {u.instructorStatus === 'APPROVED' || u.instructorStatus === 'NOT_APPLICABLE' ? (
+                                <span style={{ color: '#00C2A8', fontWeight: 600, fontSize: '0.8rem' }}>Active</span>
+                              ) : u.instructorStatus === 'PENDING_REVIEW' ? (
+                                <span style={{ color: '#F5C842', fontWeight: 600, fontSize: '0.8rem' }}>Pending</span>
+                              ) : u.instructorStatus === 'REJECTED' ? (
+                                <span style={{ color: '#f87171', fontWeight: 600, fontSize: '0.8rem' }}>Rejected</span>
+                              ) : (
+                                <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>—</span>
+                              )}
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u._count.courses}</td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#6b88a8', fontSize: '0.875rem' }}>
+                              {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
+
+          {/* All Students */}
+          {(() => {
+            const allStudents = allUsers.filter((u) => u.role === 'STUDENT')
+            return (
+              <div style={{ marginBottom: '2.5rem' }}>
+                <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#e8edf5', marginBottom: '1rem' }}>
+                  All Students
+                  <span style={{ backgroundColor: '#1a2d4a', color: '#a8c4e0', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
+                    {allStudents.length}
+                  </span>
+                </h2>
+                {allStudents.length === 0 ? (
+                  <div style={{ ...S.card, textAlign: 'center', color: '#6b88a8', padding: '2rem' }}>No students registered yet.</div>
+                ) : (
+                  <div style={{ ...S.card, padding: 0, overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid #1e3a5f', backgroundColor: '#0a1d35' }}>
+                          {['Name', 'Email', 'Country', 'Enrollments', 'Joined'].map((h) => (
+                            <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {allStudents.map((u, i) => (
+                          <tr key={u.id} style={{ borderBottom: i < allStudents.length - 1 ? '1px solid #1e3a5f' : 'none' }}>
+                            <td style={{ padding: '0.75rem 1rem', color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
+                              {u.firstName || u.lastName ? `${u.firstName} ${u.lastName}`.trim() : '—'}
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u.email}</td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u.country || '—'}</td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u._count.enrollments}</td>
+                            <td style={{ padding: '0.75rem 1rem', color: '#6b88a8', fontSize: '0.875rem' }}>
+                              {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )
+          })()}
 
           {/* All Courses Table */}
           <div>
