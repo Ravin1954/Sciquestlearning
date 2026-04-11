@@ -118,6 +118,8 @@ export default function AdminPage() {
   const [rejectingInstructorId, setRejectingInstructorId] = useState<string | null>(null)
   const [instructorRejectRemark, setInstructorRejectRemark] = useState('')
   const [allUsers, setAllUsers] = useState<UserRecord[]>([])
+  const [deleteUserLoading, setDeleteUserLoading] = useState<string | null>(null)
+  const [confirmDeleteUserId, setConfirmDeleteUserId] = useState<string | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -216,6 +218,20 @@ export default function AdminPage() {
     setMetrics(m)
     setDeleteLoading(null)
     setConfirmDeleteId(null)
+  }
+
+  const handleDeleteUser = async (userId: string) => {
+    setDeleteUserLoading(userId)
+    await fetch('/api/admin/users', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    })
+    setAllUsers((prev) => prev.filter((u) => u.id !== userId))
+    const m = await fetch('/api/admin/metrics').then((r) => r.json())
+    setMetrics(m)
+    setDeleteUserLoading(null)
+    setConfirmDeleteUserId(null)
   }
 
   const pending = courses.filter((c) => c.status === 'PENDING')
@@ -606,7 +622,7 @@ export default function AdminPage() {
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr style={{ borderBottom: '1px solid #1e3a5f', backgroundColor: '#0a1d35' }}>
-                          {['Name', 'Email', 'Country', 'Status', 'Courses', 'Joined'].map((h) => (
+                          {['Name', 'Email', 'Country', 'Status', 'Courses', 'Joined', ''].map((h) => (
                             <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                           ))}
                         </tr>
@@ -633,6 +649,20 @@ export default function AdminPage() {
                             <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u._count.courses}</td>
                             <td style={{ padding: '0.75rem 1rem', color: '#6b88a8', fontSize: '0.875rem' }}>
                               {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem' }}>
+                              {confirmDeleteUserId === u.id ? (
+                                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                                  <span style={{ color: '#f87171', fontSize: '0.75rem' }}>Sure?</span>
+                                  <button onClick={() => handleDeleteUser(u.id)} disabled={deleteUserLoading === u.id}
+                                    style={{ ...S.btn('#fff', '#7f1d1d'), opacity: deleteUserLoading === u.id ? 0.5 : 1 }}>
+                                    {deleteUserLoading === u.id ? '...' : 'Yes'}
+                                  </button>
+                                  <button onClick={() => setConfirmDeleteUserId(null)} style={S.btn('#a8c4e0', 'transparent')}>No</button>
+                                </div>
+                              ) : (
+                                <button onClick={() => setConfirmDeleteUserId(u.id)} style={S.btn('#f87171', 'transparent')}>Delete</button>
+                              )}
                             </td>
                           </tr>
                         ))}
@@ -662,7 +692,7 @@ export default function AdminPage() {
                     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                       <thead>
                         <tr style={{ borderBottom: '1px solid #1e3a5f', backgroundColor: '#0a1d35' }}>
-                          {['Name', 'Email', 'Country', 'Enrollments', 'Joined'].map((h) => (
+                          {['Name', 'Email', 'Country', 'Enrollments', 'Joined', ''].map((h) => (
                             <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                           ))}
                         </tr>
@@ -678,6 +708,20 @@ export default function AdminPage() {
                             <td style={{ padding: '0.75rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u._count.enrollments}</td>
                             <td style={{ padding: '0.75rem 1rem', color: '#6b88a8', fontSize: '0.875rem' }}>
                               {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </td>
+                            <td style={{ padding: '0.75rem 1rem' }}>
+                              {confirmDeleteUserId === u.id ? (
+                                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                                  <span style={{ color: '#f87171', fontSize: '0.75rem' }}>Sure?</span>
+                                  <button onClick={() => handleDeleteUser(u.id)} disabled={deleteUserLoading === u.id}
+                                    style={{ ...S.btn('#fff', '#7f1d1d'), opacity: deleteUserLoading === u.id ? 0.5 : 1 }}>
+                                    {deleteUserLoading === u.id ? '...' : 'Yes'}
+                                  </button>
+                                  <button onClick={() => setConfirmDeleteUserId(null)} style={S.btn('#a8c4e0', 'transparent')}>No</button>
+                                </div>
+                              ) : (
+                                <button onClick={() => setConfirmDeleteUserId(u.id)} style={S.btn('#f87171', 'transparent')}>Delete</button>
+                              )}
                             </td>
                           </tr>
                         ))}
