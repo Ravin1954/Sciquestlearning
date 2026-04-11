@@ -32,14 +32,34 @@ const SUBJECT_LABELS: Record<string, string> = {
   MATHEMATICS: 'Mathematics',
 }
 
-const CARIBBEAN_COUNTRIES = [
-  'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Cuba', 'Dominica',
-  'Dominican Republic', 'Grenada', 'Haiti', 'Jamaica', 'Puerto Rico',
+// Caribbean countries eligible for US payment remittance (Cuba and Haiti excluded)
+// Cuba: OFAC sanctioned — US payments illegal
+// Haiti: banking system too unreliable for consistent remittance
+const CARIBBEAN_INSTRUCTOR = [
+  'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Dominica',
+  'Dominican Republic', 'Grenada', 'Jamaica', 'Puerto Rico',
   'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines',
   'Trinidad and Tobago',
 ]
 
-const EUROPEAN_COUNTRIES = [
+// European countries with no US banking restrictions
+// Ukraine excluded due to active conflict zone banking restrictions
+const EUROPEAN_INSTRUCTOR = [
+  'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
+  'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
+  'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland',
+  'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania', 'Luxembourg',
+  'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia',
+  'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino', 'Serbia', 'Slovakia',
+  'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'United Kingdom',
+]
+
+const STUDENT_COUNTRIES = [
+  'United States', 'Canada', 'Mexico', 'China', 'Philippines', 'South Korea',
+  'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Cuba', 'Dominica',
+  'Dominican Republic', 'Grenada', 'Haiti', 'Jamaica', 'Puerto Rico',
+  'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines',
+  'Trinidad and Tobago',
   'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
   'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
   'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland',
@@ -47,24 +67,19 @@ const EUROPEAN_COUNTRIES = [
   'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia',
   'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino', 'Serbia', 'Slovakia',
   'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Ukraine', 'United Kingdom',
-]
-
-const STUDENT_COUNTRIES = [
-  'United States',
-  'Canada',
-  'Mexico',
-  'China',
-  'Philippines',
-  'South Korea',
-  ...CARIBBEAN_COUNTRIES,
-  ...EUROPEAN_COUNTRIES,
 ].sort()
 
+// Instructor countries: only where US banks can legally remit payments
+// Excluded: Cuba (OFAC), Haiti (banking failure), Ukraine (conflict restrictions),
+// China (government forex controls block USD receipt)
 const INSTRUCTOR_COUNTRIES = [
-  'United States', 'Canada', 'United Kingdom', 'Australia', 'India',
-  'Philippines', 'South Korea', 'China', 'Mexico',
-  ...CARIBBEAN_COUNTRIES,
-  ...EUROPEAN_COUNTRIES,
+  'United States', 'Canada', 'Mexico', 'United Kingdom', 'Australia',
+  'India', 'Philippines', 'South Korea', 'New Zealand', 'Singapore',
+  'Japan', 'Malaysia', 'Thailand', 'Indonesia', 'Bangladesh', 'Sri Lanka',
+  'Pakistan', 'Nepal', 'Kenya', 'Ghana', 'Nigeria', 'South Africa',
+  'Brazil', 'Colombia', 'Argentina', 'Chile', 'Peru',
+  ...CARIBBEAN_INSTRUCTOR,
+  ...EUROPEAN_INSTRUCTOR,
 ].sort()
 
 const inputStyle: React.CSSProperties = {

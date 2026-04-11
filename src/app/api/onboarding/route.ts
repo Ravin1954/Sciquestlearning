@@ -2,14 +2,29 @@ import { auth, clerkClient } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
-const CARIBBEAN = [
-  'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Cuba', 'Dominica',
-  'Dominican Republic', 'Grenada', 'Haiti', 'Jamaica', 'Puerto Rico',
+const CARIBBEAN_INSTRUCTOR = [
+  'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Dominica',
+  'Dominican Republic', 'Grenada', 'Jamaica', 'Puerto Rico',
   'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines',
   'Trinidad and Tobago',
 ]
 
-const EUROPE = [
+const EUROPEAN_INSTRUCTOR = [
+  'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
+  'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
+  'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland',
+  'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania', 'Luxembourg',
+  'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia',
+  'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino', 'Serbia', 'Slovakia',
+  'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'United Kingdom',
+]
+
+const ALLOWED_STUDENT_COUNTRIES = new Set([
+  'United States', 'Canada', 'Mexico', 'China', 'Philippines', 'South Korea',
+  'Antigua and Barbuda', 'Bahamas', 'Barbados', 'Cuba', 'Dominica',
+  'Dominican Republic', 'Grenada', 'Haiti', 'Jamaica', 'Puerto Rico',
+  'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines',
+  'Trinidad and Tobago',
   'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
   'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
   'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland',
@@ -17,19 +32,21 @@ const EUROPE = [
   'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia',
   'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino', 'Serbia', 'Slovakia',
   'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Ukraine', 'United Kingdom',
-]
-
-const ALLOWED_STUDENT_COUNTRIES = new Set([
-  'United States', 'Canada', 'Mexico', 'China', 'Philippines', 'South Korea',
-  ...CARIBBEAN,
-  ...EUROPE,
 ])
 
+// Excluded from instructor list:
+// Cuba: OFAC sanctioned — US payments illegal
+// Haiti: banking system too unreliable for consistent remittance
+// Ukraine: active conflict zone, many US banks restrict transfers
+// China: government forex controls prevent recipients from receiving USD
 const ALLOWED_INSTRUCTOR_COUNTRIES = new Set([
-  'United States', 'Canada', 'United Kingdom', 'Australia', 'India',
-  'Philippines', 'South Korea', 'China', 'Mexico',
-  ...CARIBBEAN,
-  ...EUROPE,
+  'United States', 'Canada', 'Mexico', 'United Kingdom', 'Australia',
+  'India', 'Philippines', 'South Korea', 'New Zealand', 'Singapore',
+  'Japan', 'Malaysia', 'Thailand', 'Indonesia', 'Bangladesh', 'Sri Lanka',
+  'Pakistan', 'Nepal', 'Kenya', 'Ghana', 'Nigeria', 'South Africa',
+  'Brazil', 'Colombia', 'Argentina', 'Chile', 'Peru',
+  ...CARIBBEAN_INSTRUCTOR,
+  ...EUROPEAN_INSTRUCTOR,
 ])
 
 export async function POST(req: Request) {
