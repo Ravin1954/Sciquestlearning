@@ -46,23 +46,39 @@ const STUDENT_COUNTRIES = [
   'Jamaica', 'Trinidad and Tobago', 'Dominican Republic', 'Bahamas',
 ].sort()
 
-// Instructor countries = Stripe Connect supported countries
-// Stripe handles all payout compliance — if Stripe supports it, we can pay there
-// Full list: https://stripe.com/global
+// Instructor countries: all countries where PayPal can receive payments
+// Instructors can use Stripe Connect (bank transfer) or PayPal for payouts
+// Only OFAC-sanctioned countries are excluded (Cuba, Iran, North Korea, Syria, Sudan, Russia)
 const INSTRUCTOR_COUNTRIES = [
+  // North America
   'United States', 'Canada', 'Mexico',
-  'United Kingdom', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus',
-  'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany',
-  'Greece', 'Hungary', 'Ireland', 'Italy', 'Latvia', 'Liechtenstein',
-  'Lithuania', 'Luxembourg', 'Malta', 'Netherlands', 'Norway', 'Poland',
-  'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
-  'Australia', 'New Zealand',
-  'India', 'Japan', 'Singapore', 'Malaysia', 'Thailand', 'Indonesia', 'Hong Kong',
-  'South Korea', 'Philippines',
-  'United Arab Emirates',
-  'Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru',
-  'South Africa', 'Kenya', 'Ghana', 'Nigeria',
+  // Europe
+  'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
+  'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
+  'Finland', 'France', 'Germany', 'Gibraltar', 'Greece', 'Hungary', 'Iceland',
+  'Ireland', 'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania',
+  'Luxembourg', 'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands',
+  'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino',
+  'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
+  'Ukraine', 'United Kingdom',
+  // Asia-Pacific
+  'Australia', 'New Zealand', 'Japan', 'South Korea', 'Singapore', 'Hong Kong',
+  'Taiwan', 'Malaysia', 'Thailand', 'Indonesia', 'Philippines', 'Vietnam',
+  'India', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Pakistan',
+  'Cambodia', 'Mongolia',
+  // Middle East
+  'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain',
+  'Oman', 'Jordan', 'Israel', 'Turkey',
+  // Africa
+  'South Africa', 'Kenya', 'Ghana', 'Nigeria', 'Tanzania', 'Uganda',
+  'Rwanda', 'Mozambique', 'Zambia', 'Zimbabwe', 'Botswana', 'Namibia',
+  'Senegal', 'Ivory Coast', 'Cameroon',
+  // Latin America & Caribbean
+  'Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Uruguay', 'Ecuador',
+  'Paraguay', 'Bolivia', 'Venezuela', 'Guatemala', 'Costa Rica', 'Panama',
+  'El Salvador', 'Honduras', 'Nicaragua',
   'Jamaica', 'Trinidad and Tobago', 'Dominican Republic', 'Bahamas',
+  'Barbados', 'Belize',
 ].sort()
 
 const inputStyle: React.CSSProperties = {

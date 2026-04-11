@@ -16,22 +16,33 @@ const ALLOWED_STUDENT_COUNTRIES = new Set([
   'Jamaica', 'Trinidad and Tobago', 'Dominican Republic', 'Bahamas',
 ])
 
-// Instructor countries = Stripe Connect supported countries
-// Stripe handles all payout compliance — if Stripe supports it, we can pay there
+// Instructor countries: all countries where PayPal can receive payments
+// Instructors can use Stripe Connect (bank transfer) or PayPal for payouts
+// Only OFAC-sanctioned countries excluded (Cuba, Iran, North Korea, Syria, Sudan, Russia)
 const ALLOWED_INSTRUCTOR_COUNTRIES = new Set([
   'United States', 'Canada', 'Mexico',
-  'United Kingdom', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus',
-  'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany',
-  'Greece', 'Hungary', 'Ireland', 'Italy', 'Latvia', 'Liechtenstein',
-  'Lithuania', 'Luxembourg', 'Malta', 'Netherlands', 'Norway', 'Poland',
-  'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
-  'Australia', 'New Zealand',
-  'India', 'Japan', 'Singapore', 'Malaysia', 'Thailand', 'Indonesia', 'Hong Kong',
-  'South Korea', 'Philippines',
-  'United Arab Emirates',
-  'Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru',
-  'South Africa', 'Kenya', 'Ghana', 'Nigeria',
+  'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
+  'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
+  'Finland', 'France', 'Germany', 'Gibraltar', 'Greece', 'Hungary', 'Iceland',
+  'Ireland', 'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania',
+  'Luxembourg', 'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands',
+  'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino',
+  'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
+  'Ukraine', 'United Kingdom',
+  'Australia', 'New Zealand', 'Japan', 'South Korea', 'Singapore', 'Hong Kong',
+  'Taiwan', 'Malaysia', 'Thailand', 'Indonesia', 'Philippines', 'Vietnam',
+  'India', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Pakistan',
+  'Cambodia', 'Mongolia',
+  'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain',
+  'Oman', 'Jordan', 'Israel', 'Turkey',
+  'South Africa', 'Kenya', 'Ghana', 'Nigeria', 'Tanzania', 'Uganda',
+  'Rwanda', 'Mozambique', 'Zambia', 'Zimbabwe', 'Botswana', 'Namibia',
+  'Senegal', 'Ivory Coast', 'Cameroon',
+  'Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Uruguay', 'Ecuador',
+  'Paraguay', 'Bolivia', 'Venezuela', 'Guatemala', 'Costa Rica', 'Panama',
+  'El Salvador', 'Honduras', 'Nicaragua',
   'Jamaica', 'Trinidad and Tobago', 'Dominican Republic', 'Bahamas',
+  'Barbados', 'Belize',
 ])
 
 export async function POST(req: Request) {
