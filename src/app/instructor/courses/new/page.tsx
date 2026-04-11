@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 
@@ -42,6 +42,8 @@ const DAY_INDEX: Record<string, number> = {
   Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6,
 }
 
+type Session = { day: string; date: string; week: number }
+
 function nextDateForDay(dayName: string): string {
   const target = DAY_INDEX[dayName]
   const today = new Date()
@@ -50,6 +52,23 @@ function nextDateForDay(dayName: string): string {
   const next = new Date(today)
   next.setDate(today.getDate() + diff)
   return next.toISOString().split('T')[0]
+}
+
+function generateAllSessions(days: string[], durationWeeks: number): Session[] {
+  if (days.length === 0 || durationWeeks < 1) return []
+  const sortedDays = DAYS.filter((d) => days.includes(d))
+  const baseDates: Record<string, string> = {}
+  sortedDays.forEach((day) => { baseDates[day] = nextDateForDay(day) })
+
+  const sessions: Session[] = []
+  for (let week = 1; week <= durationWeeks; week++) {
+    sortedDays.forEach((day) => {
+      const base = new Date(baseDates[day] + 'T00:00:00')
+      base.setDate(base.getDate() + (week - 1) * 7)
+      sessions.push({ day, date: base.toISOString().split('T')[0], week })
+    })
+  }
+  return sessions
 }
 
 function formatDate(dateStr: string): string {
@@ -78,7 +97,6 @@ function localTimeToUtc(localTime: string, timezone: string): string {
   return `${String(utcDate.getUTCHours()).padStart(2, '0')}:${String(utcDate.getUTCMinutes()).padStart(2, '0')}`
 }
 
-
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.75rem',
@@ -105,14 +123,10 @@ export default function NewCoursePage() {
   const [courseType, setCourseType] = useState<'LIVE' | 'SELF_PACED'>('LIVE')
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [timezone, setTimezone] = useState('America/New_York')
-  // Per-day local times: { Monday: ['09:00', '14:00'], Wednesday: ['10:00'] }
   const [dayTimes, setDayTimes] = useState<Record<string, string[]>>({})
-  // Per-day dates (auto-computed from next occurrence of that weekday)
-  const [dayDates, setDayDates] = useState<Record<string, string>>({})
-  // Topics
+  const [sessions, setSessions] = useState<Session[]>([])
   const [topics, setTopics] = useState<string[]>([])
   const [topicInput, setTopicInput] = useState('')
-
   const [durationUnit, setDurationUnit] = useState<'WEEKS' | 'DAYS'>('WEEKS')
   const [feeType, setFeeType] = useState<'PER_SESSION' | 'LUMP_SUM'>('PER_SESSION')
   const [form, setForm] = useState({
@@ -127,25 +141,41 @@ export default function NewCoursePage() {
     startDate: '',
   })
 
+  // Auto-generate full session schedule whenever days or duration changes
+  useEffect(() => {
+    const weeks = parseInt(form.durationWeeks) || 0
+    if (selectedDays.length > 0 && weeks >= 1) {
+      const newSessions = generateAllSessions(selectedDays, weeks)
+      setSessions(newSessions)
+      const earliest = newSessions.map((s) => s.date).sort()[0] || ''
+      setForm((f) => ({ ...f, startDate: earliest }))
+    } else {
+      setSessions([])
+      setForm((f) => ({ ...f, startDate: '' }))
+    }
+  }, [selectedDays, form.durationWeeks])
+
   const toggleDay = (day: string) => {
     setSelectedDays((prev) => {
-      let next: string[]
       if (prev.includes(day)) {
         setDayTimes((dt) => { const n = { ...dt }; delete n[day]; return n })
-        setDayDates((dd) => { const n = { ...dd }; delete n[day]; return n })
-        next = prev.filter((d) => d !== day)
+        return prev.filter((d) => d !== day)
       } else {
         setDayTimes((dt) => ({ ...dt, [day]: [''] }))
-        setDayDates((dd) => ({ ...dd, [day]: nextDateForDay(day) }))
-        next = [...prev, day]
+        return [...prev, day]
       }
-      // Set startDate to the earliest selected day date
-      const allDates = DAYS.filter((d) => next.includes(d)).map((d) =>
-        d === day && !prev.includes(day) ? nextDateForDay(d) : dayDates[d] || nextDateForDay(d)
-      )
-      const earliest = allDates.sort()[0] || ''
+    })
+  }
+
+  const updateSessionDate = (week: number, day: string, newDate: string) => {
+    setSessions((prev) =>
+      prev.map((s) => (s.week === week && s.day === day ? { ...s, date: newDate } : s))
+    )
+    // Keep startDate in sync with earliest session
+    setSessions((prev) => {
+      const earliest = prev.map((s) => (s.week === week && s.day === day ? newDate : s.date)).filter(Boolean).sort()[0] || ''
       setForm((f) => ({ ...f, startDate: earliest }))
-      return next
+      return prev
     })
   }
 
@@ -183,13 +213,13 @@ export default function NewCoursePage() {
 
   const removeTopic = (t: string) => setTopics((prev) => prev.filter((x) => x !== t))
 
-  // Build schedule for submission
   const buildSchedule = () =>
-    DAYS.filter((d) => selectedDays.includes(d)).map((day) => {
-      const times = (dayTimes[day] || ['']).filter(Boolean)
+    sessions.map((session) => {
+      const times = (dayTimes[session.day] || ['']).filter(Boolean)
       return {
-        day,
-        date: dayDates[day] || '',
+        day: session.day,
+        date: session.date,
+        week: session.week,
         localTimes: times,
         utcTimes: times.map((t) => localTimeToUtc(t, timezone)),
       }
@@ -200,6 +230,7 @@ export default function NewCoursePage() {
 
     if (courseType === 'LIVE') {
       if (selectedDays.length === 0) { setError('Select at least one class day.'); return }
+      if (!form.durationWeeks || parseInt(form.durationWeeks) < 1) { setError('Please enter a valid duration.'); return }
       const missingTime = selectedDays.find((d) => !dayTimes[d] || dayTimes[d].every((t) => !t))
       if (missingTime) { setError(`Please set at least one start time for ${missingTime}.`); return }
     }
@@ -242,6 +273,10 @@ export default function NewCoursePage() {
     }
     setLoading(false)
   }
+
+  // Group sessions by week for display
+  const weekNumbers = Array.from(new Set(sessions.map((s) => s.week))).sort((a, b) => a - b)
+  const totalSessions = sessions.length
 
   return (
     <DashboardLayout role="instructor">
@@ -401,88 +436,13 @@ export default function NewCoursePage() {
             </div>
           </div>
 
-          {/* Duration — hidden for self-paced (lifetime access) */}
-          {courseType === 'LIVE' && <div>
-            <label style={labelStyle}>Duration</label>
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.625rem' }}>
-              {(['WEEKS', 'DAYS'] as const).map((unit) => (
-                <button
-                  key={unit}
-                  type="button"
-                  onClick={() => setDurationUnit(unit)}
-                  style={{
-                    padding: '0.4rem 1rem',
-                    borderRadius: '6px',
-                    border: durationUnit === unit ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                    backgroundColor: durationUnit === unit ? '#003d35' : '#060f1a',
-                    color: durationUnit === unit ? '#00C2A8' : '#6b88a8',
-                    cursor: 'pointer',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                  }}
-                >
-                  {unit === 'WEEKS' ? 'Weeks' : 'Days'}
-                </button>
-              ))}
-            </div>
-            <input
-              required
-              type="number"
-              min="1"
-              max={durationUnit === 'WEEKS' ? 52 : 365}
-              value={form.durationWeeks}
-              onChange={set('durationWeeks')}
-              placeholder={durationUnit === 'WEEKS' ? 'e.g. 8' : 'e.g. 1'}
-              style={inputStyle}
-            />
-            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
-              {durationUnit === 'DAYS' && parseInt(form.durationWeeks) === 1 ? 'Single-day course' : `Number of ${durationUnit.toLowerCase()} the course runs`}
-            </p>
-          </div>}
-
-          {/* Course Calendar — shown once days are selected */}
-          {selectedDays.length > 0 && (
-            <div>
-              <label style={labelStyle}>Course Calendar</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                {DAYS.filter((d) => selectedDays.includes(d)).map((day) => (
-                  <div key={day} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.625rem 0.875rem' }}>
-                    <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 600, width: '100px' }}>{day}</span>
-                    <input
-                      type="date"
-                      value={dayDates[day] || ''}
-                      min={new Date().toISOString().split('T')[0]}
-                      onChange={(e) => {
-                        const newDate = e.target.value
-                        setDayDates((dd) => ({ ...dd, [day]: newDate }))
-                        // Update startDate to earliest
-                        const allDates = DAYS.filter((d) => selectedDays.includes(d)).map((d) => d === day ? newDate : dayDates[d] || '')
-                        const earliest = allDates.filter(Boolean).sort()[0] || ''
-                        setForm((f) => ({ ...f, startDate: earliest }))
-                      }}
-                      style={{ ...inputStyle, flex: 1, colorScheme: 'dark', padding: '0.4rem 0.625rem' }}
-                    />
-                    {dayDates[day] && (
-                      <span style={{ color: '#00C2A8', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
-                        {formatDate(dayDates[day])}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
-                Dates are auto-set to the next upcoming occurrence. You can adjust them if needed.
-              </p>
-            </div>
-          )}
-
-          {/* LIVE-only fields */}
+          {/* LIVE-only scheduling fields */}
           {courseType === 'LIVE' && (
             <>
               {/* Class Days */}
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                  <label style={{ ...labelStyle, marginBottom: 0 }}>Class Days</label>
+                  <label style={{ ...labelStyle, marginBottom: 0 }}>Class Days (per week)</label>
                   {selectedDays.length > 0 && (
                     <span style={{
                       backgroundColor: '#1a2d4a',
@@ -492,7 +452,7 @@ export default function NewCoursePage() {
                       fontSize: '0.75rem',
                       fontWeight: 700,
                     }}>
-                      {selectedDays.length} meeting{selectedDays.length !== 1 ? 's' : ''} per week
+                      {selectedDays.length} day{selectedDays.length !== 1 ? 's' : ''} per week
                     </span>
                   )}
                 </div>
@@ -518,6 +478,106 @@ export default function NewCoursePage() {
                   ))}
                 </div>
               </div>
+
+              {/* Duration */}
+              <div>
+                <label style={labelStyle}>Course Duration</label>
+                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.625rem' }}>
+                  {(['WEEKS', 'DAYS'] as const).map((unit) => (
+                    <button
+                      key={unit}
+                      type="button"
+                      onClick={() => setDurationUnit(unit)}
+                      style={{
+                        padding: '0.4rem 1rem',
+                        borderRadius: '6px',
+                        border: durationUnit === unit ? '1px solid #00C2A8' : '1px solid #1e3a5f',
+                        backgroundColor: durationUnit === unit ? '#003d35' : '#060f1a',
+                        color: durationUnit === unit ? '#00C2A8' : '#6b88a8',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                      }}
+                    >
+                      {unit === 'WEEKS' ? 'Weeks' : 'Days'}
+                    </button>
+                  ))}
+                </div>
+                <input
+                  required
+                  type="number"
+                  min="1"
+                  max={durationUnit === 'WEEKS' ? 52 : 365}
+                  value={form.durationWeeks}
+                  onChange={set('durationWeeks')}
+                  placeholder={durationUnit === 'WEEKS' ? 'e.g. 4' : 'e.g. 1'}
+                  style={inputStyle}
+                />
+                {selectedDays.length > 0 && parseInt(form.durationWeeks) >= 1 && (
+                  <p style={{ color: '#00C2A8', fontSize: '0.75rem', marginTop: '0.375rem', fontWeight: 600 }}>
+                    {totalSessions} total session{totalSessions !== 1 ? 's' : ''} — {selectedDays.length} day{selectedDays.length !== 1 ? 's' : ''}/week × {form.durationWeeks} week{parseInt(form.durationWeeks) !== 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+
+              {/* Full Session Schedule */}
+              {sessions.length > 0 && (
+                <div>
+                  <label style={labelStyle}>Full Session Schedule</label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {weekNumbers.map((weekNum) => (
+                      <div key={weekNum}>
+                        <div style={{
+                          color: '#F5C842',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          marginBottom: '0.4rem',
+                          paddingLeft: '0.25rem',
+                        }}>
+                          Week {weekNum}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                          {sessions.filter((s) => s.week === weekNum).map((session) => (
+                            <div
+                              key={`${session.week}-${session.day}`}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.75rem',
+                                backgroundColor: '#060f1a',
+                                border: '1px solid #1e3a5f',
+                                borderRadius: '8px',
+                                padding: '0.5rem 0.875rem',
+                              }}
+                            >
+                              <span style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, width: '90px', flexShrink: 0 }}>
+                                {session.day}
+                              </span>
+                              <input
+                                type="date"
+                                value={session.date}
+                                min={new Date().toISOString().split('T')[0]}
+                                onChange={(e) => updateSessionDate(session.week, session.day, e.target.value)}
+                                style={{ ...inputStyle, flex: 1, colorScheme: 'dark', padding: '0.35rem 0.625rem' }}
+                              />
+                              {session.date && (
+                                <span style={{ color: '#00C2A8', fontSize: '0.78rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                  {formatDate(session.date)}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.5rem' }}>
+                    Dates are auto-generated from today. You can adjust any date (e.g. to skip a holiday).
+                  </p>
+                </div>
+              )}
 
               {/* Per-day start times */}
               {selectedDays.length > 0 && (
@@ -590,7 +650,7 @@ export default function NewCoursePage() {
                     })}
                   </div>
                   <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
-                    Set one or more start times per day. Use &quot;+ Add time&quot; for multiple sessions on the same day.
+                    Set one or more start times per day. The same time applies to all weeks.
                   </p>
                 </div>
               )}
