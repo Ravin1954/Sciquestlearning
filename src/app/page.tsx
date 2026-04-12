@@ -1,5 +1,111 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
+
+export const metadata: Metadata = {
+  title: 'SciQuest Learning — Live Science & Math Classes for Middle & High School',
+  description: 'SciQuest Learning offers live, interactive online science and math classes for middle and high school students (grades 6–12). Biology, Chemistry, Physical Science, and Mathematics taught by verified educators via Google Meet.',
+  alternates: { canonical: 'https://sciquestlearning.com' },
+  openGraph: {
+    title: 'SciQuest Learning — Live Science & Math Classes for Grades 6–12',
+    description: 'Live, interactive online science and math classes for middle and high school students. Biology, Chemistry, Physical Science, Mathematics — taught by verified educators.',
+    url: 'https://sciquestlearning.com',
+  },
+}
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'EducationalOrganization',
+  name: 'SciQuest Learning',
+  url: 'https://sciquestlearning.com',
+  description: 'Live, interactive online science and math classes for middle and high school students (grades 6–12).',
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer support',
+    url: 'https://sciquestlearning.com/contact',
+  },
+  sameAs: [],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Science & Math Courses',
+    itemListElement: [
+      { '@type': 'Course', name: 'Biology', description: 'Cell biology, genetics, ecosystems for middle and high school students.' },
+      { '@type': 'Course', name: 'Chemistry', description: 'Atomic structure, chemical reactions, periodic table for grades 8–12.' },
+      { '@type': 'Course', name: 'Physical Science', description: 'Forces, motion, energy, waves for middle and high school.' },
+      { '@type': 'Course', name: 'Mathematics', description: 'Algebra, geometry, pre-calculus for grades 6–12.' },
+    ],
+  },
+}
+
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'SciQuest Learning',
+  url: 'https://sciquestlearning.com',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://sciquestlearning.com/courses?subject={search_term_string}',
+    },
+    'query-input': 'required name=search_term_string',
+  },
+}
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What subjects does SciQuest Learning offer?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SciQuest Learning offers live and self-paced online classes in Biology, Chemistry, Physical Science, and Mathematics for middle and high school students (grades 6–12).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How are SciQuest Learning classes delivered?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Live classes are delivered via Google Meet — students join a scheduled video session with a verified instructor. Self-paced courses provide access to pre-recorded content and materials.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Are SciQuest Learning instructors verified?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. Every instructor on SciQuest Learning is reviewed and approved by our admin team before they can teach. We verify qualifications, background, and teaching credentials.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What grade levels does SciQuest Learning serve?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'SciQuest Learning serves middle school and high school students, approximately grades 6 through 12 (ages 11–18).',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How much do SciQuest Learning classes cost?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Course fees vary by instructor and are set per session or as a lump sum for the full course. You can browse all available courses and their fees at sciquestlearning.com/courses.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can I become an instructor on SciQuest Learning?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes! Qualified educators can apply to teach on SciQuest Learning. Sign up as an instructor, complete the onboarding form, and your application will be reviewed by our team.',
+      },
+    },
+  ],
+}
 
 const subjects = [
   {
@@ -64,6 +170,9 @@ const features = [
 export default function HomePage() {
   return (
     <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <NavBar />
 
       {/* Hero Section */}

@@ -30,10 +30,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: 'https://sciquestlearning.com/courses?subject=BIOLOGY',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: 'https://sciquestlearning.com/courses?subject=CHEMISTRY',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: 'https://sciquestlearning.com/courses?subject=PHYSICAL_SCIENCE',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: 'https://sciquestlearning.com/courses?subject=MATHEMATICS',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.85,
+    },
+    {
+      url: 'https://sciquestlearning.com/courses?type=SELF_PACED',
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: 'https://sciquestlearning.com/contact',
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
       url: 'https://sciquestlearning.com/sign-in',
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.4,
     },
     {
       url: 'https://sciquestlearning.com/sign-up',
