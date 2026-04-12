@@ -62,7 +62,7 @@ export async function POST(req: Request) {
         ? `${course.daysOfWeek.join(', ')} at ${course.startTimeUtc} UTC`
         : 'Self-paced — access anytime'
     }
-    await sendEnrollmentConfirmationEmail(student.email, course.title, accessLink, schedule)
+    await sendEnrollmentConfirmationEmail(student.email, course.title, accessLink, schedule, `${student.firstName} ${student.lastName}`)
 
     // Notify admin of new enrollment
     sendEnrollmentNotificationEmail(

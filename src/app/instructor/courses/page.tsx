@@ -93,6 +93,19 @@ export default function MyCoursesPage() {
   const [recordingLabel, setRecordingLabel] = useState('')
   const [recordingUrl, setRecordingUrl] = useState('')
   const [recordingSaving, setRecordingSaving] = useState(false)
+  const [rosterCourseId, setRosterCourseId] = useState<string | null>(null)
+  const [rosterData, setRosterData] = useState<{ studentName: string; email: string; enrolledAt: string }[]>([])
+  const [rosterLoading, setRosterLoading] = useState(false)
+
+  const handleViewRoster = async (courseId: string) => {
+    if (rosterCourseId === courseId) { setRosterCourseId(null); return }
+    setRosterCourseId(courseId)
+    setRosterLoading(true)
+    const res = await fetch(`/api/instructor/courses/${courseId}/roster`)
+    const data = await res.json()
+    setRosterData(Array.isArray(data) ? data : [])
+    setRosterLoading(false)
+  }
 
   useEffect(() => {
     fetch('/api/instructor/courses')
@@ -163,6 +176,14 @@ export default function MyCoursesPage() {
                         )}
                       </div>
                       <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {c._count.enrollments > 0 && (
+                          <button
+                            onClick={() => handleViewRoster(c.id)}
+                            style={{ backgroundColor: 'transparent', color: '#F5C842', border: '1px solid #F5C842', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          >
+                            {rosterCourseId === c.id ? 'Hide Roster' : `Roster (${c._count.enrollments})`}
+                          </button>
+                        )}
                         {c.courseType === 'SELF_PACED' ? (
                           c.contentUrl ? (
                             <a href={c.contentUrl.startsWith('http') ? c.contentUrl : `https://${c.contentUrl}`} target="_blank" rel="noopener noreferrer"
@@ -182,7 +203,34 @@ export default function MyCoursesPage() {
                         )}
                       </div>
                     </div>
-                  )
+
+                    {/* Roster panel */}
+                    {rosterCourseId === c.id && (
+                      <div style={{ borderTop: '1px solid #1e3a5f', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                        <p style={{ color: '#F5C842', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+                          Enrolled Students — verify names against Google Meet waiting room
+                        </p>
+                        {rosterLoading ? (
+                          <p style={{ color: '#6b88a8', fontSize: '0.85rem' }}>Loading roster...</p>
+                        ) : rosterData.length === 0 ? (
+                          <p style={{ color: '#6b88a8', fontSize: '0.85rem' }}>No students enrolled.</p>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                            {rosterData.map((s, i) => (
+                              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.6rem 1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                <span style={{ color: '#e8edf5', fontWeight: 600, fontSize: '0.875rem' }}>{s.studentName}</span>
+                                <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>{s.email}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.75rem', lineHeight: 1.5 }}>
+                          Admit students whose name in Google Meet matches the student name above. If they appear as "Guest", ask them to re-join and type their child's name.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )
                 })}
               </div>
             </div>

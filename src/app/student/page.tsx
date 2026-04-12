@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useUser } from '@clerk/nextjs'
 import DashboardLayout from '@/components/DashboardLayout'
 
 interface Feedback {
@@ -15,6 +16,7 @@ interface Enrollment {
   zoomJoinUrl: string
   enrolledAt: string
   feedback: Feedback | null
+  student?: { firstName: string; lastName: string }
   course: {
     id: string
     title: string
@@ -131,6 +133,8 @@ function FeedbackForm({ enrollmentId, onSubmitted }: { enrollmentId: string; onS
 }
 
 export default function StudentPage() {
+  const { user } = useUser()
+  const studentName = user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : ''
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<Set<string>>(new Set())
@@ -231,10 +235,17 @@ export default function StudentPage() {
                           <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Content pending</span>
                         )
                       ) : enrollment.zoomJoinUrl ? (
-                        <a href={enrollment.zoomJoinUrl} target="_blank" rel="noopener noreferrer"
-                          style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
-                          Join Class →
-                        </a>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
+                          <a href={enrollment.zoomJoinUrl} target="_blank" rel="noopener noreferrer"
+                            style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                            Join Class →
+                          </a>
+                          {studentName && (
+                            <p style={{ color: '#F5C842', fontSize: '0.7rem', textAlign: 'right', maxWidth: '180px', lineHeight: 1.4, margin: 0 }}>
+                              Enter name as: <strong>{studentName}</strong>
+                            </p>
+                          )}
+                        </div>
                       ) : (
                         <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Link pending</span>
                       )}

@@ -64,17 +64,37 @@ export async function sendEnrollmentConfirmationEmail(
   studentEmail: string,
   courseTitle: string,
   zoomJoinUrl: string,
-  schedule: string
+  schedule: string,
+  studentName?: string,
 ) {
+  const isLive = !!zoomJoinUrl && zoomJoinUrl.startsWith('http')
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: studentEmail,
-    subject: `You're enrolled in ${courseTitle}!`,
+    subject: `Enrollment Confirmed: ${courseTitle}`,
     html: `
-      <h2>Enrollment Confirmed</h2>
-      <p>You are now enrolled in <strong>${courseTitle}</strong>.</p>
-      <p><strong>Schedule:</strong> ${schedule}</p>
-      <p><a href="${zoomJoinUrl}">Join Zoom Class</a></p>
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Enrollment Confirmed!</h2>
+        <p>You are now enrolled in <strong>${courseTitle}</strong>.</p>
+        <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
+          ${studentName ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Student Name</td><td style="padding:0.5rem;">${studentName}</td></tr>` : ''}
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Schedule</td><td style="padding:0.5rem;">${schedule}</td></tr>
+          ${isLive ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Google Meet Link</td><td style="padding:0.5rem;"><a href="${zoomJoinUrl}" style="color:#00C2A8;">${zoomJoinUrl}</a></td></tr>` : ''}
+        </table>
+        ${isLive && studentName ? `
+        <div style="background:#fff8e1; border-left:4px solid #F5C842; padding:1rem 1.25rem; border-radius:0 8px 8px 0; margin: 1.25rem 0;">
+          <p style="margin:0 0 0.5rem; font-weight:700; color:#7a5800;">Important: Joining Google Meet</p>
+          <p style="margin:0; color:#4a3800; font-size:0.9rem; line-height:1.6;">
+            When joining the class, please make sure the name shown in Google Meet matches your child's enrolled name:
+            <strong>${studentName}</strong>.<br/><br/>
+            To do this, click the Meet link and when prompted, type <strong>${studentName}</strong> as the name before joining.
+            This helps the instructor identify and admit the correct student.
+          </p>
+        </div>
+        ` : ''}
+        ${isLive ? `<p><a href="${zoomJoinUrl}" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block;">Join Class →</a></p>` : ''}
+        <p style="margin-top:2rem; color:#666;">Thank you for enrolling with SciQuest Learning!</p>
+      </div>
     `,
   })
 }
