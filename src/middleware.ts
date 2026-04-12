@@ -12,6 +12,7 @@ const isPublicRoute = createRouteMatcher([
   '/contact',
   '/qrcode',
   '/api/qrcode',
+  '/flyer',
 ])
 
 export default clerkMiddleware(async (auth, req) => {
