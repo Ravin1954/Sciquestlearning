@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" fill="none">
+  <!-- Atom icon mark -->
+  <circle cx="24" cy="24" r="5" fill="#00C2A8"/>
+  <!-- Orbit ring 1 -->
+  <ellipse cx="24" cy="24" rx="20" ry="8" stroke="#00C2A8" stroke-width="1.8" fill="none"/>
+  <!-- Orbit ring 2 (rotated 60deg) -->
+  <ellipse cx="24" cy="24" rx="20" ry="8" stroke="#F5C842" stroke-width="1.8" fill="none" transform="rotate(60 24 24)"/>
+  <!-- Orbit ring 3 (rotated 120deg) -->
+  <ellipse cx="24" cy="24" rx="20" ry="8" stroke="#00C2A8" stroke-width="1.8" fill="none" transform="rotate(120 24 24)" opacity="0.5"/>
+
+  <!-- SciQuest text -->
+  <text x="54" y="30" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#00C2A8" letter-spacing="-0.5">SciQuest</text>
+  <!-- Learning text -->
+  <text x="157" y="30" font-family="Georgia, serif" font-size="22" font-weight="400" fill="#F5C842" letter-spacing="-0.5"> Learning</text>
+</svg>

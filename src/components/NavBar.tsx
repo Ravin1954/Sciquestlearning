@@ -17,17 +17,8 @@ export default function NavBar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2">
-            <span
-              style={{ fontFamily: 'Fraunces, serif', color: '#00C2A8', fontSize: '1.5rem', fontWeight: 700 }}
-            >
-              SciQuest
-            </span>
-            <span
-              style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.5rem', fontWeight: 400 }}
-            >
-              Learning
-            </span>
+          <Link href="/" className="flex items-center">
+            <img src="/logo.svg" alt="SciQuest Learning" style={{ height: '36px', width: 'auto' }} />
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
