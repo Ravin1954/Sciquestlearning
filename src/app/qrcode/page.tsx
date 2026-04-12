@@ -1,3 +1,5 @@
+'use client'
+
 export default function QRCodePage() {
   return (
     <div style={{
