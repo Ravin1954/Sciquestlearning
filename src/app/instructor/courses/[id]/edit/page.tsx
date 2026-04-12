@@ -103,6 +103,7 @@ export default function EditCoursePage() {
     sessionDurationMins: '',
     feeUsd: '',
     contentUrl: '',
+    classroomUrl: '',
     startDate: '',
   })
 
@@ -130,6 +131,7 @@ export default function EditCoursePage() {
           sessionDurationMins: course.sessionDurationMins?.toString() || '',
           feeUsd: Number(course.feeUsd).toFixed(2),
           contentUrl: course.contentUrl || '',
+          classroomUrl: course.classroomUrl || '',
           startDate: course.startDate || '',
         })
         // Pre-fill day times from scheduleJson
@@ -236,6 +238,7 @@ export default function EditCoursePage() {
         topics,
         scheduleJson,
         startDate: form.startDate,
+        classroomUrl: form.classroomUrl || null,
       }),
     })
 
@@ -484,6 +487,21 @@ export default function EditCoursePage() {
               <input required type="url" value={form.contentUrl} onChange={set('contentUrl')} placeholder="e.g. https://drive.google.com/..." style={inputStyle} />
             </div>
           )}
+
+          {/* Google Classroom URL */}
+          <div>
+            <label style={labelStyle}>Google Classroom Link <span style={{ color: '#6b88a8', fontWeight: 400 }}>(optional)</span></label>
+            <input
+              type="url"
+              value={form.classroomUrl}
+              onChange={set('classroomUrl')}
+              placeholder="https://classroom.google.com/c/..."
+              style={inputStyle}
+            />
+            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+              Students will receive this link in their enrollment email.
+            </p>
+          </div>
 
           {/* Fee */}
           <div>

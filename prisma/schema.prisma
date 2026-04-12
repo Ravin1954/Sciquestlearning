@@ -59,6 +59,7 @@ model Course {
   zoomMeetingId       String?
   zoomJoinUrl         String?
   zoomStartUrl        String?
+  classroomUrl           String?
   recordingsJson         String       @default("[]")
   cancelledSessionsJson  String       @default("[]")
   createdAt              DateTime     @default(now())

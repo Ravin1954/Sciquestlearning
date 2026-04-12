@@ -66,6 +66,7 @@ export async function sendEnrollmentConfirmationEmail(
   zoomJoinUrl: string,
   schedule: string,
   studentName?: string,
+  classroomUrl?: string,
 ) {
   const isLive = !!zoomJoinUrl && zoomJoinUrl.startsWith('http')
   await resend.emails.send({
@@ -80,6 +81,7 @@ export async function sendEnrollmentConfirmationEmail(
           ${studentName ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Student Name</td><td style="padding:0.5rem;">${studentName}</td></tr>` : ''}
           <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Schedule</td><td style="padding:0.5rem;">${schedule}</td></tr>
           ${isLive ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Google Meet Link</td><td style="padding:0.5rem;"><a href="${zoomJoinUrl}" style="color:#00C2A8;">${zoomJoinUrl}</a></td></tr>` : ''}
+          ${classroomUrl ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Google Classroom</td><td style="padding:0.5rem;"><a href="${classroomUrl}" style="color:#00C2A8;">${classroomUrl}</a></td></tr>` : ''}
         </table>
         ${isLive && studentName ? `
         <div style="background:#fff8e1; border-left:4px solid #F5C842; padding:1rem 1.25rem; border-radius:0 8px 8px 0; margin: 1.25rem 0;">
@@ -92,7 +94,10 @@ export async function sendEnrollmentConfirmationEmail(
           </p>
         </div>
         ` : ''}
-        ${isLive ? `<p><a href="${zoomJoinUrl}" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block;">Join Class →</a></p>` : ''}
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin:1.25rem 0;">
+          ${isLive ? `<a href="${zoomJoinUrl}" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block;">Join Class →</a>` : ''}
+          ${classroomUrl ? `<a href="${classroomUrl}" style="background:#1a73e8; color:#fff; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block;">Open Google Classroom →</a>` : ''}
+        </div>
         <p style="margin-top:2rem; color:#666;">Thank you for enrolling with SciQuest Learning!</p>
       </div>
     `,

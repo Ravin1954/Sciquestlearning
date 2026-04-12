@@ -96,15 +96,42 @@ export default function MyCoursesPage() {
   const [rosterCourseId, setRosterCourseId] = useState<string | null>(null)
   const [rosterData, setRosterData] = useState<{ studentName: string; email: string; enrolledAt: string }[]>([])
   const [rosterLoading, setRosterLoading] = useState(false)
+  const [msgSubject, setMsgSubject] = useState('')
+  const [msgBody, setMsgBody] = useState('')
+  const [msgAttachment, setMsgAttachment] = useState('')
+  const [msgSending, setMsgSending] = useState(false)
+  const [msgResult, setMsgResult] = useState<string | null>(null)
 
   const handleViewRoster = async (courseId: string) => {
-    if (rosterCourseId === courseId) { setRosterCourseId(null); return }
+    if (rosterCourseId === courseId) { setRosterCourseId(null); setMsgResult(null); return }
     setRosterCourseId(courseId)
     setRosterLoading(true)
+    setMsgResult(null)
     const res = await fetch(`/api/instructor/courses/${courseId}/roster`)
     const data = await res.json()
     setRosterData(Array.isArray(data) ? data : [])
     setRosterLoading(false)
+  }
+
+  const handleSendMessage = async (courseId: string) => {
+    if (!msgSubject.trim() || !msgBody.trim()) { setMsgResult('error:Please fill in the subject and message.'); return }
+    setMsgSending(true)
+    setMsgResult(null)
+    const res = await fetch(`/api/instructor/courses/${courseId}/message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subject: msgSubject, message: msgBody, attachmentUrl: msgAttachment || null }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setMsgResult(`success:Message sent to ${data.sent} student${data.sent !== 1 ? 's' : ''}.`)
+      setMsgSubject('')
+      setMsgBody('')
+      setMsgAttachment('')
+    } else {
+      setMsgResult(`error:${data.error || 'Failed to send.'}`)
+    }
+    setMsgSending(false)
   }
 
   useEffect(() => {
@@ -227,6 +254,52 @@ export default function MyCoursesPage() {
                         <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.75rem', lineHeight: 1.5 }}>
                           Admit students whose name in Google Meet matches the student name above. If they appear as "Guest", ask them to re-join and type their child's name.
                         </p>
+
+                        {/* Message Students */}
+                        <div style={{ marginTop: '1.25rem', borderTop: '1px solid #1e3a5f', paddingTop: '1rem' }}>
+                          <p style={{ color: '#00C2A8', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+                            Message All Students
+                          </p>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                            <input
+                              placeholder="Subject (e.g. Please review Chapter 3 before class)"
+                              value={msgSubject}
+                              onChange={(e) => setMsgSubject(e.target.value)}
+                              style={{ padding: '0.6rem 0.875rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.825rem', fontFamily: "'DM Sans', sans-serif" }}
+                            />
+                            <textarea
+                              placeholder="Your message to students/parents..."
+                              value={msgBody}
+                              onChange={(e) => setMsgBody(e.target.value)}
+                              rows={4}
+                              style={{ padding: '0.6rem 0.875rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.825rem', fontFamily: "'DM Sans', sans-serif", resize: 'vertical' }}
+                            />
+                            <input
+                              placeholder="Attachment link (optional — Google Drive, PDF, etc.)"
+                              value={msgAttachment}
+                              onChange={(e) => setMsgAttachment(e.target.value)}
+                              style={{ padding: '0.6rem 0.875rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.825rem', fontFamily: "'DM Sans', sans-serif" }}
+                            />
+                            {msgResult && (
+                              <p style={{
+                                fontSize: '0.8rem',
+                                padding: '0.5rem 0.75rem',
+                                borderRadius: '6px',
+                                backgroundColor: msgResult.startsWith('success') ? '#003d35' : '#3d0f0f',
+                                color: msgResult.startsWith('success') ? '#00C2A8' : '#f87171',
+                              }}>
+                                {msgResult.replace(/^(success|error):/, '')}
+                              </p>
+                            )}
+                            <button
+                              onClick={() => handleSendMessage(c.id)}
+                              disabled={msgSending}
+                              style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', border: 'none', padding: '0.6rem 1.25rem', borderRadius: '6px', fontWeight: 700, fontSize: '0.825rem', cursor: msgSending ? 'not-allowed' : 'pointer', opacity: msgSending ? 0.6 : 1, alignSelf: 'flex-start' }}
+                            >
+                              {msgSending ? 'Sending...' : `Send to ${rosterData.length} Student${rosterData.length !== 1 ? 's' : ''}`}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

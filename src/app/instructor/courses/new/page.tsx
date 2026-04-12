@@ -138,6 +138,7 @@ export default function NewCoursePage() {
     sessionDurationMins: '',
     feeUsd: '',
     contentUrl: '',
+    classroomUrl: '',
     startDate: '',
   })
 
@@ -262,6 +263,7 @@ export default function NewCoursePage() {
         topics,
         scheduleJson,
         startDate: form.startDate,
+        classroomUrl: form.classroomUrl || null,
       }),
     })
 
@@ -693,6 +695,21 @@ export default function NewCoursePage() {
               </p>
             </div>
           )}
+
+          {/* Google Classroom URL */}
+          <div>
+            <label style={labelStyle}>Google Classroom Link <span style={{ color: '#6b88a8', fontWeight: 400 }}>(optional)</span></label>
+            <input
+              type="url"
+              value={form.classroomUrl}
+              onChange={set('classroomUrl')}
+              placeholder="https://classroom.google.com/c/..."
+              style={inputStyle}
+            />
+            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+              If you use Google Classroom for materials and assignments, paste the invite link here. Students will receive it in their enrollment email.
+            </p>
+          </div>
 
           {/* Fee */}
           <div>

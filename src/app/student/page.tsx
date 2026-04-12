@@ -27,6 +27,7 @@ interface Enrollment {
     startTimeUtc: string
     sessionDurationMins: number
     contentUrl?: string
+    classroomUrl?: string
     status: string
     instructor: { firstName: string; lastName: string }
   }
@@ -248,6 +249,12 @@ export default function StudentPage() {
                         </div>
                       ) : (
                         <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Link pending</span>
+                      )}
+                      {course.classroomUrl && (
+                        <a href={course.classroomUrl} target="_blank" rel="noopener noreferrer"
+                          style={{ backgroundColor: '#1a73e8', color: '#fff', padding: '0.5rem 1rem', borderRadius: '8px', fontWeight: 600, textDecoration: 'none', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
+                          Google Classroom →
+                        </a>
                       )}
                     </div>
                   </div>
