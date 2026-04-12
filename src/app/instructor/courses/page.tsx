@@ -185,7 +185,8 @@ export default function MyCoursesPage() {
                   const nextLabel = c.courseType === 'LIVE' && !isClassTime ? nextSessionLabel(c.daysOfWeek, c.startTimeUtc) : ''
                   const meetLink = c.zoomJoinUrl || c.zoomStartUrl
                   return (
-                    <div key={c.id} style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', borderColor: isClassTime ? '#00C2A8' : '#1e3a5f' }}>
+                    <div key={c.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '0.75rem', borderColor: isClassTime ? '#00C2A8' : '#1e3a5f' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                       <div>
                         <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
                         <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
@@ -229,7 +230,7 @@ export default function MyCoursesPage() {
                           <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Meeting link pending</span>
                         )}
                       </div>
-                    </div>
+                      </div>
 
                     {/* Roster panel */}
                     {rosterCourseId === c.id && (
