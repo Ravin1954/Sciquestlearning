@@ -10,6 +10,11 @@ interface User {
   email: string
   role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN'
   createdAt: string
+  country?: string
+  qualifications?: string
+  aboutMe?: string
+  certificatesUrl?: string
+  instructorStatus?: string
   _count: { enrollments: number; courses: number }
 }
 
@@ -30,6 +35,7 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState('')
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const handleDelete = async (userId: string) => {
     setDeleteLoading(userId)
@@ -122,54 +128,107 @@ export default function AdminUsersPage() {
               ) : (
                 filtered.map((u, i) => {
                   const badge = roleBadge[u.role] || roleBadge.STUDENT
+                  const isExpanded = expandedId === u.id
+                  const isInstructor = u.role === 'INSTRUCTOR'
+                  const statusColors: Record<string, string> = {
+                    APPROVED: '#00C2A8', PENDING_REVIEW: '#F5C842', REJECTED: '#f87171', NOT_APPLICABLE: '#6b88a8',
+                  }
                   return (
-                    <tr key={u.id} style={{ borderBottom: i < filtered.length - 1 ? '1px solid #1e3a5f' : 'none' }}>
-                      <td style={{ padding: '0.875rem 1rem', color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
-                        {(u.firstName || u.lastName) ? `${u.firstName} ${u.lastName}`.trim() : <span style={{ color: '#6b88a8', fontStyle: 'italic' }}>No name</span>}
-                      </td>
-                      <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u.email}</td>
-                      <td style={{ padding: '0.875rem 1rem' }}>
-                        <span style={{ backgroundColor: badge.bg, color: badge.color, borderRadius: '999px', padding: '0.2rem 0.7rem', fontSize: '0.75rem', fontWeight: 700 }}>
-                          {u.role}
-                        </span>
-                      </td>
-                      <td style={{ padding: '0.875rem 1rem', color: '#6b88a8', fontSize: '0.8rem' }}>
-                        {new Date(u.createdAt).toLocaleDateString()}
-                      </td>
-                      <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem', textAlign: 'center' }}>
-                        {u._count.enrollments}
-                      </td>
-                      <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem', textAlign: 'center' }}>
-                        {u._count.courses > 0 ? u._count.courses : '—'}
-                      </td>
-                      <td style={{ padding: '0.875rem 1rem' }}>
-                        {confirmDeleteId === u.id ? (
-                          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                            <span style={{ color: '#f87171', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>Sure?</span>
-                            <button
-                              onClick={() => handleDelete(u.id)}
-                              disabled={deleteLoading === u.id}
-                              style={{ backgroundColor: '#7f1d1d', color: '#fff', border: 'none', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', opacity: deleteLoading === u.id ? 0.5 : 1 }}
-                            >
-                              {deleteLoading === u.id ? '...' : 'Yes'}
-                            </button>
-                            <button
-                              onClick={() => setConfirmDeleteId(null)}
-                              style={{ backgroundColor: 'transparent', color: '#a8c4e0', border: '1px solid #1e3a5f', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}
-                            >
-                              No
-                            </button>
+                    <>
+                      <tr key={u.id} style={{ borderBottom: (isExpanded || i < filtered.length - 1) ? '1px solid #1e3a5f' : 'none' }}>
+                        <td style={{ padding: '0.875rem 1rem', color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
+                          {(u.firstName || u.lastName) ? `${u.firstName} ${u.lastName}`.trim() : <span style={{ color: '#6b88a8', fontStyle: 'italic' }}>No name</span>}
+                        </td>
+                        <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem' }}>{u.email}</td>
+                        <td style={{ padding: '0.875rem 1rem' }}>
+                          <span style={{ backgroundColor: badge.bg, color: badge.color, borderRadius: '999px', padding: '0.2rem 0.7rem', fontSize: '0.75rem', fontWeight: 700 }}>
+                            {u.role}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.875rem 1rem', color: '#6b88a8', fontSize: '0.8rem' }}>
+                          {new Date(u.createdAt).toLocaleDateString()}
+                        </td>
+                        <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem', textAlign: 'center' }}>
+                          {u._count.enrollments}
+                        </td>
+                        <td style={{ padding: '0.875rem 1rem', color: '#a8c4e0', fontSize: '0.875rem', textAlign: 'center' }}>
+                          {u._count.courses > 0 ? u._count.courses : '—'}
+                        </td>
+                        <td style={{ padding: '0.875rem 1rem' }}>
+                          <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                            {isInstructor && (
+                              <button
+                                onClick={() => setExpandedId(isExpanded ? null : u.id)}
+                                style={{ backgroundColor: 'transparent', color: '#F5C842', border: '1px solid #F5C842', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.75rem', cursor: 'pointer' }}
+                              >
+                                {isExpanded ? 'Hide' : 'Credentials'}
+                              </button>
+                            )}
+                            {confirmDeleteId === u.id ? (
+                              <>
+                                <span style={{ color: '#f87171', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>Sure?</span>
+                                <button
+                                  onClick={() => handleDelete(u.id)}
+                                  disabled={deleteLoading === u.id}
+                                  style={{ backgroundColor: '#7f1d1d', color: '#fff', border: 'none', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer', opacity: deleteLoading === u.id ? 0.5 : 1 }}
+                                >
+                                  {deleteLoading === u.id ? '...' : 'Yes'}
+                                </button>
+                                <button
+                                  onClick={() => setConfirmDeleteId(null)}
+                                  style={{ backgroundColor: 'transparent', color: '#a8c4e0', border: '1px solid #1e3a5f', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}
+                                >
+                                  No
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                onClick={() => setConfirmDeleteId(u.id)}
+                                style={{ backgroundColor: 'transparent', color: '#f87171', border: '1px solid #f87171', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}
+                              >
+                                Delete
+                              </button>
+                            )}
                           </div>
-                        ) : (
-                          <button
-                            onClick={() => setConfirmDeleteId(u.id)}
-                            style={{ backgroundColor: 'transparent', color: '#f87171', border: '1px solid #f87171', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.8rem', cursor: 'pointer' }}
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </td>
-                    </tr>
+                        </td>
+                      </tr>
+                      {isExpanded && isInstructor && (
+                        <tr key={`${u.id}-creds`} style={{ borderBottom: i < filtered.length - 1 ? '1px solid #1e3a5f' : 'none', backgroundColor: '#060f1a' }}>
+                          <td colSpan={7} style={{ padding: '1rem 1.25rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                              <div>
+                                <p style={{ color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Status</p>
+                                <span style={{ color: statusColors[u.instructorStatus || 'NOT_APPLICABLE'] || '#6b88a8', fontWeight: 600, fontSize: '0.875rem' }}>
+                                  {u.instructorStatus === 'APPROVED' ? 'Approved' : u.instructorStatus === 'PENDING_REVIEW' ? 'Pending Review' : u.instructorStatus === 'REJECTED' ? 'Rejected' : '—'}
+                                </span>
+                              </div>
+                              <div>
+                                <p style={{ color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Country</p>
+                                <p style={{ color: u.country ? '#e8edf5' : '#3a5070', fontStyle: u.country ? 'normal' : 'italic', fontSize: '0.875rem' }}>{u.country || 'Not provided'}</p>
+                              </div>
+                              <div>
+                                <p style={{ color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Qualifications</p>
+                                <p style={{ color: u.qualifications ? '#e8edf5' : '#3a5070', fontStyle: u.qualifications ? 'normal' : 'italic', fontSize: '0.875rem', lineHeight: 1.5 }}>{u.qualifications || 'Not provided'}</p>
+                              </div>
+                              <div>
+                                <p style={{ color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>About Me</p>
+                                <p style={{ color: u.aboutMe ? '#e8edf5' : '#3a5070', fontStyle: u.aboutMe ? 'normal' : 'italic', fontSize: '0.875rem', lineHeight: 1.5 }}>{u.aboutMe || 'Not provided'}</p>
+                              </div>
+                              <div>
+                                <p style={{ color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Certificates / Credentials URL</p>
+                                {u.certificatesUrl ? (
+                                  <a href={u.certificatesUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#00C2A8', fontSize: '0.875rem', wordBreak: 'break-all' }}>
+                                    View Document →
+                                  </a>
+                                ) : (
+                                  <p style={{ color: '#3a5070', fontStyle: 'italic', fontSize: '0.875rem' }}>Not provided</p>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </>
                   )
                 })
               )}

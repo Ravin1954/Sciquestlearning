@@ -27,6 +27,7 @@ const navItems: Record<string, NavItem[]> = {
     { label: 'My Courses', href: '/instructor/courses', icon: '📚' },
     { label: 'New Course', href: '/instructor/courses/new', icon: '➕' },
     { label: 'Earnings', href: '/instructor/earnings', icon: '💰' },
+    { label: 'My Profile', href: '/instructor/profile', icon: '👤' },
   ],
   student: [
     { label: 'Dashboard', href: '/student', icon: '📊' },
