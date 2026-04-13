@@ -276,7 +276,7 @@ export default function CoursePageClient() {
                           {s.label} {isCancelled ? '— Cancelled' : ''}
                         </span>
                         <span style={{ marginLeft: 'auto', color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : '#6b88a8', fontSize: '0.8rem', fontWeight: alreadyPaid ? 600 : 400 }}>
-                          {isCancelled ? '✗' : alreadyPaid ? '✓ Paid' : `$${feePerSession.toFixed(2)}`}
+                          {isCancelled ? '✗' : alreadyPaid ? '✓ Paid' : isLumpSum ? '' : `$${feePerSession.toFixed(2)}`}
                         </span>
                       </label>
                     )
@@ -343,8 +343,8 @@ export default function CoursePageClient() {
                       <span style={{ color: '#F5C842', fontSize: '0.875rem', fontWeight: 600 }}>{sessions.length} session{sessions.length !== 1 ? 's' : ''}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Fee per Session</span>
-                      <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>${feePerSession.toFixed(2)}</span>
+                      <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>{isLumpSum ? 'Total Course Fee' : 'Fee per Session'}</span>
+                      <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>${feePerSession.toFixed(2)}{isLumpSum ? ' (flat fee)' : ''}</span>
                     </div>
                   </>
                 )}
