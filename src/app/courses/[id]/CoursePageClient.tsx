@@ -124,12 +124,10 @@ export default function CoursePageClient() {
           })
           setSessions(parsed)
           setSessionGroups(groups)
-          // For lump sum with only one time per day, auto-select all
+          // For lump sum: auto-select the first time slot for every day
           if (data.feeType === 'LUMP_SUM') {
-            const singleTimeGroups = groups.every((g) => g.sessions.length === 1)
-            if (singleTimeGroups) {
-              setSelectedSessions(new Set(parsed.map((s) => s.label)))
-            }
+            const autoSelected = new Set(groups.map((g) => g.sessions[0].label))
+            setSelectedSessions(autoSelected)
           }
         } catch { /* ignore */ }
       }

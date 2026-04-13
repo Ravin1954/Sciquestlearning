@@ -20,8 +20,10 @@ interface CourseCardProps {
     durationWeeks: number
     daysOfWeek: string[]
     startTimeUtc: string
+    scheduleJson?: string
     sessionDurationMins: number
     feeUsd: number | string
+    feeType?: string
     status?: 'PENDING' | 'APPROVED' | 'REJECTED'
     instructor?: {
       firstName: string
@@ -145,7 +147,24 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
           <>
             <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
               <span style={{ color: '#6b88a8' }}>Schedule: </span>
-              {course.daysOfWeek.join(', ')} at {formatLocalTime(course.startTimeUtc)}
+              {course.daysOfWeek.join(', ')} at {(() => {
+                // Extract all unique times from scheduleJson
+                if (course.scheduleJson) {
+                  try {
+                    const schedule = JSON.parse(course.scheduleJson)
+                    const allTimes: string[] = []
+                    schedule.forEach((entry: { utcTimes?: string[]; utcTime?: string }) => {
+                      const times = entry.utcTimes || (entry.utcTime ? [entry.utcTime] : [])
+                      times.forEach((t) => {
+                        const formatted = formatLocalTime(t)
+                        if (!allTimes.includes(formatted)) allTimes.push(formatted)
+                      })
+                    })
+                    if (allTimes.length > 0) return allTimes.join(' / ')
+                  } catch { /* ignore */ }
+                }
+                return formatLocalTime(course.startTimeUtc)
+              })()}
             </p>
             <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
               <span style={{ color: '#6b88a8' }}>Session: </span>

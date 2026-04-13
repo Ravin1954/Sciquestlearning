@@ -15,8 +15,10 @@ interface Course {
   durationWeeks: number
   daysOfWeek: string[]
   startTimeUtc: string
+  scheduleJson?: string
   sessionDurationMins: number
   feeUsd: number | string
+  feeType?: string
   instructor: { firstName: string; lastName: string }
 }
 
