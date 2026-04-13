@@ -9,6 +9,8 @@ interface Session { day: string; utcTime: string; label: string }
 
 interface ScheduleEntry {
   day: string
+  date?: string
+  week?: number
   utcTime?: string
   utcTimes?: string[]
   localTime?: string
@@ -102,8 +104,11 @@ export default function CoursePageClient() {
           const parsed: Session[] = []
           schedule.forEach((entry) => {
             const times = entry.utcTimes || (entry.utcTime ? [entry.utcTime] : [])
+            const dateLabel = entry.date
+              ? new Date(entry.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+              : entry.day
             times.forEach((t) => {
-              parsed.push({ day: entry.day, utcTime: t, label: `${entry.day} — ${formatUtcTime(t)}` })
+              parsed.push({ day: entry.day, utcTime: t, label: `${dateLabel} (${entry.day.slice(0, 3)}) — ${formatUtcTime(t)}` })
             })
           })
           setSessions(parsed)
