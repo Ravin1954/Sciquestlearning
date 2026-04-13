@@ -105,7 +105,14 @@ export default function CoursePageClient() {
           const schedule: ScheduleEntry[] = JSON.parse(data.scheduleJson)
           const parsed: Session[] = []
           const groups: SessionGroup[] = []
+          const todayMidnight = new Date()
+          todayMidnight.setHours(0, 0, 0, 0)
           schedule.forEach((entry) => {
+            // Filter out past dates
+            if (entry.date) {
+              const entryDate = new Date(entry.date + 'T00:00:00')
+              if (entryDate < todayMidnight) return
+            }
             const times = entry.utcTimes || (entry.utcTime ? [entry.utcTime] : [])
             const dateKey = entry.date || entry.day
             const dateLabel = entry.date
@@ -265,85 +272,69 @@ export default function CoursePageClient() {
                   }
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  {(isLumpSum ? sessionGroups : sessions.map((s) => ({ date: s.date, day: s.day, dateLabel: s.label, sessions: [s] }))).map((group, gi) => {
-                    if (isLumpSum) {
-                      const g = group as SessionGroup
-                      const cancelledKeys: string[] = (() => { try { return JSON.parse(course.cancelledSessionsJson || '[]') } catch { return [] } })()
-                      const selectedInGroup = g.sessions.find((s) => selectedSessions.has(s.label))
-                      return (
-                        <div key={gi} style={{ backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.625rem 0.875rem' }}>
-                          <p style={{ color: '#a8c4e0', fontSize: '0.825rem', fontWeight: 600, marginBottom: g.sessions.length > 1 ? '0.5rem' : 0 }}>{g.dateLabel}</p>
-                          {g.sessions.length > 1 && (
-                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                              {g.sessions.map((s) => {
-                                const isCancelled = cancelledKeys.some((k) => { const [kDay, kTime] = k.split('|'); return s.day === kDay && s.utcTime === kTime })
-                                const isSelected = selectedSessions.has(s.label)
-                                return (
-                                  <label key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: isCancelled ? 'default' : 'pointer', opacity: isCancelled ? 0.5 : 1 }}>
-                                    <input
-                                      type="radio"
-                                      name={`session-${gi}`}
-                                      checked={isSelected}
-                                      disabled={isCancelled}
-                                      onChange={() => {
-                                        setSelectedSessions((prev) => {
-                                          const next = new Set(prev)
-                                          g.sessions.forEach((gs) => next.delete(gs.label))
-                                          next.add(s.label)
-                                          return next
-                                        })
-                                      }}
-                                      style={{ accentColor: '#00C2A8' }}
-                                    />
-                                    <span style={{ color: isSelected ? '#00C2A8' : '#6b88a8', fontSize: '0.825rem', fontWeight: isSelected ? 600 : 400 }}>
-                                      {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : ''}
-                                    </span>
-                                  </label>
-                                )
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    }
-                    const s = (group as { date: string; day: string; dateLabel: string; sessions: Session[] }).sessions[0]
-                    const alreadyPaid = enrolledSessions.has(s.label)
-                    const checked = selectedSessions.has(s.label)
-                    // Check if this session is cancelled (key format: "Day|HH:MM")
+                  {sessionGroups.map((g, gi) => {
                     const cancelledKeys: string[] = (() => { try { return JSON.parse(course.cancelledSessionsJson || '[]') } catch { return [] } })()
-                    const isCancelled = cancelledKeys.some((k) => {
-                      const [kDay, kTime] = k.split('|')
-                      return s.label.startsWith(kDay) && s.utcTime === kTime
-                    })
+                    const anySelected = g.sessions.some((s) => selectedSessions.has(s.label))
                     return (
-                      <label
-                        key={s.label}
+                      <div
+                        key={gi}
                         style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.75rem',
-                          padding: '0.625rem 0.875rem',
+                          backgroundColor: anySelected ? '#003d35' : '#060f1a',
+                          border: `1px solid ${anySelected ? '#00C2A8' : '#1e3a5f'}`,
                           borderRadius: '8px',
-                          border: isCancelled ? '1px solid #3d1a1a' : alreadyPaid ? '1px solid #1e4a1e' : checked ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                          backgroundColor: isCancelled ? '#1a0a0a' : alreadyPaid ? '#0a200a' : checked ? '#003d35' : '#060f1a',
-                          cursor: (alreadyPaid || isCancelled) ? 'default' : 'pointer',
-                          opacity: isCancelled ? 0.5 : alreadyPaid ? 0.8 : 1,
+                          padding: '0.625rem 0.875rem',
                         }}
                       >
-                        <input
-                          type="checkbox"
-                          checked={alreadyPaid || checked}
-                          disabled={alreadyPaid || isCancelled}
-                          onChange={() => !alreadyPaid && !isCancelled && toggleSession(s.label)}
-                          style={{ accentColor: alreadyPaid ? '#22c55e' : '#00C2A8', width: '16px', height: '16px' }}
-                        />
-                        <span style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : checked ? '#00C2A8' : '#a8c4e0', fontSize: '0.875rem', fontWeight: (alreadyPaid || checked) ? 600 : 400 }}>
-                          {s.label} {isCancelled ? '— Cancelled' : ''}
-                        </span>
-                        <span style={{ marginLeft: 'auto', color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : '#6b88a8', fontSize: '0.8rem', fontWeight: alreadyPaid ? 600 : 400 }}>
-                          {isCancelled ? '✗' : alreadyPaid ? '✓ Paid' : `$${feePerSession.toFixed(2)}`}
-                        </span>
-                      </label>
+                        <p style={{ color: '#a8c4e0', fontSize: '0.825rem', fontWeight: 600, marginBottom: g.sessions.length > 1 ? '0.5rem' : 0 }}>
+                          {g.dateLabel}
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: g.sessions.length > 1 ? 0 : '0.25rem' }}>
+                          {g.sessions.map((s) => {
+                            const isCancelled = cancelledKeys.some((k) => { const [kDay, kTime] = k.split('|'); return s.day === kDay && s.utcTime === kTime })
+                            const alreadyPaid = enrolledSessions.has(s.label)
+                            const isSelected = selectedSessions.has(s.label)
+                            if (isLumpSum) {
+                              return (
+                                <label key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: (isCancelled || alreadyPaid) ? 'default' : 'pointer', opacity: isCancelled ? 0.5 : 1 }}>
+                                  <input
+                                    type="radio"
+                                    name={`session-${gi}`}
+                                    checked={isSelected || alreadyPaid}
+                                    disabled={isCancelled}
+                                    onChange={() => {
+                                      setSelectedSessions((prev) => {
+                                        const next = new Set(prev)
+                                        g.sessions.forEach((gs) => next.delete(gs.label))
+                                        next.add(s.label)
+                                        return next
+                                      })
+                                    }}
+                                    style={{ accentColor: '#00C2A8' }}
+                                  />
+                                  <span style={{ color: alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#6b88a8', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
+                                    {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓' : ''}
+                                  </span>
+                                </label>
+                              )
+                            }
+                            // Per-session: checkbox per time slot
+                            return (
+                              <label key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: (isCancelled || alreadyPaid) ? 'default' : 'pointer', opacity: isCancelled ? 0.5 : 1 }}>
+                                <input
+                                  type="checkbox"
+                                  checked={alreadyPaid || isSelected}
+                                  disabled={alreadyPaid || isCancelled}
+                                  onChange={() => !alreadyPaid && !isCancelled && toggleSession(s.label)}
+                                  style={{ accentColor: alreadyPaid ? '#22c55e' : '#00C2A8', width: '15px', height: '15px' }}
+                                />
+                                <span style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#6b88a8', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
+                                  {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓ Paid' : ` — $${feePerSession.toFixed(2)}`}
+                                </span>
+                              </label>
+                            )
+                          })}
+                        </div>
+                      </div>
                     )
                   })}
                 </div>
