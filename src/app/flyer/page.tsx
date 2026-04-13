@@ -15,10 +15,10 @@ export default function FlyerPage() {
         Print this page or screenshot it for community distribution
       </p>
 
-      <img
-        src="/flyer.svg"
-        alt="SciQuest Learning Flyer"
-        style={{ width: '100%', maxWidth: '816px', borderRadius: '8px', boxShadow: '0 0 60px rgba(0,194,168,0.15)' }}
+      <object
+        data="/flyer.svg"
+        type="image/svg+xml"
+        style={{ width: '100%', maxWidth: '816px', borderRadius: '8px', boxShadow: '0 0 60px rgba(0,194,168,0.15)', minHeight: '1056px' }}
       />
 
       <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
