@@ -11,10 +11,18 @@ interface User {
   role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN'
   createdAt: string
   country?: string
+  timezone?: string
+  // Instructor fields
   qualifications?: string
   aboutMe?: string
   certificatesUrl?: string
   instructorStatus?: string
+  // Student fields
+  age?: number | null
+  gender?: string
+  fathersName?: string
+  mothersName?: string
+  subjects?: string[]
   _count: { enrollments: number; courses: number }
 }
 
@@ -130,8 +138,13 @@ export default function AdminUsersPage() {
                   const badge = roleBadge[u.role] || roleBadge.STUDENT
                   const isExpanded = expandedId === u.id
                   const isInstructor = u.role === 'INSTRUCTOR'
+                  const isStudent = u.role === 'STUDENT'
                   const statusColors: Record<string, string> = {
                     APPROVED: '#00C2A8', PENDING_REVIEW: '#F5C842', REJECTED: '#f87171', NOT_APPLICABLE: '#6b88a8',
+                  }
+                  const SUBJECT_LABELS: Record<string, string> = {
+                    BIOLOGY: 'Biology', PHYSICAL_SCIENCE: 'Physical Science',
+                    CHEMISTRY: 'Chemistry', MATHEMATICS: 'Mathematics',
                   }
                   return (
                     <>
@@ -156,12 +169,12 @@ export default function AdminUsersPage() {
                         </td>
                         <td style={{ padding: '0.875rem 1rem' }}>
                           <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                            {isInstructor && (
+                            {(isInstructor || isStudent) && (
                               <button
                                 onClick={() => setExpandedId(isExpanded ? null : u.id)}
-                                style={{ backgroundColor: 'transparent', color: '#F5C842', border: '1px solid #F5C842', padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.75rem', cursor: 'pointer' }}
+                                style={{ backgroundColor: 'transparent', color: isInstructor ? '#F5C842' : '#00C2A8', border: `1px solid ${isInstructor ? '#F5C842' : '#00C2A8'}`, padding: '0.3rem 0.7rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.75rem', cursor: 'pointer' }}
                               >
-                                {isExpanded ? 'Hide' : 'Credentials'}
+                                {isExpanded ? 'Hide' : 'Details'}
                               </button>
                             )}
                             {confirmDeleteId === u.id ? (
@@ -224,6 +237,39 @@ export default function AdminUsersPage() {
                                   <p style={{ color: '#3a5070', fontStyle: 'italic', fontSize: '0.875rem' }}>Not provided</p>
                                 )}
                               </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                      {isExpanded && isStudent && (
+                        <tr key={`${u.id}-student`} style={{ borderBottom: i < filtered.length - 1 ? '1px solid #1e3a5f' : 'none', backgroundColor: '#060f1a' }}>
+                          <td colSpan={7} style={{ padding: '1rem 1.25rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1rem' }}>
+                              {[
+                                { label: 'Age', value: u.age ? `${u.age} years` : null },
+                                { label: 'Gender', value: u.gender },
+                                { label: "Father's Name", value: u.fathersName },
+                                { label: "Mother's Name", value: u.mothersName },
+                                { label: 'Country', value: u.country },
+                                { label: 'Timezone', value: u.timezone },
+                              ].map(({ label, value }) => (
+                                <div key={label}>
+                                  <p style={{ color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{label}</p>
+                                  <p style={{ color: value ? '#e8edf5' : '#3a5070', fontStyle: value ? 'normal' : 'italic', fontSize: '0.875rem' }}>{value || 'Not provided'}</p>
+                                </div>
+                              ))}
+                              {u.subjects && u.subjects.length > 0 && (
+                                <div style={{ gridColumn: '1 / -1' }}>
+                                  <p style={{ color: '#6b88a8', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.375rem' }}>Subjects of Interest</p>
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                                    {u.subjects.map((s: string) => (
+                                      <span key={s} style={{ backgroundColor: '#003d35', color: '#00C2A8', padding: '0.2rem 0.6rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>
+                                        {SUBJECT_LABELS[s] || s}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </td>
                         </tr>
