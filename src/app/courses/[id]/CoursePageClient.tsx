@@ -112,6 +112,10 @@ export default function CoursePageClient() {
             })
           })
           setSessions(parsed)
+          // For lump sum courses, auto-select all sessions
+          if (data.feeType === 'LUMP_SUM') {
+            setSelectedSessions(new Set(parsed.map((s) => s.label)))
+          }
         } catch { /* ignore */ }
       }
       setLoading(false)
@@ -228,16 +232,18 @@ export default function CoursePageClient() {
               <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.875rem' }}>
                   <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem' }}>
-                    Select Your Sessions
+                    {isLumpSum ? 'Course Schedule' : 'Select Your Sessions'}
                   </h2>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button onClick={selectAll} type="button" style={{ background: 'none', border: '1px solid #1e3a5f', color: '#00C2A8', borderRadius: '5px', padding: '0.2rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer' }}>
-                      Select All
-                    </button>
-                    <button onClick={clearAll} type="button" style={{ background: 'none', border: '1px solid #1e3a5f', color: '#6b88a8', borderRadius: '5px', padding: '0.2rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer' }}>
-                      Clear
-                    </button>
-                  </div>
+                  {!isLumpSum && (
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button onClick={selectAll} type="button" style={{ background: 'none', border: '1px solid #1e3a5f', color: '#00C2A8', borderRadius: '5px', padding: '0.2rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+                        Select All
+                      </button>
+                      <button onClick={clearAll} type="button" style={{ background: 'none', border: '1px solid #1e3a5f', color: '#6b88a8', borderRadius: '5px', padding: '0.2rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+                        Clear
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.875rem' }}>
                   {isLumpSum
@@ -256,6 +262,26 @@ export default function CoursePageClient() {
                       return s.label.startsWith(kDay) && s.utcTime === kTime
                     })
                     return (
+                      {isLumpSum ? (
+                        <div
+                          key={s.label}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '0.625rem 0.875rem',
+                            borderRadius: '8px',
+                            border: isCancelled ? '1px solid #3d1a1a' : alreadyPaid ? '1px solid #1e4a1e' : '1px solid #1e3a5f',
+                            backgroundColor: isCancelled ? '#1a0a0a' : alreadyPaid ? '#0a200a' : '#060f1a',
+                            opacity: isCancelled ? 0.5 : 1,
+                          }}
+                        >
+                          <span style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : '#a8c4e0', fontSize: '0.875rem' }}>
+                            {isCancelled ? '✗' : alreadyPaid ? '✓' : '•'} {s.label} {isCancelled ? '— Cancelled' : ''}
+                          </span>
+                          {alreadyPaid && <span style={{ marginLeft: 'auto', color: '#22c55e', fontSize: '0.8rem', fontWeight: 600 }}>Paid</span>}
+                        </div>
+                      ) : (
                       <label
                         key={s.label}
                         style={{
@@ -281,9 +307,10 @@ export default function CoursePageClient() {
                           {s.label} {isCancelled ? '— Cancelled' : ''}
                         </span>
                         <span style={{ marginLeft: 'auto', color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : '#6b88a8', fontSize: '0.8rem', fontWeight: alreadyPaid ? 600 : 400 }}>
-                          {isCancelled ? '✗' : alreadyPaid ? '✓ Paid' : isLumpSum ? '' : `$${feePerSession.toFixed(2)}`}
+                          {isCancelled ? '✗' : alreadyPaid ? '✓ Paid' : `$${feePerSession.toFixed(2)}`}
                         </span>
                       </label>
+                      )}
                     )
                   })}
                 </div>
