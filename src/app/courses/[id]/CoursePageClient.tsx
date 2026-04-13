@@ -117,7 +117,10 @@ export default function CoursePageClient() {
             const dateKey = entry.date || entry.day
             const dateLabel = entry.date
               ? new Date(entry.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-              : entry.day
+              : (() => {
+                  const d = nextDateForDay(entry.day)
+                  return entry.day + ', ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                })()
             const groupSessions: Session[] = times.map((t) => ({
               day: entry.day,
               date: dateKey,
@@ -363,41 +366,20 @@ export default function CoursePageClient() {
             <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
               <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>Course Details</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {isLive && hasSessions ? (
-                  // Dynamic start date: earliest selected session day, or course startDate if none selected
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Start Date</span>
-                    <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
-                      {(() => {
-                        const selected = sessions.filter(s => selectedSessions.has(s.label))
-                        if (selected.length === 0 && course.startDate) {
-                          return new Date(course.startDate + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-                        }
-                        if (selected.length === 0) return '—'
-                        const dates = selected.map(s => nextDateForDay(s.day))
-                        const earliest = dates.reduce((a, b) => a < b ? a : b)
-                        return earliest.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-                      })()}
-                    </span>
-                  </div>
-                ) : course.startDate ? (
+                {!isLive && course.startDate && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Start Date</span>
                     <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
                       {new Date(course.startDate + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                   </div>
-                ) : null}
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Access</span>
-                  <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
-                    {isLive
-                      ? sessionCount > 0
-                        ? `${sessionCount} session${sessionCount !== 1 ? 's' : ''} selected`
-                        : durationLabel
-                      : 'Lifetime Access'}
-                  </span>
-                </div>
+                )}
+                {!isLive && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Access</span>
+                    <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>Lifetime Access</span>
+                  </div>
+                )}
                 {isLive && (
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
