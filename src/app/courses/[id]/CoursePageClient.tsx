@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@clerk/nextjs'
 import NavBar from '@/components/NavBar'
 
-interface Session { day: string; utcTime: string; label: string }
+interface Session { day: string; date: string; utcTime: string; label: string }
+interface SessionGroup { date: string; day: string; dateLabel: string; sessions: Session[] }
 
 interface ScheduleEntry {
   day: string
@@ -86,6 +87,7 @@ export default function CoursePageClient() {
   const [enrolling, setEnrolling] = useState(false)
   const [error, setError] = useState('')
   const [sessions, setSessions] = useState<Session[]>([])
+  const [sessionGroups, setSessionGroups] = useState<SessionGroup[]>([])
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set())
   const [enrolledSessions, setEnrolledSessions] = useState<Set<string>>(new Set())
 
@@ -102,19 +104,32 @@ export default function CoursePageClient() {
         try {
           const schedule: ScheduleEntry[] = JSON.parse(data.scheduleJson)
           const parsed: Session[] = []
+          const groups: SessionGroup[] = []
           schedule.forEach((entry) => {
             const times = entry.utcTimes || (entry.utcTime ? [entry.utcTime] : [])
+            const dateKey = entry.date || entry.day
             const dateLabel = entry.date
-              ? new Date(entry.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+              ? new Date(entry.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
               : entry.day
-            times.forEach((t) => {
-              parsed.push({ day: entry.day, utcTime: t, label: `${dateLabel} (${entry.day.slice(0, 3)}) — ${formatUtcTime(t)}` })
-            })
+            const groupSessions: Session[] = times.map((t) => ({
+              day: entry.day,
+              date: dateKey,
+              utcTime: t,
+              label: `${dateLabel} — ${formatUtcTime(t)}`,
+            }))
+            parsed.push(...groupSessions)
+            if (times.length > 0) {
+              groups.push({ date: dateKey, day: entry.day, dateLabel, sessions: groupSessions })
+            }
           })
           setSessions(parsed)
-          // For lump sum courses, auto-select all sessions
+          setSessionGroups(groups)
+          // For lump sum with only one time per day, auto-select all
           if (data.feeType === 'LUMP_SUM') {
-            setSelectedSessions(new Set(parsed.map((s) => s.label)))
+            const singleTimeGroups = groups.every((g) => g.sessions.length === 1)
+            if (singleTimeGroups) {
+              setSelectedSessions(new Set(parsed.map((s) => s.label)))
+            }
           }
         } catch { /* ignore */ }
       }
@@ -252,7 +267,48 @@ export default function CoursePageClient() {
                   }
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  {sessions.map((s) => {
+                  {(isLumpSum ? sessionGroups : sessions.map((s) => ({ date: s.date, day: s.day, dateLabel: s.label, sessions: [s] }))).map((group, gi) => {
+                    if (isLumpSum) {
+                      const g = group as SessionGroup
+                      const cancelledKeys: string[] = (() => { try { return JSON.parse(course.cancelledSessionsJson || '[]') } catch { return [] } })()
+                      const selectedInGroup = g.sessions.find((s) => selectedSessions.has(s.label))
+                      return (
+                        <div key={gi} style={{ backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.625rem 0.875rem' }}>
+                          <p style={{ color: '#a8c4e0', fontSize: '0.825rem', fontWeight: 600, marginBottom: g.sessions.length > 1 ? '0.5rem' : 0 }}>{g.dateLabel}</p>
+                          {g.sessions.length > 1 && (
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                              {g.sessions.map((s) => {
+                                const isCancelled = cancelledKeys.some((k) => { const [kDay, kTime] = k.split('|'); return s.day === kDay && s.utcTime === kTime })
+                                const isSelected = selectedSessions.has(s.label)
+                                return (
+                                  <label key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: isCancelled ? 'default' : 'pointer', opacity: isCancelled ? 0.5 : 1 }}>
+                                    <input
+                                      type="radio"
+                                      name={`session-${gi}`}
+                                      checked={isSelected}
+                                      disabled={isCancelled}
+                                      onChange={() => {
+                                        setSelectedSessions((prev) => {
+                                          const next = new Set(prev)
+                                          g.sessions.forEach((gs) => next.delete(gs.label))
+                                          next.add(s.label)
+                                          return next
+                                        })
+                                      }}
+                                      style={{ accentColor: '#00C2A8' }}
+                                    />
+                                    <span style={{ color: isSelected ? '#00C2A8' : '#6b88a8', fontSize: '0.825rem', fontWeight: isSelected ? 600 : 400 }}>
+                                      {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : ''}
+                                    </span>
+                                  </label>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    }
+                    const s = (group as { date: string; day: string; dateLabel: string; sessions: Session[] }).sessions[0]
                     const alreadyPaid = enrolledSessions.has(s.label)
                     const checked = selectedSessions.has(s.label)
                     // Check if this session is cancelled (key format: "Day|HH:MM")
@@ -262,26 +318,6 @@ export default function CoursePageClient() {
                       return s.label.startsWith(kDay) && s.utcTime === kTime
                     })
                     return (
-                      {isLumpSum ? (
-                        <div
-                          key={s.label}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.625rem 0.875rem',
-                            borderRadius: '8px',
-                            border: isCancelled ? '1px solid #3d1a1a' : alreadyPaid ? '1px solid #1e4a1e' : '1px solid #1e3a5f',
-                            backgroundColor: isCancelled ? '#1a0a0a' : alreadyPaid ? '#0a200a' : '#060f1a',
-                            opacity: isCancelled ? 0.5 : 1,
-                          }}
-                        >
-                          <span style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : '#a8c4e0', fontSize: '0.875rem' }}>
-                            {isCancelled ? '✗' : alreadyPaid ? '✓' : '•'} {s.label} {isCancelled ? '— Cancelled' : ''}
-                          </span>
-                          {alreadyPaid && <span style={{ marginLeft: 'auto', color: '#22c55e', fontSize: '0.8rem', fontWeight: 600 }}>Paid</span>}
-                        </div>
-                      ) : (
                       <label
                         key={s.label}
                         style={{
@@ -310,7 +346,6 @@ export default function CoursePageClient() {
                           {isCancelled ? '✗' : alreadyPaid ? '✓ Paid' : `$${feePerSession.toFixed(2)}`}
                         </span>
                       </label>
-                      )}
                     )
                   })}
                 </div>
