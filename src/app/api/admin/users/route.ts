@@ -18,6 +18,28 @@ export async function GET() {
     },
   })
 
+  // For users with missing names, sync from Clerk
+  const usersWithMissingNames = users.filter((u) => !u.firstName && !u.lastName && u.clerkId)
+  if (usersWithMissingNames.length > 0) {
+    try {
+      const clerk = await clerkClient()
+      await Promise.all(
+        usersWithMissingNames.map(async (u) => {
+          try {
+            const clerkUser = await clerk.users.getUser(u.clerkId)
+            const firstName = clerkUser.firstName || ''
+            const lastName = clerkUser.lastName || ''
+            if (firstName || lastName) {
+              await prisma.user.update({ where: { id: u.id }, data: { firstName, lastName } })
+              u.firstName = firstName
+              u.lastName = lastName
+            }
+          } catch { /* skip individual failures */ }
+        })
+      )
+    } catch { /* ignore */ }
+  }
+
   return NextResponse.json(users)
 }
 

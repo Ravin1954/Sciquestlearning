@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth, clerkClient } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
@@ -21,7 +21,23 @@ export async function GET() {
     },
   })
 
-  return NextResponse.json(user || { instructorStatus: 'PENDING_REVIEW' })
+  if (!user) return NextResponse.json({ instructorStatus: 'PENDING_REVIEW' })
+
+  // If name is missing in Prisma, sync it from Clerk
+  if (!user.firstName && !user.lastName) {
+    try {
+      const clerk = await clerkClient()
+      const clerkUser = await clerk.users.getUser(userId)
+      const firstName = clerkUser.firstName || ''
+      const lastName = clerkUser.lastName || ''
+      if (firstName || lastName) {
+        await prisma.user.update({ where: { clerkId: userId }, data: { firstName, lastName } })
+        return NextResponse.json({ ...user, firstName, lastName })
+      }
+    } catch { /* ignore */ }
+  }
+
+  return NextResponse.json(user)
 }
 
 export async function PUT(req: Request) {
