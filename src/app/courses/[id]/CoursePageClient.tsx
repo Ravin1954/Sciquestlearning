@@ -247,6 +247,16 @@ export default function CoursePageClient() {
               </div>
             )}
 
+            {/* No upcoming sessions notice */}
+            {isLive && !hasSessions && course.scheduleJson && course.scheduleJson !== '[]' && (
+              <div style={{ backgroundColor: '#1a100a', border: '1px solid #7c3a1a', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+                <p style={{ color: '#f59e0b', fontWeight: 600, fontSize: '0.95rem', marginBottom: '0.4rem' }}>No upcoming sessions scheduled</p>
+                <p style={{ color: '#a8c4e0', fontSize: '0.85rem' }}>
+                  The instructor has not yet added future session dates. Please check back soon or contact the instructor for updates.
+                </p>
+              </div>
+            )}
+
             {/* Session Picker for LIVE courses */}
             {isLive && hasSessions && (
               <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
@@ -486,17 +496,17 @@ export default function CoursePageClient() {
 
               <button
                 onClick={handleEnroll}
-                disabled={enrolling || (isLive && hasSessions && sessionCount === 0)}
+                disabled={enrolling || (isLive && !hasSessions) || (isLive && hasSessions && sessionCount === 0)}
                 style={{
                   width: '100%',
-                  backgroundColor: enrolling ? '#005040' : (isLive && hasSessions && sessionCount === 0) ? '#1e3a5f' : '#00C2A8',
-                  color: (isLive && hasSessions && sessionCount === 0) ? '#6b88a8' : '#0B1A2E',
+                  backgroundColor: enrolling ? '#005040' : (isLive && (!hasSessions || sessionCount === 0)) ? '#1e3a5f' : '#00C2A8',
+                  color: (isLive && (!hasSessions || sessionCount === 0)) ? '#6b88a8' : '#0B1A2E',
                   border: 'none',
                   padding: '0.875rem',
                   borderRadius: '10px',
                   fontWeight: 700,
                   fontSize: '1rem',
-                  cursor: (enrolling || (isLive && hasSessions && sessionCount === 0)) ? 'not-allowed' : 'pointer',
+                  cursor: (enrolling || (isLive && (!hasSessions || sessionCount === 0))) ? 'not-allowed' : 'pointer',
                   marginBottom: '0.75rem',
                 }}
               >
@@ -504,13 +514,15 @@ export default function CoursePageClient() {
                   ? 'Redirecting to Checkout...'
                   : !isSignedIn
                     ? 'Sign In to Enroll →'
-                    : isLive && hasSessions && sessionCount === 0
-                      ? 'Select Sessions Above'
-                      : isLumpSum && sessionCount > 0
-                        ? `Enroll — Pay $${totalFee.toFixed(2)} →`
-                        : sessionCount > 0
-                          ? `Enroll in ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} →`
-                          : 'Enroll Now →'}
+                    : isLive && !hasSessions
+                      ? 'No Sessions Available'
+                      : isLive && sessionCount === 0
+                        ? 'Select Sessions Above'
+                        : isLumpSum && sessionCount > 0
+                          ? `Enroll — Pay $${totalFee.toFixed(2)} →`
+                          : sessionCount > 0
+                            ? `Enroll in ${sessionCount} Session${sessionCount !== 1 ? 's' : ''} →`
+                            : 'Enroll Now →'}
               </button>
 
               <p style={{ textAlign: 'center', color: '#6b88a8', fontSize: '0.75rem', marginBottom: '1rem' }}>
