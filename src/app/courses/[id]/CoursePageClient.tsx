@@ -70,6 +70,33 @@ function nextDateForDay(dayName: string): Date {
   return result
 }
 
+function generateDatedSessions(
+  days: string[],
+  startDate: string,
+  durationWeeks: number,
+  durationUnit: string = 'WEEKS'
+): { day: string; date: string; week: number }[] {
+  const result: { day: string; date: string; week: number }[] = []
+  if (!startDate || !days.length || durationWeeks <= 0) return result
+  const start = new Date(startDate + 'T00:00:00')
+  const totalWeeks = durationUnit === 'DAYS' ? Math.ceil(durationWeeks / 7) : durationWeeks
+  for (let week = 0; week < totalWeeks; week++) {
+    for (const day of days) {
+      const targetDow = DAY_INDEX[day]
+      if (targetDow === undefined) continue
+      const weekStart = new Date(start)
+      weekStart.setDate(start.getDate() + week * 7)
+      const weekStartDow = weekStart.getDay()
+      let diff = targetDow - weekStartDow
+      if (diff < 0) diff += 7
+      const sessionDate = new Date(weekStart)
+      sessionDate.setDate(weekStart.getDate() + diff)
+      result.push({ day, date: sessionDate.toISOString().split('T')[0], week: week + 1 })
+    }
+  }
+  return result.sort((a, b) => a.date.localeCompare(b.date))
+}
+
 function formatUtcTime(utc: string) {
   if (!utc) return utc
   const [h, m] = utc.split(':').map(Number)
@@ -102,7 +129,22 @@ export default function CoursePageClient() {
 
       if (data.scheduleJson) {
         try {
-          const schedule: ScheduleEntry[] = JSON.parse(data.scheduleJson)
+          let schedule: ScheduleEntry[] = JSON.parse(data.scheduleJson)
+          // If old format (no dates), expand using startDate + durationWeeks
+          const hasDateInfo = schedule.some((e) => e.date)
+          if (!hasDateInfo && data.startDate && data.durationWeeks > 0 && data.daysOfWeek?.length > 0) {
+            const dayTimesMap: Record<string, { utcTimes: string[] }> = {}
+            schedule.forEach((e) => {
+              dayTimesMap[e.day] = { utcTimes: e.utcTimes || (e.utcTime ? [e.utcTime] : []) }
+            })
+            const dated = generateDatedSessions(data.daysOfWeek, data.startDate, data.durationWeeks, data.durationUnit)
+            schedule = dated.map((d) => ({
+              day: d.day,
+              date: d.date,
+              week: d.week,
+              utcTimes: dayTimesMap[d.day]?.utcTimes || [],
+            }))
+          }
           const parsed: Session[] = []
           const groups: SessionGroup[] = []
           const todayMidnight = new Date()
