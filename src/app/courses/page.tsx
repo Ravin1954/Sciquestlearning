@@ -188,6 +188,14 @@ function CoursesContent() {
       {/* Results */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: '#6b88a8' }}>Loading courses...</div>
+      ) : !instructorFilter && !search && !subject && !gradeLevel ? (
+        <div style={{ textAlign: 'center', padding: '4rem 2rem', backgroundColor: '#0f2240', borderRadius: '12px', border: '1px solid #1e3a5f' }}>
+          <p style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>👩‍🏫</p>
+          <p style={{ color: '#e8edf5', fontWeight: 600, fontSize: '1.125rem', marginBottom: '0.5rem' }}>Choose an instructor to get started</p>
+          <p style={{ color: '#6b88a8', fontSize: '0.9rem' }}>
+            Select an instructor above to browse their {activeTab === 'LIVE' ? 'live classes' : 'self-paced courses'}, or use the search and filters below.
+          </p>
+        </div>
       ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem', backgroundColor: '#0f2240', borderRadius: '12px', border: '1px solid #1e3a5f' }}>
           <p style={{ fontSize: '2rem', marginBottom: '1rem' }}>🔭</p>
@@ -199,7 +207,8 @@ function CoursesContent() {
       ) : (
         <>
           <p style={{ color: '#6b88a8', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-            {filtered.length} course{filtered.length !== 1 ? 's' : ''} available
+            {filtered.length} course{filtered.length !== 1 ? 's' : ''} found
+            {instructorFilter && <span style={{ color: '#F5C842', fontWeight: 600 }}> · {instructorFilter}</span>}
             {totalPages > 1 && <span style={{ marginLeft: '0.5rem' }}>· Page {page} of {totalPages}</span>}
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
