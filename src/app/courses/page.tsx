@@ -2,7 +2,6 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import CourseCard from '@/components/CourseCard'
 
@@ -97,9 +96,6 @@ function CoursesContent() {
     return matchSearch && matchInstructor
   })
 
-  const selectedInstructor = instructorFilter
-    ? instructors.find((i) => i.name === instructorFilter)
-    : null
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -174,28 +170,6 @@ function CoursesContent() {
         </div>
       )}
 
-      {/* Instructor profile banner — shown when an instructor is selected */}
-      {selectedInstructor && (
-        <div style={{ backgroundColor: '#0f2240', border: '1px solid #F5C842', borderRadius: '10px', padding: '0.875rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: '#3d2a00', border: '2px solid #F5C842', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontWeight: 700, fontSize: '1rem' }}>
-                {selectedInstructor.name[0]}
-              </span>
-            </div>
-            <div>
-              <p style={{ color: '#F5C842', fontWeight: 700, fontSize: '0.9rem' }}>{selectedInstructor.name}</p>
-              <p style={{ color: '#6b88a8', fontSize: '0.78rem' }}>Verified Instructor · {filtered.length} course{filtered.length !== 1 ? 's' : ''}</p>
-            </div>
-          </div>
-          <Link
-            href={`/instructors/${selectedInstructor.id}`}
-            style={{ backgroundColor: '#F5C842', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.825rem', textDecoration: 'none', whiteSpace: 'nowrap' }}
-          >
-            View Full Profile →
-          </Link>
-        </div>
-      )}
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
@@ -216,14 +190,6 @@ function CoursesContent() {
       {/* Results */}
       {loading ? (
         <div style={{ textAlign: 'center', padding: '4rem', color: '#6b88a8' }}>Loading courses...</div>
-      ) : !instructorFilter && !search && !subject && !gradeLevel ? (
-        <div style={{ textAlign: 'center', padding: '4rem 2rem', backgroundColor: '#0f2240', borderRadius: '12px', border: '1px solid #1e3a5f' }}>
-          <p style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>👩‍🏫</p>
-          <p style={{ color: '#e8edf5', fontWeight: 600, fontSize: '1.125rem', marginBottom: '0.5rem' }}>Choose an instructor to get started</p>
-          <p style={{ color: '#6b88a8', fontSize: '0.9rem' }}>
-            Click an instructor name above to browse their {activeTab === 'LIVE' ? 'live classes' : 'self-paced courses'}, or use the search and subject filters.
-          </p>
-        </div>
       ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem', backgroundColor: '#0f2240', borderRadius: '12px', border: '1px solid #1e3a5f' }}>
           <p style={{ fontSize: '2rem', marginBottom: '1rem' }}>🔭</p>
