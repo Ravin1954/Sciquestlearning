@@ -21,7 +21,7 @@ export async function GET(req: Request) {
         ...(gradeLevel ? { gradeLevel } : {}),
         ...(duration ? { durationWeeks: parseInt(duration) } : {}),
       },
-      include: { instructor: { select: { firstName: true, lastName: true } } },
+      include: { instructor: { select: { id: true, firstName: true, lastName: true } } },
       orderBy: { createdAt: 'desc' },
     })
     return NextResponse.json(courses)

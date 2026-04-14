@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import CourseCard from '@/components/CourseCard'
 
@@ -19,7 +20,7 @@ interface Course {
   sessionDurationMins: number
   feeUsd: number | string
   feeType?: string
-  instructor: { firstName: string; lastName: string }
+  instructor: { id: string; firstName: string; lastName: string }
 }
 
 const SUBJECTS = [
@@ -83,9 +84,9 @@ function CoursesContent() {
   const instructors = Array.from(
     new Map(courses.map((c) => {
       const key = `${c.instructor.firstName} ${c.instructor.lastName}`
-      return [key, key]
+      return [key, { name: key, id: c.instructor.id }]
     })).values()
-  ).sort()
+  ).sort((a, b) => a.name.localeCompare(b.name))
 
   const filtered = courses.filter((c) => {
     const fullName = `${c.instructor.firstName} ${c.instructor.lastName}`
@@ -95,6 +96,10 @@ function CoursesContent() {
     const matchInstructor = !instructorFilter || fullName === instructorFilter
     return matchSearch && matchInstructor
   })
+
+  const selectedInstructor = instructorFilter
+    ? instructors.find((i) => i.name === instructorFilter)
+    : null
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -151,21 +156,44 @@ function CoursesContent() {
           >
             All Instructors
           </button>
-          {instructors.map((name) => (
+          {instructors.map((inst) => (
             <button
-              key={name}
-              onClick={() => setInstructorFilter(instructorFilter === name ? '' : name)}
+              key={inst.name}
+              onClick={() => setInstructorFilter(instructorFilter === inst.name ? '' : inst.name)}
               style={{
                 padding: '0.3rem 0.875rem', borderRadius: '999px', border: '1px solid',
-                borderColor: instructorFilter === name ? '#F5C842' : '#1e3a5f',
-                backgroundColor: instructorFilter === name ? '#3d2a00' : 'transparent',
-                color: instructorFilter === name ? '#F5C842' : '#a8c4e0',
-                cursor: 'pointer', fontSize: '0.8rem', fontWeight: instructorFilter === name ? 700 : 400,
+                borderColor: instructorFilter === inst.name ? '#F5C842' : '#1e3a5f',
+                backgroundColor: instructorFilter === inst.name ? '#3d2a00' : 'transparent',
+                color: instructorFilter === inst.name ? '#F5C842' : '#a8c4e0',
+                cursor: 'pointer', fontSize: '0.8rem', fontWeight: instructorFilter === inst.name ? 700 : 400,
               }}
             >
-              {name}
+              {inst.name}
             </button>
           ))}
+        </div>
+      )}
+
+      {/* Instructor profile banner — shown when an instructor is selected */}
+      {selectedInstructor && (
+        <div style={{ backgroundColor: '#0f2240', border: '1px solid #F5C842', borderRadius: '10px', padding: '0.875rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: '#3d2a00', border: '2px solid #F5C842', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontWeight: 700, fontSize: '1rem' }}>
+                {selectedInstructor.name[0]}
+              </span>
+            </div>
+            <div>
+              <p style={{ color: '#F5C842', fontWeight: 700, fontSize: '0.9rem' }}>{selectedInstructor.name}</p>
+              <p style={{ color: '#6b88a8', fontSize: '0.78rem' }}>Verified Instructor · {filtered.length} course{filtered.length !== 1 ? 's' : ''}</p>
+            </div>
+          </div>
+          <Link
+            href={`/instructors/${selectedInstructor.id}`}
+            style={{ backgroundColor: '#F5C842', color: '#0B1A2E', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, fontSize: '0.825rem', textDecoration: 'none', whiteSpace: 'nowrap' }}
+          >
+            View Full Profile →
+          </Link>
         </div>
       )}
 

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import StatusBadge from './StatusBadge'
+import { usePathname } from 'next/navigation'
 
 function formatLocalTime(utcTime: string): string {
   if (!utcTime) return ''
@@ -26,6 +27,7 @@ interface CourseCardProps {
     feeType?: string
     status?: 'PENDING' | 'APPROVED' | 'REJECTED'
     instructor?: {
+      id?: string
       firstName: string
       lastName: string
     }
@@ -49,8 +51,11 @@ const subjectLabels: Record<string, string> = {
 }
 
 export default function CourseCard({ course, showStatus = false, showEnroll = true }: CourseCardProps) {
+  const pathname = usePathname()
   const subjectColor = subjectColors[course.subject] || '#00C2A8'
   const isSelfPaced = course.courseType === 'SELF_PACED'
+  // Show profile link on browse page, not on instructor's own profile page
+  const showInstructorLink = course.instructor?.id && !pathname?.startsWith('/instructors/')
 
   return (
     <div
@@ -133,7 +138,16 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
       {course.instructor && (
         <p style={{ color: '#a8c4e0', fontSize: '0.875rem' }}>
           <span style={{ color: '#6b88a8' }}>Instructor: </span>
-          {course.instructor.firstName} {course.instructor.lastName}
+          {showInstructorLink ? (
+            <Link
+              href={`/instructors/${course.instructor.id}`}
+              style={{ color: '#00C2A8', textDecoration: 'none', fontWeight: 500 }}
+            >
+              {course.instructor.firstName} {course.instructor.lastName}
+            </Link>
+          ) : (
+            <>{course.instructor.firstName} {course.instructor.lastName}</>
+          )}
         </p>
       )}
 
