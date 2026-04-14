@@ -15,6 +15,7 @@ interface Course {
   durationWeeks: number
   daysOfWeek: string[]
   startTimeUtc: string
+  scheduleJson?: string
   sessionDurationMins: number
   zoomJoinUrl?: string
   zoomStartUrl?: string
@@ -25,11 +26,6 @@ interface Course {
   _count: { enrollments: number }
 }
 
-const DAY_INDEX: Record<string, number> = {
-  Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3,
-  Thursday: 4, Friday: 5, Saturday: 6,
-}
-
 function formatLocalTime(utcTime: string): string {
   if (!utcTime) return ''
   const [h, m] = utcTime.split(':').map(Number)
@@ -38,43 +34,44 @@ function formatLocalTime(utcTime: string): string {
   return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true, timeZoneName: 'short' })
 }
 
-function minutesUntilNextSession(daysOfWeek: string[], startTimeUtc: string): number {
-  if (!daysOfWeek.length || !startTimeUtc) return Infinity
-  const [h, m] = startTimeUtc.split(':').map(Number)
-  const now = new Date()
-  const nowUtcMins = now.getUTCHours() * 60 + now.getUTCMinutes()
-  const sessionMins = h * 60 + m
-  const todayDay = now.getUTCDay()
-  let minDiff = Infinity
-  for (const day of daysOfWeek) {
-    const target = DAY_INDEX[day] ?? -1
-    if (target < 0) continue
-    let dayDiff = target - todayDay
-    if (dayDiff < 0) dayDiff += 7
-    const totalMins = dayDiff * 1440 + (sessionMins - nowUtcMins)
-    if (totalMins < minDiff) minDiff = totalMins
-  }
-  return minDiff
+interface ScheduleEntry {
+  day: string
+  date?: string
+  utcTimes?: string[]
+  utcTime?: string
 }
 
-function nextSessionLabel(daysOfWeek: string[], startTimeUtc: string): string {
-  if (!daysOfWeek.length || !startTimeUtc) return ''
-  const [h, m] = startTimeUtc.split(':').map(Number)
-  const now = new Date()
-  const todayDay = now.getUTCDay()
-  let minDiff = Infinity
-  for (const day of daysOfWeek) {
-    const target = DAY_INDEX[day] ?? -1
-    if (target < 0) continue
-    let dayDiff = target - todayDay
-    if (dayDiff <= 0) dayDiff += 7
-    if (dayDiff < minDiff) minDiff = dayDiff
+// Find the next upcoming session from scheduleJson dated entries
+function getNextSession(scheduleJson: string | undefined): { label: string; minsUntil: number } | null {
+  if (!scheduleJson) return null
+  try {
+    const schedule: ScheduleEntry[] = JSON.parse(scheduleJson)
+    const now = new Date()
+    let nearest: { dt: Date; label: string } | null = null
+
+    schedule.forEach((entry) => {
+      if (!entry.date) return
+      const times = entry.utcTimes || (entry.utcTime ? [entry.utcTime] : [])
+      times.forEach((utcTime) => {
+        const [h, m] = utcTime.split(':').map(Number)
+        const dt = new Date(entry.date + 'T00:00:00Z')
+        dt.setUTCHours(h, m, 0, 0)
+        if (dt > now) {
+          if (!nearest || dt < nearest.dt) {
+            const localDt = new Date(dt)
+            const dateLabel = localDt.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
+            const timeLabel = localDt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
+            nearest = { dt, label: `${dateLabel} at ${timeLabel}` }
+          }
+        }
+      })
+    })
+    if (!nearest) return null
+    const minsUntil = Math.round(((nearest as { dt: Date }).dt.getTime() - now.getTime()) / 60000)
+    return { label: (nearest as { label: string }).label, minsUntil }
+  } catch {
+    return null
   }
-  const d = new Date()
-  d.setUTCDate(d.getUTCDate() + minDiff)
-  d.setUTCHours(h, m, 0, 0)
-  return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' }) +
-    ' at ' + d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
 }
 
 const S = {
@@ -180,9 +177,10 @@ export default function MyCoursesPage() {
               <h2 style={S.h2}>Upcoming Classes</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {approved.map((c) => {
-                  const minsUntil = c.courseType === 'LIVE' ? minutesUntilNextSession(c.daysOfWeek, c.startTimeUtc) : Infinity
+                  const nextSession = c.courseType === 'LIVE' ? getNextSession(c.scheduleJson) : null
+                  const minsUntil = nextSession?.minsUntil ?? Infinity
                   const isClassTime = minsUntil <= 30 && minsUntil >= -60 && c._count.enrollments > 0
-                  const nextLabel = c.courseType === 'LIVE' && !isClassTime ? nextSessionLabel(c.daysOfWeek, c.startTimeUtc) : ''
+                  const nextLabel = nextSession && !isClassTime ? nextSession.label : ''
                   const meetLink = c.zoomJoinUrl || c.zoomStartUrl
                   return (
                     <div key={c.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '0.75rem', borderColor: isClassTime ? '#00C2A8' : '#1e3a5f' }}>
