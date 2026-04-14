@@ -141,7 +141,7 @@ function CoursesContent() {
       </div>
 
       {/* Instructor filter chips */}
-      {instructors.length > 1 && (
+      {instructors.length > 0 && (
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem' }}>
           <span style={{ color: '#6b88a8', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Instructor:</span>
           <button
@@ -221,7 +221,7 @@ function CoursesContent() {
           <p style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>👩‍🏫</p>
           <p style={{ color: '#e8edf5', fontWeight: 600, fontSize: '1.125rem', marginBottom: '0.5rem' }}>Choose an instructor to get started</p>
           <p style={{ color: '#6b88a8', fontSize: '0.9rem' }}>
-            Select an instructor above to browse their {activeTab === 'LIVE' ? 'live classes' : 'self-paced courses'}, or use the search and filters below.
+            Click an instructor name above to browse their {activeTab === 'LIVE' ? 'live classes' : 'self-paced courses'}, or use the search and subject filters.
           </p>
         </div>
       ) : filtered.length === 0 ? (
