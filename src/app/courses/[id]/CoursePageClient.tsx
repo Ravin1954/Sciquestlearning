@@ -247,9 +247,7 @@ export default function CoursePageClient() {
   }
 
   const color = subjectColors[course.subject] || '#00C2A8'
-  const durationLabel = course.durationUnit === 'DAYS'
-    ? `${course.durationWeeks} day${course.durationWeeks !== 1 ? 's' : ''}`
-    : `${course.durationWeeks} week${course.durationWeeks !== 1 ? 's' : ''}`
+
 
   const isLive = course.courseType === 'LIVE'
   const hasSessions = sessions.length > 0
@@ -430,7 +428,7 @@ export default function CoursePageClient() {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Total Sessions Available</span>
-                      <span style={{ color: '#F5C842', fontSize: '0.875rem', fontWeight: 600 }}>{sessions.length} session{sessions.length !== 1 ? 's' : ''}</span>
+                      <span style={{ color: '#F5C842', fontSize: '0.875rem', fontWeight: 600 }}>{sessionGroups.length} session{sessionGroups.length !== 1 ? 's' : ''}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>{isLumpSum ? 'Total Course Fee' : 'Fee per Session'}</span>
