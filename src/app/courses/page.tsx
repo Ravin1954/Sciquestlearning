@@ -58,6 +58,7 @@ function CoursesContent() {
   const [subject, setSubject] = useState('')
   const [gradeLevel, setGradeLevel] = useState('')
   const [search, setSearch] = useState('')
+  const [instructorFilter, setInstructorFilter] = useState('')
   const [page, setPage] = useState(1)
 
   useEffect(() => {
@@ -73,13 +74,27 @@ function CoursesContent() {
   }, [subject, gradeLevel, activeTab])
 
   // Reset to page 1 whenever filters/search/tab change
-  useEffect(() => { setPage(1) }, [subject, gradeLevel, activeTab, search])
+  useEffect(() => { setPage(1) }, [subject, gradeLevel, activeTab, search, instructorFilter])
 
-  const filtered = courses.filter((c) =>
-    !search || c.title.toLowerCase().includes(search.toLowerCase()) ||
-    c.instructor.firstName.toLowerCase().includes(search.toLowerCase()) ||
-    c.instructor.lastName.toLowerCase().includes(search.toLowerCase())
-  )
+  // Reset instructor filter when tab changes
+  useEffect(() => { setInstructorFilter('') }, [activeTab])
+
+  // Unique instructors from loaded courses
+  const instructors = Array.from(
+    new Map(courses.map((c) => {
+      const key = `${c.instructor.firstName} ${c.instructor.lastName}`
+      return [key, key]
+    })).values()
+  ).sort()
+
+  const filtered = courses.filter((c) => {
+    const fullName = `${c.instructor.firstName} ${c.instructor.lastName}`
+    const matchSearch = !search || c.title.toLowerCase().includes(search.toLowerCase()) ||
+      c.instructor.firstName.toLowerCase().includes(search.toLowerCase()) ||
+      c.instructor.lastName.toLowerCase().includes(search.toLowerCase())
+    const matchInstructor = !instructorFilter || fullName === instructorFilter
+    return matchSearch && matchInstructor
+  })
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -119,6 +134,40 @@ function CoursesContent() {
           </button>
         ))}
       </div>
+
+      {/* Instructor filter chips */}
+      {instructors.length > 1 && (
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <span style={{ color: '#6b88a8', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Instructor:</span>
+          <button
+            onClick={() => setInstructorFilter('')}
+            style={{
+              padding: '0.3rem 0.875rem', borderRadius: '999px', border: '1px solid',
+              borderColor: !instructorFilter ? '#00C2A8' : '#1e3a5f',
+              backgroundColor: !instructorFilter ? '#003d35' : 'transparent',
+              color: !instructorFilter ? '#00C2A8' : '#6b88a8',
+              cursor: 'pointer', fontSize: '0.8rem', fontWeight: !instructorFilter ? 700 : 400,
+            }}
+          >
+            All Instructors
+          </button>
+          {instructors.map((name) => (
+            <button
+              key={name}
+              onClick={() => setInstructorFilter(instructorFilter === name ? '' : name)}
+              style={{
+                padding: '0.3rem 0.875rem', borderRadius: '999px', border: '1px solid',
+                borderColor: instructorFilter === name ? '#F5C842' : '#1e3a5f',
+                backgroundColor: instructorFilter === name ? '#3d2a00' : 'transparent',
+                color: instructorFilter === name ? '#F5C842' : '#a8c4e0',
+                cursor: 'pointer', fontSize: '0.8rem', fontWeight: instructorFilter === name ? 700 : 400,
+              }}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
