@@ -58,6 +58,55 @@ function localTimeToUtc(localTime: string, timezone: string): string {
   return `${String(utcDate.getUTCHours()).padStart(2, '0')}:${String(utcDate.getUTCMinutes()).padStart(2, '0')}`
 }
 
+const DAY_INDEX: Record<string, number> = {
+  Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6,
+}
+
+function generateDatedSessions(
+  days: string[],
+  startDate: string,
+  durationWeeks: number,
+  durationUnit: 'WEEKS' | 'DAYS',
+): { day: string; date: string; week: number }[] {
+  if (days.length === 0 || !startDate) return []
+  const sortedDays = DAYS.filter((d) => days.includes(d))
+  const start = new Date(startDate + 'T00:00:00')
+  const sessions: { day: string; date: string; week: number }[] = []
+
+  if (durationUnit === 'DAYS') {
+    // Single-day or multi-day course: iterate each day in the range
+    const totalDays = Math.max(1, durationWeeks)
+    for (let i = 0; i < totalDays; i++) {
+      const d = new Date(start)
+      d.setDate(start.getDate() + i)
+      const dayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][d.getDay()]
+      if (sortedDays.includes(dayName)) {
+        sessions.push({ day: dayName, date: d.toISOString().split('T')[0], week: 1 })
+      }
+    }
+    return sessions
+  }
+
+  // Weekly: for each week, find each selected day on or after startDate
+  for (let week = 1; week <= durationWeeks; week++) {
+    sortedDays.forEach((dayName) => {
+      const target = DAY_INDEX[dayName]
+      // Find the first occurrence of this day in the given week offset
+      const weekStart = new Date(start)
+      weekStart.setDate(start.getDate() + (week - 1) * 7)
+      let candidate = new Date(weekStart)
+      // Find the next occurrence of dayName on or after weekStart
+      // but within 7 days of weekStart
+      let diff = (target - weekStart.getDay() + 7) % 7
+      candidate.setDate(weekStart.getDate() + diff)
+      sessions.push({ day: dayName, date: candidate.toISOString().split('T')[0], week })
+    })
+  }
+  // Sort by date
+  sessions.sort((a, b) => a.date.localeCompare(b.date))
+  return sessions
+}
+
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.75rem',
@@ -134,14 +183,15 @@ export default function EditCoursePage() {
           classroomUrl: course.classroomUrl || '',
           startDate: course.startDate || '',
         })
-        // Pre-fill day times from scheduleJson
+        // Pre-fill day times from scheduleJson (use first occurrence of each day)
         if (course.scheduleJson) {
           try {
             const schedule = JSON.parse(course.scheduleJson)
             const dt: Record<string, string[]> = {}
             schedule.forEach((entry: { day: string; localTime?: string; localTimes?: string[] }) => {
-              // Support both old (localTime) and new (localTimes) formats
-              dt[entry.day] = entry.localTimes || (entry.localTime ? [entry.localTime] : [''])
+              if (!dt[entry.day]) {
+                dt[entry.day] = entry.localTimes || (entry.localTime ? [entry.localTime] : [''])
+              }
             })
             setDayTimes(dt)
           } catch { /* ignore */ }
@@ -196,15 +246,20 @@ export default function EditCoursePage() {
 
   const removeTopic = (t: string) => setTopics((prev) => prev.filter((x) => x !== t))
 
-  const buildSchedule = () =>
-    DAYS.filter((d) => selectedDays.includes(d)).map((day) => {
-      const times = (dayTimes[day] || ['']).filter(Boolean)
+  const buildSchedule = () => {
+    const weeks = parseInt(form.durationWeeks) || 1
+    const dated = generateDatedSessions(selectedDays, form.startDate, weeks, durationUnit)
+    return dated.map((session) => {
+      const times = (dayTimes[session.day] || ['']).filter(Boolean)
       return {
-        day,
+        day: session.day,
+        date: session.date,
+        week: session.week,
         localTimes: times,
         utcTimes: times.map((t) => localTimeToUtc(t, timezone)),
       }
     })
+  }
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
