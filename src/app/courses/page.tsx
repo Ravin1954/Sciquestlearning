@@ -46,6 +46,8 @@ const GRADE_OPTIONS = [
   { value: 'High School', label: 'High School' },
 ]
 
+const PAGE_SIZE = 9
+
 function CoursesContent() {
   const searchParams = useSearchParams()
   const [courses, setCourses] = useState<Course[]>([])
@@ -56,6 +58,7 @@ function CoursesContent() {
   const [subject, setSubject] = useState('')
   const [gradeLevel, setGradeLevel] = useState('')
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
     const params = new URLSearchParams()
@@ -69,11 +72,17 @@ function CoursesContent() {
       .catch(() => { setCourses([]); setLoading(false) })
   }, [subject, gradeLevel, activeTab])
 
+  // Reset to page 1 whenever filters/search/tab change
+  useEffect(() => { setPage(1) }, [subject, gradeLevel, activeTab, search])
+
   const filtered = courses.filter((c) =>
     !search || c.title.toLowerCase().includes(search.toLowerCase()) ||
     c.instructor.firstName.toLowerCase().includes(search.toLowerCase()) ||
     c.instructor.lastName.toLowerCase().includes(search.toLowerCase())
   )
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem' }}>
@@ -142,12 +151,43 @@ function CoursesContent() {
         <>
           <p style={{ color: '#6b88a8', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
             {filtered.length} course{filtered.length !== 1 ? 's' : ''} available
+            {totalPages > 1 && <span style={{ marginLeft: '0.5rem' }}>· Page {page} of {totalPages}</span>}
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
-            {filtered.map((course) => (
+            {paginated.map((course) => (
               <CourseCard key={course.id} course={course} />
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', marginTop: '2.5rem' }}>
+              <button
+                onClick={() => { setPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                disabled={page === 1}
+                style={{ padding: '0.5rem 1.25rem', borderRadius: '8px', border: '1px solid #1e3a5f', backgroundColor: page === 1 ? '#060f1a' : '#0f2240', color: page === 1 ? '#3a5070' : '#a8c4e0', cursor: page === 1 ? 'default' : 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
+              >
+                ← Previous
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                  style={{ width: '36px', height: '36px', borderRadius: '8px', border: p === page ? '1px solid #00C2A8' : '1px solid #1e3a5f', backgroundColor: p === page ? '#003d35' : '#0f2240', color: p === page ? '#00C2A8' : '#6b88a8', cursor: 'pointer', fontWeight: p === page ? 700 : 400, fontSize: '0.875rem' }}
+                >
+                  {p}
+                </button>
+              ))}
+
+              <button
+                onClick={() => { setPage((p) => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                disabled={page === totalPages}
+                style={{ padding: '0.5rem 1.25rem', borderRadius: '8px', border: '1px solid #1e3a5f', backgroundColor: page === totalPages ? '#060f1a' : '#0f2240', color: page === totalPages ? '#3a5070' : '#a8c4e0', cursor: page === totalPages ? 'default' : 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
