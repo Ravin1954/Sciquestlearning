@@ -13,7 +13,7 @@ export async function GET() {
 
   const enrollments = await prisma.enrollment.findMany({
     where: { course: { instructorId: user.id } },
-    include: { course: { select: { title: true } }, student: { select: { firstName: true, lastName: true } } },
+    include: { course: { select: { id: true, title: true } }, student: { select: { firstName: true, lastName: true } } },
     orderBy: { enrolledAt: 'desc' },
   })
 
