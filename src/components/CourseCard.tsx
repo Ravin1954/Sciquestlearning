@@ -34,6 +34,7 @@ interface CourseCardProps {
   }
   showStatus?: boolean
   showEnroll?: boolean
+  showInstructor?: boolean
 }
 
 const subjectColors: Record<string, string> = {
@@ -50,7 +51,7 @@ const subjectLabels: Record<string, string> = {
   MATHEMATICS: 'Mathematics',
 }
 
-export default function CourseCard({ course, showStatus = false, showEnroll = true }: CourseCardProps) {
+export default function CourseCard({ course, showStatus = false, showEnroll = true, showInstructor = true }: CourseCardProps) {
   const pathname = usePathname()
   const subjectColor = subjectColors[course.subject] || '#00C2A8'
   const isSelfPaced = course.courseType === 'SELF_PACED'
@@ -135,7 +136,7 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
         </p>
       )}
 
-      {course.instructor && (
+      {course.instructor && showInstructor && (
         <p style={{ color: '#a8c4e0', fontSize: '0.875rem' }}>
           <span style={{ color: '#6b88a8' }}>Instructor: </span>
           {showInstructorLink ? (

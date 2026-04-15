@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useAuth } from '@clerk/nextjs'
 import NavBar from '@/components/NavBar'
 import CourseCard from '@/components/CourseCard'
 
@@ -50,6 +51,7 @@ const PAGE_SIZE = 9
 
 function CoursesContent() {
   const searchParams = useSearchParams()
+  const { isSignedIn } = useAuth()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'LIVE' | 'SELF_PACED'>(
@@ -136,8 +138,8 @@ function CoursesContent() {
         ))}
       </div>
 
-      {/* Instructor filter chips */}
-      {instructors.length > 0 && (
+      {/* Instructor filter chips — only visible after login */}
+      {isSignedIn && instructors.length > 0 && (
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem' }}>
           <span style={{ color: '#6b88a8', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Instructor:</span>
           <button
@@ -207,7 +209,7 @@ function CoursesContent() {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
             {paginated.map((course) => (
-              <CourseCard key={course.id} course={course} />
+              <CourseCard key={course.id} course={course} showInstructor={!!isSignedIn} />
             ))}
           </div>
 
