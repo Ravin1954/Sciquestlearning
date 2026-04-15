@@ -1,6 +1,22 @@
 import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
+import { Fraunces, DM_Sans } from 'next/font/google'
 import './globals.css'
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  axes: ['opsz'],
+  variable: '--font-fraunces',
+  display: 'swap',
+})
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://sciquestlearning.com'),
@@ -72,16 +88,8 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <head>
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link
-            href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600&display=swap"
-            rel="stylesheet"
-          />
-        </head>
-        <body style={{ backgroundColor: '#0B1A2E', color: '#e8edf5', fontFamily: "'DM Sans', sans-serif", margin: 0 }}>
+      <html lang="en" className={`${fraunces.variable} ${dmSans.variable}`}>
+        <body style={{ backgroundColor: '#0B1A2E', color: '#e8edf5', fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif", margin: 0 }}>
           {children}
         </body>
       </html>
