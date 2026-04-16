@@ -81,11 +81,13 @@ export async function POST(req: Request) {
           currency: 'usd',
           product_data: {
             name: course.title,
-            description: isLumpSum
-              ? `Full course fee — ${sessions.length > 0 ? sessions.join(', ') : 'all sessions'}`
-              : sessionCount > 1
-                ? `${sessionCount} sessions × $${feePerSession.toFixed(2)}/session`
-                : sessions[0] || course.title,
+            description: course.courseType === 'SELF_PACED'
+              ? '1 year access from enrollment date'
+              : isLumpSum
+                ? sessions.length > 0 ? `Full course fee — ${sessions.join(', ')}` : 'Full course fee'
+                : sessionCount > 1
+                  ? `${sessionCount} sessions × $${feePerSession.toFixed(2)}/session`
+                  : sessions[0] || course.title,
           },
           unit_amount: Math.round(feePerSession * 100),
         },
