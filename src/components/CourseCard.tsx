@@ -156,7 +156,7 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
         {isSelfPaced ? (
           <p style={{ color: '#2d4a6b', fontSize: '0.8rem' }}>
             <span style={{ color: '#5a7a96' }}>Access: </span>
-            Study anytime · {course.durationWeeks > 0 ? `${course.durationWeeks} weeks` : 'Lifetime access'}
+            Study anytime · {course.durationWeeks > 0 ? `${course.durationWeeks} weeks` : '1 year access'}
           </p>
         ) : (
           <>

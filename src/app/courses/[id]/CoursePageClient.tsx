@@ -417,7 +417,7 @@ export default function CoursePageClient() {
                 {!isLive && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: '#5a7a96', fontSize: '0.875rem' }}>Access</span>
-                    <span style={{ color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>Lifetime Access</span>
+                    <span style={{ color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>1 year from enrollment date</span>
                   </div>
                 )}
                 {isLive && (
@@ -494,7 +494,7 @@ export default function CoursePageClient() {
               <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
                 {isLive && hasSessions
                   ? enrolledSessions.size > 0 ? 'Select more sessions to add' : 'Select sessions above then enroll'
-                  : 'One-time fee — lifetime access'}
+                  : 'One-time fee — 1 year access from enrollment date'}
               </p>
 
               <div style={{ marginBottom: '1.25rem' }}>

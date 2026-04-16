@@ -221,7 +221,7 @@ export default function StudentPage() {
                       </p>
                       <p style={{ color: '#5a7a96', fontSize: '0.825rem' }}>
                         {course.courseType === 'SELF_PACED'
-                          ? `Self-Paced · Study anytime · ${course.durationWeeks > 0 ? `${course.durationWeeks} weeks` : 'Lifetime access'}`
+                          ? `Self-Paced · Study anytime · ${course.durationWeeks > 0 ? `${course.durationWeeks} weeks` : '1 year access'}`
                           : `${course.daysOfWeek.join(', ')} · ${course.startTimeUtc} UTC · ${course.sessionDurationMins} min/session`}
                       </p>
                     </div>
