@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { sendReminderEmail } from '@/lib/resend'
+import { sendReminderEmail, sendAccessExpiryWarningEmail, sendAccessExpiredEmail } from '@/lib/resend'
 
 // Called by Railway cron every minute
 // Sends reminders for sessions starting in 19–21 minutes
@@ -59,5 +59,33 @@ export async function GET(req: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, remindersSent: sent })
+  // Once daily at 08:00 UTC — send access expiry warnings and expiry notifications
+  let expirySent = 0
+  if (now.getUTCHours() === 8 && now.getUTCMinutes() === 0) {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://sciquestlearning.com'
+    const in29Days = new Date(now.getTime() + 29 * 24 * 60 * 60 * 1000)
+    const in31Days = new Date(now.getTime() + 31 * 24 * 60 * 60 * 1000)
+    const yesterday = new Date(now.getTime() - 25 * 60 * 60 * 1000)
+
+    const expiringSoon = await prisma.enrollment.findMany({
+      where: { accessExpiresAt: { gte: in29Days, lte: in31Days } },
+      include: { student: true, course: { select: { id: true, title: true } } },
+    })
+    for (const e of expiringSoon) {
+      const expiryDate = e.accessExpiresAt!.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      await sendAccessExpiryWarningEmail(e.student.email, e.student.firstName, e.course.title, expiryDate, `${baseUrl}/courses/${e.course.id}`).catch(() => {})
+      expirySent++
+    }
+
+    const justExpired = await prisma.enrollment.findMany({
+      where: { accessExpiresAt: { gte: yesterday, lte: now } },
+      include: { student: true, course: { select: { id: true, title: true } } },
+    })
+    for (const e of justExpired) {
+      await sendAccessExpiredEmail(e.student.email, e.student.firstName, e.course.title, `${baseUrl}/courses/${e.course.id}`).catch(() => {})
+      expirySent++
+    }
+  }
+
+  return NextResponse.json({ ok: true, remindersSent: sent, expirySent })
 }
