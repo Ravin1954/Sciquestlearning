@@ -33,13 +33,13 @@ interface EarningsData {
 }
 
 const S = {
-  card: { backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' } as React.CSSProperties,
-  label: { color: '#6b88a8', fontSize: '0.72rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.25rem' },
-  value: { fontFamily: 'Fraunces, serif', fontSize: '1.875rem', fontWeight: 700, color: '#e8edf5' },
-  h1: { fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.25rem' } as React.CSSProperties,
-  sub: { color: '#6b88a8', fontSize: '0.9rem', marginBottom: '2rem' } as React.CSSProperties,
-  th: { padding: '0.75rem 1.25rem', textAlign: 'left' as const, color: '#6b88a8', fontSize: '0.72rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em', fontWeight: 600 },
-  td: { padding: '0.75rem 1.25rem', fontSize: '0.875rem', borderTop: '1px solid #1e3a5f' },
+  card: { backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' } as React.CSSProperties,
+  label: { color: '#5a7a96', fontSize: '0.72rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.25rem' },
+  value: { fontFamily: 'Fraunces, serif', fontSize: '1.875rem', fontWeight: 700, color: '#0B1A2E' },
+  h1: { fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.25rem' } as React.CSSProperties,
+  sub: { color: '#5a7a96', fontSize: '0.9rem', marginBottom: '2rem' } as React.CSSProperties,
+  th: { padding: '0.75rem 1.25rem', textAlign: 'left' as const, color: '#5a7a96', fontSize: '0.72rem', textTransform: 'uppercase' as const, letterSpacing: '0.06em', fontWeight: 600 },
+  td: { padding: '0.75rem 1.25rem', fontSize: '0.875rem', borderTop: '1px solid #C5D5E4' },
 }
 
 function groupByCourse(enrollments: Enrollment[]): CourseGroup[] {
@@ -80,7 +80,7 @@ export default function EarningsPage() {
       <p style={S.sub}>Your revenue and payout history</p>
 
       {loading ? (
-        <p style={{ color: '#6b88a8' }}>Loading...</p>
+        <p style={{ color: '#5a7a96' }}>Loading...</p>
       ) : !data ? (
         <p style={{ color: '#f87171' }}>Failed to load earnings.</p>
       ) : (
@@ -88,7 +88,7 @@ export default function EarningsPage() {
           {/* Summary Cards — always visible */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
             {[
-              { label: 'Gross Revenue', value: `$${Number(data.grossRevenue).toFixed(2)}`, color: '#e8edf5' },
+              { label: 'Gross Revenue', value: `$${Number(data.grossRevenue).toFixed(2)}`, color: '#0B1A2E' },
               { label: 'Platform Fee (20%)', value: `$${Number(data.platformFee).toFixed(2)}`, color: '#f87171' },
               { label: 'Your Earnings (80%)', value: `$${Number(data.netPayout).toFixed(2)}`, color: '#00C2A8' },
               { label: 'Total Enrollments', value: data.enrollments.length, color: '#F5C842' },
@@ -102,7 +102,7 @@ export default function EarningsPage() {
           </div>
 
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #1e3a5f', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #C5D5E4', marginBottom: '1.5rem' }}>
             {[
               { value: 'overview', label: 'By Course' },
               { value: 'all', label: 'All Enrollments' },
@@ -112,7 +112,7 @@ export default function EarningsPage() {
                 onClick={() => setTab(t.value as typeof tab)}
                 style={{
                   padding: '0.75rem 1.5rem', border: 'none', background: 'transparent', cursor: 'pointer',
-                  color: tab === t.value ? '#00C2A8' : '#6b88a8',
+                  color: tab === t.value ? '#00C2A8' : '#5a7a96',
                   borderBottom: tab === t.value ? '2px solid #00C2A8' : '2px solid transparent',
                   fontWeight: tab === t.value ? 700 : 500, fontSize: '0.875rem',
                 }}
@@ -126,7 +126,7 @@ export default function EarningsPage() {
           {tab === 'overview' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {courseGroups.length === 0 ? (
-                <div style={{ ...S.card, textAlign: 'center', color: '#6b88a8', padding: '3rem' }}>
+                <div style={{ ...S.card, textAlign: 'center', color: '#5a7a96', padding: '3rem' }}>
                   No enrollments yet. Earnings will appear here once students enroll in your courses.
                 </div>
               ) : courseGroups.map((g) => (
@@ -137,25 +137,25 @@ export default function EarningsPage() {
                     onClick={() => setExpandedCourse(expandedCourse === g.courseId ? null : g.courseId)}
                   >
                     <div>
-                      <p style={{ color: '#e8edf5', fontWeight: 700, fontSize: '1rem', marginBottom: '0.25rem' }}>{g.courseTitle}</p>
-                      <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                      <p style={{ color: '#0B1A2E', fontWeight: 700, fontSize: '1rem', marginBottom: '0.25rem' }}>{g.courseTitle}</p>
+                      <p style={{ color: '#5a7a96', fontSize: '0.8rem' }}>
                         {g.enrollments.length} student{g.enrollments.length !== 1 ? 's' : ''}
                       </p>
                     </div>
                     <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
                       <div style={{ textAlign: 'right' }}>
-                        <p style={{ color: '#6b88a8', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Gross</p>
-                        <p style={{ color: '#e8edf5', fontWeight: 600 }}>${g.grossRevenue.toFixed(2)}</p>
+                        <p style={{ color: '#5a7a96', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Gross</p>
+                        <p style={{ color: '#0B1A2E', fontWeight: 600 }}>${g.grossRevenue.toFixed(2)}</p>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <p style={{ color: '#6b88a8', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Your Payout</p>
+                        <p style={{ color: '#5a7a96', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Your Payout</p>
                         <p style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', fontWeight: 700, color: '#00C2A8' }}>${g.payout.toFixed(2)}</p>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <p style={{ color: '#6b88a8', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Pending</p>
+                        <p style={{ color: '#5a7a96', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>Pending</p>
                         <p style={{ color: g.pending > 0 ? '#F5C842' : '#22c55e', fontWeight: 600 }}>${g.pending.toFixed(2)}</p>
                       </div>
-                      <span style={{ color: '#6b88a8', fontSize: '1rem' }}>
+                      <span style={{ color: '#5a7a96', fontSize: '1rem' }}>
                         {expandedCourse === g.courseId ? '▲' : '▼'}
                       </span>
                     </div>
@@ -163,7 +163,7 @@ export default function EarningsPage() {
 
                   {/* Expanded student breakdown */}
                   {expandedCourse === g.courseId && (
-                    <div style={{ marginTop: '1rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid #1e3a5f' }}>
+                    <div style={{ marginTop: '1rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid #C5D5E4' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                         <thead style={{ backgroundColor: '#0a1d35' }}>
                           <tr>
@@ -175,11 +175,11 @@ export default function EarningsPage() {
                         <tbody>
                           {g.enrollments.map((e) => (
                             <tr key={e.id}>
-                              <td style={{ ...S.td, color: '#6b88a8', whiteSpace: 'nowrap' }}>
+                              <td style={{ ...S.td, color: '#5a7a96', whiteSpace: 'nowrap' }}>
                                 {new Date(e.enrolledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </td>
-                              <td style={{ ...S.td, color: '#e8edf5' }}>{e.student.firstName} {e.student.lastName}</td>
-                              <td style={{ ...S.td, color: '#e8edf5', fontWeight: 600 }}>${Number(e.amountPaidUsd).toFixed(2)}</td>
+                              <td style={{ ...S.td, color: '#0B1A2E' }}>{e.student.firstName} {e.student.lastName}</td>
+                              <td style={{ ...S.td, color: '#0B1A2E', fontWeight: 600 }}>${Number(e.amountPaidUsd).toFixed(2)}</td>
                               <td style={{ ...S.td, color: '#00C2A8', fontWeight: 700 }}>${Number(e.instructorPayoutUsd).toFixed(2)}</td>
                               <td style={S.td}>
                                 {e.instructorPaidOut
@@ -190,12 +190,12 @@ export default function EarningsPage() {
                           ))}
                         </tbody>
                         {/* Course subtotals */}
-                        <tfoot style={{ backgroundColor: '#0a1d35', borderTop: '2px solid #1e3a5f' }}>
+                        <tfoot style={{ backgroundColor: '#0a1d35', borderTop: '2px solid #C5D5E4' }}>
                           <tr>
-                            <td colSpan={2} style={{ ...S.td, color: '#6b88a8', fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase' }}>Course Total</td>
-                            <td style={{ ...S.td, color: '#e8edf5', fontWeight: 700 }}>${g.grossRevenue.toFixed(2)}</td>
+                            <td colSpan={2} style={{ ...S.td, color: '#5a7a96', fontWeight: 600, fontSize: '0.78rem', textTransform: 'uppercase' }}>Course Total</td>
+                            <td style={{ ...S.td, color: '#0B1A2E', fontWeight: 700 }}>${g.grossRevenue.toFixed(2)}</td>
                             <td style={{ ...S.td, color: '#00C2A8', fontWeight: 700 }}>${g.payout.toFixed(2)}</td>
-                            <td style={{ ...S.td, color: '#6b88a8', fontSize: '0.78rem' }}>
+                            <td style={{ ...S.td, color: '#5a7a96', fontSize: '0.78rem' }}>
                               {g.paidOut > 0 && <span style={{ color: '#22c55e' }}>${g.paidOut.toFixed(2)} paid · </span>}
                               {g.pending > 0 && <span style={{ color: '#F5C842' }}>${g.pending.toFixed(2)} pending</span>}
                             </td>
@@ -213,7 +213,7 @@ export default function EarningsPage() {
           {tab === 'all' && (
             <div>
               {data.enrollments.length === 0 ? (
-                <div style={{ ...S.card, textAlign: 'center', color: '#6b88a8', padding: '3rem' }}>
+                <div style={{ ...S.card, textAlign: 'center', color: '#5a7a96', padding: '3rem' }}>
                   No enrollments yet.
                 </div>
               ) : (
@@ -228,13 +228,13 @@ export default function EarningsPage() {
                     </thead>
                     <tbody>
                       {data.enrollments.map((e, i) => (
-                        <tr key={e.id} style={{ borderTop: i > 0 ? '1px solid #1e3a5f' : 'none' }}>
-                          <td style={{ ...S.td, color: '#6b88a8', whiteSpace: 'nowrap' }}>
+                        <tr key={e.id} style={{ borderTop: i > 0 ? '1px solid #C5D5E4' : 'none' }}>
+                          <td style={{ ...S.td, color: '#5a7a96', whiteSpace: 'nowrap' }}>
                             {new Date(e.enrolledAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </td>
-                          <td style={{ ...S.td, color: '#e8edf5' }}>{e.student.firstName} {e.student.lastName}</td>
-                          <td style={{ ...S.td, color: '#a8c4e0' }}>{e.course.title}</td>
-                          <td style={{ ...S.td, color: '#e8edf5', fontWeight: 600 }}>${Number(e.amountPaidUsd).toFixed(2)}</td>
+                          <td style={{ ...S.td, color: '#0B1A2E' }}>{e.student.firstName} {e.student.lastName}</td>
+                          <td style={{ ...S.td, color: '#2d4a6b' }}>{e.course.title}</td>
+                          <td style={{ ...S.td, color: '#0B1A2E', fontWeight: 600 }}>${Number(e.amountPaidUsd).toFixed(2)}</td>
                           <td style={{ ...S.td, color: '#00C2A8', fontWeight: 700 }}>${Number(e.instructorPayoutUsd).toFixed(2)}</td>
                           <td style={S.td}>
                             {e.instructorPaidOut

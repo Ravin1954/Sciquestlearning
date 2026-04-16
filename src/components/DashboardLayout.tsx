@@ -43,13 +43,13 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
   const items = navItems[role] || []
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0B1A2E' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#EEF3F8' }}>
       {/* Sidebar */}
       <aside
         style={{
           width: '240px',
-          backgroundColor: '#0f2240',
-          borderRight: '1px solid #1e3a5f',
+          backgroundColor: '#FFFFFF',
+          borderRight: '1px solid #C5D5E4',
           padding: '1.5rem 1rem',
           display: 'flex',
           flexDirection: 'column',
@@ -58,19 +58,20 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
           top: 0,
           left: 0,
           height: '100vh',
+          boxShadow: '1px 0 4px rgba(0,0,0,0.04)',
         }}
       >
         <Link href="/" style={{ marginBottom: '1.5rem', display: 'block' }}>
-          <span style={{ fontFamily: 'Fraunces, serif', color: '#00C2A8', fontSize: '1.25rem', fontWeight: 700 }}>
+          <span style={{ fontFamily: 'Fraunces, serif', color: '#00A896', fontSize: '1.25rem', fontWeight: 700 }}>
             SciQuest
           </span>
-          <span style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem' }}>
+          <span style={{ fontFamily: 'Fraunces, serif', color: '#b8860b', fontSize: '1.25rem' }}>
             {' '}Learning
           </span>
         </Link>
 
         <div style={{ marginBottom: '1rem' }}>
-          <p style={{ color: '#6b88a8', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem', fontWeight: 600 }}>
+          <p style={{ color: '#5a7a96', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem', fontWeight: 600 }}>
             {role.charAt(0).toUpperCase() + role.slice(1)} Portal
           </p>
         </div>
@@ -90,8 +91,8 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
                   borderRadius: '8px',
                   fontSize: '0.875rem',
                   fontWeight: isActive ? 600 : 400,
-                  color: isActive ? '#00C2A8' : '#a8c4e0',
-                  backgroundColor: isActive ? '#003d35' : 'transparent',
+                  color: isActive ? '#00A896' : '#2d4a6b',
+                  backgroundColor: isActive ? '#E0F7F4' : 'transparent',
                   textDecoration: 'none',
                   transition: 'all 0.15s',
                 }}
@@ -103,9 +104,9 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
           })}
         </nav>
 
-        <div style={{ borderTop: '1px solid #1e3a5f', paddingTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <div style={{ borderTop: '1px solid #C5D5E4', paddingTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <UserButton />
-          <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Account</span>
+          <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>Account</span>
         </div>
       </aside>
 

@@ -12,8 +12,8 @@ const COUNTRIES = [
 
 const inp: React.CSSProperties = {
   width: '100%', padding: '0.625rem 0.875rem', borderRadius: '8px',
-  backgroundColor: '#060f1a', border: '1px solid #1e3a5f',
-  color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box',
+  backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4',
+  color: '#0B1A2E', fontSize: '0.875rem', boxSizing: 'border-box',
 }
 
 interface Profile {
@@ -72,50 +72,50 @@ export default function InstructorProfilePage() {
     APPROVED: { bg: '#003d35', color: '#00C2A8', label: 'Approved' },
     PENDING_REVIEW: { bg: '#3d2a00', color: '#F5C842', label: 'Pending Review' },
     REJECTED: { bg: '#3d0f0f', color: '#f87171', label: 'Not Approved' },
-    NOT_APPLICABLE: { bg: '#1a1a2e', color: '#6b88a8', label: 'N/A' },
+    NOT_APPLICABLE: { bg: '#1a1a2e', color: '#5a7a96', label: 'N/A' },
   }
 
   return (
     <DashboardLayout role="instructor">
       <div style={{ maxWidth: '680px' }}>
-        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.25rem' }}>
+        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.25rem' }}>
           My Profile
         </h1>
-        <p style={{ color: '#6b88a8', fontSize: '0.9rem', marginBottom: '2rem' }}>
+        <p style={{ color: '#5a7a96', fontSize: '0.9rem', marginBottom: '2rem' }}>
           Your instructor credentials and bio visible to students and admin.
         </p>
 
         {!profile ? (
-          <p style={{ color: '#6b88a8' }}>Loading...</p>
+          <p style={{ color: '#5a7a96' }}>Loading...</p>
         ) : (
           <>
             {/* Account info (read-only from Clerk) */}
-            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-              <p style={{ color: '#6b88a8', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '1rem' }}>Account Info</p>
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <p style={{ color: '#5a7a96', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '1rem' }}>Account Info</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
-                  <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>First Name</p>
-                  <p style={{ color: '#e8edf5', fontWeight: 600 }}>{profile.firstName || '—'}</p>
+                  <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>First Name</p>
+                  <p style={{ color: '#0B1A2E', fontWeight: 600 }}>{profile.firstName || '—'}</p>
                 </div>
                 <div>
-                  <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Last Name</p>
-                  <p style={{ color: '#e8edf5', fontWeight: 600 }}>{profile.lastName || '—'}</p>
+                  <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Last Name</p>
+                  <p style={{ color: '#0B1A2E', fontWeight: 600 }}>{profile.lastName || '—'}</p>
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Email</p>
-                  <p style={{ color: '#e8edf5' }}>{profile.email || '—'}</p>
+                  <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Email</p>
+                  <p style={{ color: '#0B1A2E' }}>{profile.email || '—'}</p>
                 </div>
               </div>
-              <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.75rem' }}>
+              <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.75rem' }}>
                 To change your name or email, click the Account button in the sidebar.
               </p>
             </div>
 
             {/* Account status */}
-            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.25rem' }}>Instructor Status</p>
-                <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Admin reviews credentials before approving instructors.</p>
+                <p style={{ color: '#5a7a96', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.25rem' }}>Instructor Status</p>
+                <p style={{ color: '#5a7a96', fontSize: '0.8rem' }}>Admin reviews credentials before approving instructors.</p>
               </div>
               {(() => {
                 const s = statusColors[profile.instructorStatus] || statusColors.NOT_APPLICABLE
@@ -128,9 +128,9 @@ export default function InstructorProfilePage() {
             </div>
 
             {/* Editable credentials */}
-            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
+                <p style={{ color: '#5a7a96', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
                   Credentials &amp; Bio
                 </p>
                 {!editing && (
@@ -152,15 +152,15 @@ export default function InstructorProfilePage() {
               {editing ? (
                 <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Country of Residence</p>
+                    <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Country of Residence</p>
                     <select value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} style={inp}>
                       <option value="">Select country</option>
                       {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
                   <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Qualifications</p>
-                    <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Degrees, certifications, teaching experience</p>
+                    <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Qualifications</p>
+                    <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Degrees, certifications, teaching experience</p>
                     <textarea
                       value={form.qualifications}
                       onChange={(e) => setForm((f) => ({ ...f, qualifications: e.target.value }))}
@@ -170,8 +170,8 @@ export default function InstructorProfilePage() {
                     />
                   </div>
                   <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>About Me</p>
-                    <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Shown to students on your course pages</p>
+                    <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>About Me</p>
+                    <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Shown to students on your course pages</p>
                     <textarea
                       value={form.aboutMe}
                       onChange={(e) => setForm((f) => ({ ...f, aboutMe: e.target.value }))}
@@ -181,8 +181,8 @@ export default function InstructorProfilePage() {
                     />
                   </div>
                   <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Certificates / Credentials URL</p>
-                    <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Link to Google Drive, LinkedIn, or any document showing your credentials</p>
+                    <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Certificates / Credentials URL</p>
+                    <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginBottom: '0.375rem' }}>Link to Google Drive, LinkedIn, or any document showing your credentials</p>
                     <input
                       type="url"
                       value={form.certificatesUrl}
@@ -196,7 +196,7 @@ export default function InstructorProfilePage() {
                     <button type="submit" disabled={saving} style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', border: 'none', padding: '0.625rem 1.5rem', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem', opacity: saving ? 0.7 : 1 }}>
                       {saving ? 'Saving...' : 'Save Profile'}
                     </button>
-                    <button type="button" onClick={() => { setEditing(false); setError('') }} style={{ backgroundColor: 'transparent', color: '#6b88a8', border: '1px solid #1e3a5f', padding: '0.625rem 1rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>
+                    <button type="button" onClick={() => { setEditing(false); setError('') }} style={{ backgroundColor: 'transparent', color: '#5a7a96', border: '1px solid #C5D5E4', padding: '0.625rem 1rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>
                       Cancel
                     </button>
                   </div>
@@ -209,14 +209,14 @@ export default function InstructorProfilePage() {
                     { label: 'About Me', value: profile.aboutMe },
                   ].map(({ label, value }) => (
                     <div key={label}>
-                      <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>{label}</p>
-                      <p style={{ color: value ? '#e8edf5' : '#3a5070', fontStyle: value ? 'normal' : 'italic' }}>
+                      <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>{label}</p>
+                      <p style={{ color: value ? '#0B1A2E' : '#3a5070', fontStyle: value ? 'normal' : 'italic' }}>
                         {value || 'Not provided'}
                       </p>
                     </div>
                   ))}
                   <div>
-                    <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Certificates / Credentials URL</p>
+                    <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Certificates / Credentials URL</p>
                     {profile.certificatesUrl ? (
                       <a href={profile.certificatesUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#00C2A8', fontSize: '0.875rem', wordBreak: 'break-all' }}>
                         {profile.certificatesUrl}

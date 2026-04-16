@@ -38,10 +38,10 @@ interface CourseCardProps {
 }
 
 const subjectColors: Record<string, string> = {
-  BIOLOGY: '#22c55e',
-  PHYSICAL_SCIENCE: '#3b82f6',
-  CHEMISTRY: '#a855f7',
-  MATHEMATICS: '#f59e0b',
+  BIOLOGY: '#16a34a',
+  PHYSICAL_SCIENCE: '#2563eb',
+  CHEMISTRY: '#9333ea',
+  MATHEMATICS: '#d97706',
 }
 
 const subjectLabels: Record<string, string> = {
@@ -53,28 +53,28 @@ const subjectLabels: Record<string, string> = {
 
 export default function CourseCard({ course, showStatus = false, showEnroll = true, showInstructor = true }: CourseCardProps) {
   const pathname = usePathname()
-  const subjectColor = subjectColors[course.subject] || '#00C2A8'
+  const subjectColor = subjectColors[course.subject] || '#00A896'
   const isSelfPaced = course.courseType === 'SELF_PACED'
-  // Show profile link on browse page, not on instructor's own profile page
   const showInstructorLink = course.instructor?.id && !pathname?.startsWith('/instructors/')
 
   return (
     <div
       style={{
-        backgroundColor: '#0f2240',
-        border: '1px solid #1e3a5f',
+        backgroundColor: '#FFFFFF',
+        border: '1px solid #C5D5E4',
         borderRadius: '12px',
         padding: '1.5rem',
         display: 'flex',
         flexDirection: 'column',
         gap: '0.75rem',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
       }}
     >
       <div className="flex items-start justify-between gap-2">
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <span
             style={{
-              backgroundColor: subjectColor + '20',
+              backgroundColor: subjectColor + '18',
               color: subjectColor,
               padding: '2px 10px',
               borderRadius: '9999px',
@@ -86,8 +86,8 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
           </span>
           <span
             style={{
-              backgroundColor: isSelfPaced ? '#2d1a4a' : '#0a2240',
-              color: isSelfPaced ? '#c084fc' : '#38bdf8',
+              backgroundColor: isSelfPaced ? '#F3E8FF' : '#E0F2FE',
+              color: isSelfPaced ? '#7c3aed' : '#0284c7',
               padding: '2px 8px',
               borderRadius: '9999px',
               fontSize: '0.7rem',
@@ -101,8 +101,8 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
           {course.gradeLevel && (
             <span
               style={{
-                backgroundColor: '#1a2d4a',
-                color: '#F5C842',
+                backgroundColor: '#FEF9C3',
+                color: '#92400e',
                 padding: '2px 8px',
                 borderRadius: '9999px',
                 fontSize: '0.7rem',
@@ -119,7 +119,7 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
       <h3
         style={{
           fontFamily: 'Fraunces, serif',
-          color: '#e8edf5',
+          color: '#0B1A2E',
           fontSize: '1.125rem',
           fontWeight: 600,
           lineHeight: 1.3,
@@ -129,7 +129,7 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
       </h3>
 
       {course.description && (
-        <p style={{ color: '#6b88a8', fontSize: '0.875rem', lineHeight: 1.6 }}>
+        <p style={{ color: '#5a7a96', fontSize: '0.875rem', lineHeight: 1.6 }}>
           {course.description.length > 120
             ? course.description.substring(0, 120) + '...'
             : course.description}
@@ -137,12 +137,12 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
       )}
 
       {course.instructor && showInstructor && (
-        <p style={{ color: '#a8c4e0', fontSize: '0.875rem' }}>
-          <span style={{ color: '#6b88a8' }}>Instructor: </span>
+        <p style={{ color: '#2d4a6b', fontSize: '0.875rem' }}>
+          <span style={{ color: '#5a7a96' }}>Instructor: </span>
           {showInstructorLink ? (
             <Link
               href={`/instructors/${course.instructor.id}`}
-              style={{ color: '#00C2A8', textDecoration: 'none', fontWeight: 500 }}
+              style={{ color: '#00A896', textDecoration: 'none', fontWeight: 500 }}
             >
               {course.instructor.firstName} {course.instructor.lastName}
             </Link>
@@ -154,16 +154,15 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
         {isSelfPaced ? (
-          <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
-            <span style={{ color: '#6b88a8' }}>Access: </span>
+          <p style={{ color: '#2d4a6b', fontSize: '0.8rem' }}>
+            <span style={{ color: '#5a7a96' }}>Access: </span>
             Study anytime · {course.durationWeeks > 0 ? `${course.durationWeeks} weeks` : 'Lifetime access'}
           </p>
         ) : (
           <>
-            <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
-              <span style={{ color: '#6b88a8' }}>Schedule: </span>
+            <p style={{ color: '#2d4a6b', fontSize: '0.8rem' }}>
+              <span style={{ color: '#5a7a96' }}>Schedule: </span>
               {course.daysOfWeek.join(', ')} at {(() => {
-                // Extract all unique times from scheduleJson
                 if (course.scheduleJson) {
                   try {
                     const schedule = JSON.parse(course.scheduleJson)
@@ -181,8 +180,8 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
                 return formatLocalTime(course.startTimeUtc)
               })()}
             </p>
-            <p style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>
-              <span style={{ color: '#6b88a8' }}>Session: </span>
+            <p style={{ color: '#2d4a6b', fontSize: '0.8rem' }}>
+              <span style={{ color: '#5a7a96' }}>Session: </span>
               {course.sessionDurationMins} min/session
             </p>
           </>
@@ -193,7 +192,7 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
         <span
           style={{
             fontFamily: 'Fraunces, serif',
-            color: '#F5C842',
+            color: '#00A896',
             fontSize: '1.25rem',
             fontWeight: 700,
           }}
@@ -206,7 +205,7 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
             href={`/courses/${course.id}`}
             style={{
               backgroundColor: '#00C2A8',
-              color: '#0B1A2E',
+              color: '#FFFFFF',
               padding: '0.5rem 1.25rem',
               borderRadius: '8px',
               fontSize: '0.875rem',

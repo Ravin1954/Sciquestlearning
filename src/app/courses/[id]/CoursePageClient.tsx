@@ -230,18 +230,18 @@ export default function CoursePageClient() {
 
   if (loading) {
     return (
-      <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
+      <div style={{ backgroundColor: '#EEF3F8', minHeight: '100vh' }}>
         <NavBar />
-        <div style={{ textAlign: 'center', padding: '6rem', color: '#6b88a8' }}>Loading...</div>
+        <div style={{ textAlign: 'center', padding: '6rem', color: '#5a7a96' }}>Loading...</div>
       </div>
     )
   }
 
   if (!course) {
     return (
-      <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
+      <div style={{ backgroundColor: '#EEF3F8', minHeight: '100vh' }}>
         <NavBar />
-        <div style={{ textAlign: 'center', padding: '6rem', color: '#6b88a8' }}>Course not found.</div>
+        <div style={{ textAlign: 'center', padding: '6rem', color: '#5a7a96' }}>Course not found.</div>
       </div>
     )
   }
@@ -254,7 +254,7 @@ export default function CoursePageClient() {
   const isLumpSum = course.feeType === 'LUMP_SUM'
 
   return (
-    <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#EEF3F8', minHeight: '100vh' }}>
       <NavBar />
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '3rem 1.5rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem', alignItems: 'start' }}>
@@ -264,25 +264,25 @@ export default function CoursePageClient() {
               {subjectLabels[course.subject] || course.subject}
             </span>
 
-            <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#e8edf5', margin: '1rem 0 0.5rem' }}>
+            <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#0B1A2E', margin: '1rem 0 0.5rem' }}>
               {course.title}
             </h1>
 
-            <p style={{ color: '#6b88a8', marginBottom: '2rem' }}>
-              Taught by <span style={{ color: '#a8c4e0' }}>{course.instructor.firstName} {course.instructor.lastName}</span>
+            <p style={{ color: '#5a7a96', marginBottom: '2rem' }}>
+              Taught by <span style={{ color: '#2d4a6b' }}>{course.instructor.firstName} {course.instructor.lastName}</span>
             </p>
 
-            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>About This Course</h2>
-              <p style={{ color: '#a8c4e0', lineHeight: 1.7 }}>{course.description}</p>
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.125rem', marginBottom: '0.875rem' }}>About This Course</h2>
+              <p style={{ color: '#2d4a6b', lineHeight: 1.7 }}>{course.description}</p>
             </div>
 
             {course.topics && course.topics.length > 0 && (
-              <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-                <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>Topics Covered</h2>
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+                <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.125rem', marginBottom: '0.875rem' }}>Topics Covered</h2>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                   {course.topics.map((topic) => (
-                    <span key={topic} style={{ backgroundColor: '#0a2240', border: '1px solid #1e3a5f', borderRadius: '6px', padding: '0.3rem 0.7rem', fontSize: '0.8rem', color: '#a8c4e0' }}>
+                    <span key={topic} style={{ backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '6px', padding: '0.3rem 0.7rem', fontSize: '0.8rem', color: '#2d4a6b' }}>
                       {topic}
                     </span>
                   ))}
@@ -292,9 +292,9 @@ export default function CoursePageClient() {
 
             {/* No upcoming sessions notice */}
             {isLive && !hasSessions && course.scheduleJson && course.scheduleJson !== '[]' && (
-              <div style={{ backgroundColor: '#1a100a', border: '1px solid #7c3a1a', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <div style={{ backgroundColor: '#FEF9C3', border: '1px solid #b8860b', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
                 <p style={{ color: '#f59e0b', fontWeight: 600, fontSize: '0.95rem', marginBottom: '0.4rem' }}>No upcoming sessions scheduled</p>
-                <p style={{ color: '#a8c4e0', fontSize: '0.85rem' }}>
+                <p style={{ color: '#2d4a6b', fontSize: '0.85rem' }}>
                   The instructor has not yet added future session dates. Please check back soon or contact the instructor for updates.
                 </p>
               </div>
@@ -302,23 +302,23 @@ export default function CoursePageClient() {
 
             {/* Session Picker for LIVE courses */}
             {isLive && hasSessions && (
-              <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.875rem' }}>
-                  <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem' }}>
+                  <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.125rem' }}>
                     {isLumpSum ? 'Course Schedule' : 'Select Your Sessions'}
                   </h2>
                   {!isLumpSum && (
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={selectAll} type="button" style={{ background: 'none', border: '1px solid #1e3a5f', color: '#00C2A8', borderRadius: '5px', padding: '0.2rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+                      <button onClick={selectAll} type="button" style={{ background: 'none', border: '1px solid #C5D5E4', color: '#00C2A8', borderRadius: '5px', padding: '0.2rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer' }}>
                         Select All
                       </button>
-                      <button onClick={clearAll} type="button" style={{ background: 'none', border: '1px solid #1e3a5f', color: '#6b88a8', borderRadius: '5px', padding: '0.2rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+                      <button onClick={clearAll} type="button" style={{ background: 'none', border: '1px solid #C5D5E4', color: '#5a7a96', borderRadius: '5px', padding: '0.2rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer' }}>
                         Clear
                       </button>
                     </div>
                   )}
                 </div>
-                <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.875rem' }}>
+                <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.875rem' }}>
                   {isLumpSum
                     ? <>One flat fee of <strong style={{ color: '#F5C842' }}>${feePerSession.toFixed(2)}</strong> covers the entire course. Select the sessions you plan to attend.</>
                     : <>Each session is <strong style={{ color: '#F5C842' }}>${feePerSession.toFixed(2)}</strong>. Select sessions and pay now, or come back later to add more.</>
@@ -332,13 +332,13 @@ export default function CoursePageClient() {
                       <div
                         key={gi}
                         style={{
-                          backgroundColor: anySelected ? '#003d35' : '#060f1a',
-                          border: `1px solid ${anySelected ? '#00C2A8' : '#1e3a5f'}`,
+                          backgroundColor: anySelected ? '#003d35' : '#EEF3F8',
+                          border: `1px solid ${anySelected ? '#00C2A8' : '#C5D5E4'}`,
                           borderRadius: '8px',
                           padding: '0.625rem 0.875rem',
                         }}
                       >
-                        <p style={{ color: '#a8c4e0', fontSize: '0.825rem', fontWeight: 600, marginBottom: g.sessions.length > 1 ? '0.5rem' : 0 }}>
+                        <p style={{ color: '#2d4a6b', fontSize: '0.825rem', fontWeight: 600, marginBottom: g.sessions.length > 1 ? '0.5rem' : 0 }}>
                           {g.dateLabel}
                         </p>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: g.sessions.length > 1 ? 0 : '0.25rem' }}>
@@ -364,7 +364,7 @@ export default function CoursePageClient() {
                                     }}
                                     style={{ accentColor: '#00C2A8' }}
                                   />
-                                  <span style={{ color: alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#6b88a8', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
+                                  <span style={{ color: alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#5a7a96', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
                                     {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓' : ''}
                                   </span>
                                 </label>
@@ -380,7 +380,7 @@ export default function CoursePageClient() {
                                   onChange={() => !alreadyPaid && !isCancelled && toggleSession(s.label)}
                                   style={{ accentColor: alreadyPaid ? '#22c55e' : '#00C2A8', width: '15px', height: '15px' }}
                                 />
-                                <span style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#6b88a8', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
+                                <span style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#5a7a96', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
                                   {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓ Paid' : ` — $${feePerSession.toFixed(2)}`}
                                 </span>
                               </label>
@@ -392,8 +392,8 @@ export default function CoursePageClient() {
                   })}
                 </div>
                 {sessionCount > 0 && (
-                  <div style={{ marginTop: '0.875rem', padding: '0.75rem', backgroundColor: '#0a2240', borderRadius: '8px', border: '1px solid #1e3a5f', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ color: '#a8c4e0', fontSize: '0.875rem' }}>
+                  <div style={{ marginTop: '0.875rem', padding: '0.75rem', backgroundColor: '#EEF3F8', borderRadius: '8px', border: '1px solid #C5D5E4', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: '#2d4a6b', fontSize: '0.875rem' }}>
                       {isLumpSum ? 'Full course fee' : `${sessionCount} session${sessionCount !== 1 ? 's' : ''} selected`}
                     </span>
                     <span style={{ color: '#F5C842', fontWeight: 700, fontSize: '1.1rem' }}>${totalFee.toFixed(2)}</span>
@@ -403,36 +403,36 @@ export default function CoursePageClient() {
             )}
 
             {/* Schedule info */}
-            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>Course Details</h2>
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.125rem', marginBottom: '0.875rem' }}>Course Details</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {!isLive && course.startDate && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Start Date</span>
-                    <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>
+                    <span style={{ color: '#5a7a96', fontSize: '0.875rem' }}>Start Date</span>
+                    <span style={{ color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>
                       {new Date(course.startDate + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                   </div>
                 )}
                 {!isLive && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Access</span>
-                    <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>Lifetime Access</span>
+                    <span style={{ color: '#5a7a96', fontSize: '0.875rem' }}>Access</span>
+                    <span style={{ color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>Lifetime Access</span>
                   </div>
                 )}
                 {isLive && (
                   <>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Session Length</span>
-                      <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>{course.sessionDurationMins} minutes</span>
+                      <span style={{ color: '#5a7a96', fontSize: '0.875rem' }}>Session Length</span>
+                      <span style={{ color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>{course.sessionDurationMins} minutes</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>Total Sessions Available</span>
+                      <span style={{ color: '#5a7a96', fontSize: '0.875rem' }}>Total Sessions Available</span>
                       <span style={{ color: '#F5C842', fontSize: '0.875rem', fontWeight: 600 }}>{sessionGroups.length} session{sessionGroups.length !== 1 ? 's' : ''}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#6b88a8', fontSize: '0.875rem' }}>{isLumpSum ? 'Total Course Fee' : 'Fee per Session'}</span>
-                      <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 500 }}>${feePerSession.toFixed(2)}{isLumpSum ? ' (flat fee)' : ''}</span>
+                      <span style={{ color: '#5a7a96', fontSize: '0.875rem' }}>{isLumpSum ? 'Total Course Fee' : 'Fee per Session'}</span>
+                      <span style={{ color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>${feePerSession.toFixed(2)}{isLumpSum ? ' (flat fee)' : ''}</span>
                     </div>
                   </>
                 )}
@@ -440,9 +440,9 @@ export default function CoursePageClient() {
             </div>
 
             {course.instructor.qualifications && (
-              <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
-                <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>About the Instructor</h2>
-                <p style={{ color: '#a8c4e0', lineHeight: 1.7, fontSize: '0.9rem' }}>{course.instructor.qualifications}</p>
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
+                <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.125rem', marginBottom: '0.875rem' }}>About the Instructor</h2>
+                <p style={{ color: '#2d4a6b', lineHeight: 1.7, fontSize: '0.9rem' }}>{course.instructor.qualifications}</p>
               </div>
             )}
 
@@ -451,16 +451,16 @@ export default function CoursePageClient() {
               const recs: { label: string; url: string }[] = (() => { try { return JSON.parse(course.recordingsJson || '[]') } catch { return [] } })()
               if (recs.length === 0) return null
               return (
-                <div style={{ backgroundColor: '#0f2240', border: '1px solid #a855f7', borderRadius: '12px', padding: '1.5rem', marginTop: '1.5rem' }}>
-                  <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.125rem', marginBottom: '0.875rem' }}>
+                <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #a855f7', borderRadius: '12px', padding: '1.5rem', marginTop: '1.5rem' }}>
+                  <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.125rem', marginBottom: '0.875rem' }}>
                     📹 Session Recordings
                   </h2>
-                  <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.875rem' }}>Available to enrolled students only.</p>
+                  <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.875rem' }}>Available to enrolled students only.</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {recs.map((r, i) => (
                       <a key={i} href={r.url} target="_blank" rel="noopener noreferrer"
-                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.625rem 0.875rem', textDecoration: 'none' }}>
-                        <span style={{ color: '#e8edf5', fontSize: '0.875rem' }}>{r.label}</span>
+                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '8px', padding: '0.625rem 0.875rem', textDecoration: 'none' }}>
+                        <span style={{ color: '#0B1A2E', fontSize: '0.875rem' }}>{r.label}</span>
                         <span style={{ color: '#a855f7', fontSize: '0.8rem', fontWeight: 600 }}>Watch →</span>
                       </a>
                     ))}
@@ -472,10 +472,10 @@ export default function CoursePageClient() {
 
           {/* Enrollment Card */}
           <div style={{ position: 'sticky', top: '1.5rem' }}>
-            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
               <p style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#F5C842', marginBottom: '0.1rem' }}>
                 ${feePerSession.toFixed(2)}
-                <span style={{ fontSize: '1rem', fontWeight: 400, color: '#6b88a8' }}>
+                <span style={{ fontSize: '1rem', fontWeight: 400, color: '#5a7a96' }}>
                   {isLumpSum ? ' full course' : ' / session'}
                 </span>
               </p>
@@ -491,19 +491,19 @@ export default function CoursePageClient() {
                   ✓ {enrolledSessions.size} session{enrolledSessions.size !== 1 ? 's' : ''} already paid
                 </p>
               )}
-              <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
+              <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '1.25rem' }}>
                 {isLive && hasSessions
                   ? enrolledSessions.size > 0 ? 'Select more sessions to add' : 'Select sessions above then enroll'
                   : 'One-time fee — lifetime access'}
               </p>
 
               <div style={{ marginBottom: '1.25rem' }}>
-                <p style={{ color: '#6b88a8', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.5rem' }}>
+                <p style={{ color: '#5a7a96', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.5rem' }}>
                   Accepted payments
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                   {['Visa', 'Mastercard', 'Amex', 'Discover', 'Apple Pay', 'Google Pay'].map((method) => (
-                    <span key={method} style={{ backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '5px', padding: '0.25rem 0.55rem', fontSize: '0.72rem', fontWeight: 600, color: '#a8c4e0' }}>
+                    <span key={method} style={{ backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '5px', padding: '0.25rem 0.55rem', fontSize: '0.72rem', fontWeight: 600, color: '#2d4a6b' }}>
                       {method}
                     </span>
                   ))}
@@ -511,7 +511,7 @@ export default function CoursePageClient() {
               </div>
 
               {error && (
-                <p style={{ color: '#f87171', backgroundColor: '#3d0f0f', padding: '0.75rem', borderRadius: '8px', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                <p style={{ color: '#f87171', backgroundColor: '#FEF2F2', padding: '0.75rem', borderRadius: '8px', fontSize: '0.8rem', marginBottom: '1rem' }}>
                   {error}
                 </p>
               )}
@@ -521,8 +521,8 @@ export default function CoursePageClient() {
                 disabled={enrolling || (isLive && !hasSessions) || (isLive && hasSessions && sessionCount === 0)}
                 style={{
                   width: '100%',
-                  backgroundColor: enrolling ? '#005040' : (isLive && (!hasSessions || sessionCount === 0)) ? '#1e3a5f' : '#00C2A8',
-                  color: (isLive && (!hasSessions || sessionCount === 0)) ? '#6b88a8' : '#0B1A2E',
+                  backgroundColor: enrolling ? '#005040' : (isLive && (!hasSessions || sessionCount === 0)) ? '#C5D5E4' : '#00C2A8',
+                  color: (isLive && (!hasSessions || sessionCount === 0)) ? '#5a7a96' : '#0B1A2E',
                   border: 'none',
                   padding: '0.875rem',
                   borderRadius: '10px',
@@ -547,15 +547,15 @@ export default function CoursePageClient() {
                             : 'Enroll Now →'}
               </button>
 
-              <p style={{ textAlign: 'center', color: '#6b88a8', fontSize: '0.75rem', marginBottom: '1rem' }}>
+              <p style={{ textAlign: 'center', color: '#5a7a96', fontSize: '0.75rem', marginBottom: '1rem' }}>
                 Secured by Stripe — your payment info is never stored on our servers
               </p>
 
-              <div style={{ borderTop: '1px solid #1e3a5f', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ borderTop: '1px solid #C5D5E4', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {['Live Google Meet sessions', 'Email reminders 20 min before class', 'Direct access to your instructor', 'Google Meet link sent on enrollment'].map((benefit) => (
                   <div key={benefit} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
                     <span style={{ color: '#00C2A8', fontWeight: 700, flexShrink: 0 }}>✓</span>
-                    <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>{benefit}</span>
+                    <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>{benefit}</span>
                   </div>
                 ))}
               </div>

@@ -34,9 +34,9 @@ const SUBJECTS = [
 const filterStyle: React.CSSProperties = {
   padding: '0.625rem 1rem',
   borderRadius: '8px',
-  backgroundColor: '#0f2240',
-  border: '1px solid #1e3a5f',
-  color: '#e8edf5',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid #C5D5E4',
+  color: '#0B1A2E',
   fontSize: '0.875rem',
   cursor: 'pointer',
 }
@@ -106,14 +106,14 @@ function CoursesContent() {
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem' }}>
       {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '2.25rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.5rem' }}>
+        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '2.25rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.5rem' }}>
           Browse Courses
         </h1>
-        <p style={{ color: '#6b88a8' }}>Discover science and mathematics courses for middle &amp; high school students</p>
+        <p style={{ color: '#5a7a96' }}>Discover science and mathematics courses for middle &amp; high school students</p>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '0', marginBottom: '2rem', borderBottom: '1px solid #1e3a5f' }}>
+      <div style={{ display: 'flex', gap: '0', marginBottom: '2rem', borderBottom: '1px solid #C5D5E4' }}>
         {[
           { value: 'LIVE', label: 'Live Classes', desc: 'Scheduled sessions with an instructor' },
           { value: 'SELF_PACED', label: 'Self-Paced', desc: 'Study at your own time' },
@@ -124,9 +124,9 @@ function CoursesContent() {
             style={{
               padding: '0.875rem 2rem',
               border: 'none',
-              borderBottom: activeTab === tab.value ? '3px solid #00C2A8' : '3px solid transparent',
+              borderBottom: activeTab === tab.value ? '3px solid #00A896' : '3px solid transparent',
               backgroundColor: 'transparent',
-              color: activeTab === tab.value ? '#00C2A8' : '#6b88a8',
+              color: activeTab === tab.value ? '#00A896' : '#5a7a96',
               cursor: 'pointer',
               fontWeight: activeTab === tab.value ? 700 : 500,
               fontSize: '0.9rem',
@@ -141,14 +141,14 @@ function CoursesContent() {
       {/* Instructor filter chips — only visible after login */}
       {isSignedIn && instructors.length > 0 && (
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <span style={{ color: '#6b88a8', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Instructor:</span>
+          <span style={{ color: '#5a7a96', fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>Instructor:</span>
           <button
             onClick={() => setInstructorFilter('')}
             style={{
               padding: '0.3rem 0.875rem', borderRadius: '999px', border: '1px solid',
-              borderColor: !instructorFilter ? '#00C2A8' : '#1e3a5f',
-              backgroundColor: !instructorFilter ? '#003d35' : 'transparent',
-              color: !instructorFilter ? '#00C2A8' : '#6b88a8',
+              borderColor: !instructorFilter ? '#00A896' : '#C5D5E4',
+              backgroundColor: !instructorFilter ? '#E0F7F4' : 'transparent',
+              color: !instructorFilter ? '#00A896' : '#5a7a96',
               cursor: 'pointer', fontSize: '0.8rem', fontWeight: !instructorFilter ? 700 : 400,
             }}
           >
@@ -160,9 +160,9 @@ function CoursesContent() {
               onClick={() => setInstructorFilter(instructorFilter === inst.name ? '' : inst.name)}
               style={{
                 padding: '0.3rem 0.875rem', borderRadius: '999px', border: '1px solid',
-                borderColor: instructorFilter === inst.name ? '#F5C842' : '#1e3a5f',
-                backgroundColor: instructorFilter === inst.name ? '#3d2a00' : 'transparent',
-                color: instructorFilter === inst.name ? '#F5C842' : '#a8c4e0',
+                borderColor: instructorFilter === inst.name ? '#b8860b' : '#C5D5E4',
+                backgroundColor: instructorFilter === inst.name ? '#FEF9C3' : 'transparent',
+                color: instructorFilter === inst.name ? '#92400e' : '#2d4a6b',
                 cursor: 'pointer', fontSize: '0.8rem', fontWeight: instructorFilter === inst.name ? 700 : 400,
               }}
             >
@@ -191,20 +191,20 @@ function CoursesContent() {
 
       {/* Results */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '4rem', color: '#6b88a8' }}>Loading courses...</div>
+        <div style={{ textAlign: 'center', padding: '4rem', color: '#5a7a96' }}>Loading courses...</div>
       ) : filtered.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '4rem', backgroundColor: '#0f2240', borderRadius: '12px', border: '1px solid #1e3a5f' }}>
+        <div style={{ textAlign: 'center', padding: '4rem', backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #C5D5E4' }}>
           <p style={{ fontSize: '2rem', marginBottom: '1rem' }}>🔭</p>
-          <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.5rem' }}>No courses found</p>
-          <p style={{ color: '#6b88a8' }}>
+          <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.5rem' }}>No courses found</p>
+          <p style={{ color: '#5a7a96' }}>
             {activeTab === 'LIVE' ? 'No live classes available yet.' : 'No self-paced courses available yet.'} Try adjusting your filters.
           </p>
         </div>
       ) : (
         <>
-          <p style={{ color: '#6b88a8', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+          <p style={{ color: '#5a7a96', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
             {filtered.length} course{filtered.length !== 1 ? 's' : ''} found
-            {instructorFilter && <span style={{ color: '#F5C842', fontWeight: 600 }}> · {instructorFilter}</span>}
+            {instructorFilter && <span style={{ color: '#b8860b', fontWeight: 600 }}> · {instructorFilter}</span>}
             {totalPages > 1 && <span style={{ marginLeft: '0.5rem' }}>· Page {page} of {totalPages}</span>}
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
@@ -218,7 +218,7 @@ function CoursesContent() {
               <button
                 onClick={() => { setPage((p) => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                 disabled={page === 1}
-                style={{ padding: '0.5rem 1.25rem', borderRadius: '8px', border: '1px solid #1e3a5f', backgroundColor: page === 1 ? '#060f1a' : '#0f2240', color: page === 1 ? '#3a5070' : '#a8c4e0', cursor: page === 1 ? 'default' : 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
+                style={{ padding: '0.5rem 1.25rem', borderRadius: '8px', border: '1px solid #C5D5E4', backgroundColor: page === 1 ? '#EEF3F8' : '#FFFFFF', color: page === 1 ? '#C5D5E4' : '#2d4a6b', cursor: page === 1 ? 'default' : 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
               >
                 ← Previous
               </button>
@@ -227,7 +227,7 @@ function CoursesContent() {
                 <button
                   key={p}
                   onClick={() => { setPage(p); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                  style={{ width: '36px', height: '36px', borderRadius: '8px', border: p === page ? '1px solid #00C2A8' : '1px solid #1e3a5f', backgroundColor: p === page ? '#003d35' : '#0f2240', color: p === page ? '#00C2A8' : '#6b88a8', cursor: 'pointer', fontWeight: p === page ? 700 : 400, fontSize: '0.875rem' }}
+                  style={{ width: '36px', height: '36px', borderRadius: '8px', border: p === page ? '1px solid #00A896' : '1px solid #C5D5E4', backgroundColor: p === page ? '#E0F7F4' : '#FFFFFF', color: p === page ? '#00A896' : '#5a7a96', cursor: 'pointer', fontWeight: p === page ? 700 : 400, fontSize: '0.875rem' }}
                 >
                   {p}
                 </button>
@@ -236,7 +236,7 @@ function CoursesContent() {
               <button
                 onClick={() => { setPage((p) => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                 disabled={page === totalPages}
-                style={{ padding: '0.5rem 1.25rem', borderRadius: '8px', border: '1px solid #1e3a5f', backgroundColor: page === totalPages ? '#060f1a' : '#0f2240', color: page === totalPages ? '#3a5070' : '#a8c4e0', cursor: page === totalPages ? 'default' : 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
+                style={{ padding: '0.5rem 1.25rem', borderRadius: '8px', border: '1px solid #C5D5E4', backgroundColor: page === totalPages ? '#EEF3F8' : '#FFFFFF', color: page === totalPages ? '#C5D5E4' : '#2d4a6b', cursor: page === totalPages ? 'default' : 'pointer', fontWeight: 600, fontSize: '0.875rem' }}
               >
                 Next →
               </button>
@@ -250,9 +250,9 @@ function CoursesContent() {
 
 export default function CoursesPage() {
   return (
-    <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#EEF3F8', minHeight: '100vh', color: '#0B1A2E' }}>
       <NavBar />
-      <Suspense fallback={<div style={{ textAlign: 'center', padding: '4rem', color: '#6b88a8' }}>Loading...</div>}>
+      <Suspense fallback={<div style={{ textAlign: 'center', padding: '4rem', color: '#5a7a96' }}>Loading...</div>}>
         <CoursesContent />
       </Suspense>
     </div>

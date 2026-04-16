@@ -7,15 +7,15 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.75rem 1rem',
   borderRadius: '8px',
-  backgroundColor: '#060f1a',
-  border: '1px solid #1e3a5f',
-  color: '#e8edf5',
+  backgroundColor: '#EEF3F8',
+  border: '1px solid #C5D5E4',
+  color: '#0B1A2E',
   fontSize: '0.9rem',
   boxSizing: 'border-box',
 }
 
 const labelStyle: React.CSSProperties = {
-  color: '#a8c4e0',
+  color: '#2d4a6b',
   fontSize: '0.85rem',
   fontWeight: 600,
   marginBottom: '0.375rem',
@@ -53,13 +53,13 @@ export default function ContactPage() {
   }
 
   return (
-    <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#EEF3F8', minHeight: '100vh' }}>
       <NavBar />
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '4rem 1.5rem' }}>
-        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.5rem' }}>
+        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.5rem' }}>
           Contact Us
         </h1>
-        <p style={{ color: '#6b88a8', marginBottom: '2.5rem', lineHeight: 1.6 }}>
+        <p style={{ color: '#5a7a96', marginBottom: '2.5rem', lineHeight: 1.6 }}>
           Have a question or need help? Send us a message and we&apos;ll get back to you as soon as possible.
         </p>
 
@@ -67,7 +67,7 @@ export default function ContactPage() {
           <div style={{ backgroundColor: '#003d35', border: '1px solid #00C2A8', borderRadius: '12px', padding: '2rem', textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>✅</div>
             <h2 style={{ color: '#00C2A8', fontFamily: 'Fraunces, serif', marginBottom: '0.5rem' }}>Message Sent!</h2>
-            <p style={{ color: '#a8c4e0' }}>Thank you for reaching out. We&apos;ll reply to your email shortly.</p>
+            <p style={{ color: '#2d4a6b' }}>Thank you for reaching out. We&apos;ll reply to your email shortly.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>

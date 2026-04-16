@@ -101,15 +101,15 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.75rem',
   borderRadius: '8px',
-  backgroundColor: '#060f1a',
-  border: '1px solid #1e3a5f',
-  color: '#e8edf5',
+  backgroundColor: '#EEF3F8',
+  border: '1px solid #C5D5E4',
+  color: '#0B1A2E',
   fontSize: '0.875rem',
   fontFamily: "'DM Sans', sans-serif",
 }
 
 const labelStyle: React.CSSProperties = {
-  color: '#a8c4e0',
+  color: '#2d4a6b',
   fontSize: '0.875rem',
   fontWeight: 600,
   display: 'block',
@@ -283,10 +283,10 @@ export default function NewCoursePage() {
   return (
     <DashboardLayout role="instructor">
       <div style={{ maxWidth: '680px' }}>
-        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.25rem' }}>
+        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.25rem' }}>
           Create New Course
         </h1>
-        <p style={{ color: '#6b88a8', fontSize: '0.9rem', marginBottom: '2rem' }}>
+        <p style={{ color: '#5a7a96', fontSize: '0.9rem', marginBottom: '2rem' }}>
           Your course will be submitted for admin review before going live.
         </p>
 
@@ -308,9 +308,9 @@ export default function NewCoursePage() {
                     flex: 1,
                     padding: '1rem',
                     borderRadius: '10px',
-                    border: courseType === opt.value ? '2px solid #00C2A8' : '1px solid #1e3a5f',
-                    backgroundColor: courseType === opt.value ? '#003d35' : '#060f1a',
-                    color: courseType === opt.value ? '#00C2A8' : '#6b88a8',
+                    border: courseType === opt.value ? '2px solid #00C2A8' : '1px solid #C5D5E4',
+                    backgroundColor: courseType === opt.value ? '#E0F7F4' : '#FFFFFF',
+                    color: courseType === opt.value ? '#00C2A8' : '#5a7a96',
                     cursor: 'pointer',
                     textAlign: 'left',
                   }}
@@ -364,8 +364,8 @@ export default function NewCoursePage() {
                 style={{
                   padding: '0.75rem 1.25rem',
                   borderRadius: '8px',
-                  backgroundColor: '#003d35',
-                  border: '1px solid #00C2A8',
+                  backgroundColor: '#E0F7F4',
+                  border: '1px solid #00A896',
                   color: '#00C2A8',
                   fontWeight: 700,
                   fontSize: '0.875rem',
@@ -383,11 +383,11 @@ export default function NewCoursePage() {
                     key={t}
                     style={{
                       backgroundColor: '#0a2240',
-                      border: '1px solid #1e3a5f',
+                      border: '1px solid #C5D5E4',
                       borderRadius: '6px',
                       padding: '0.3rem 0.65rem',
                       fontSize: '0.8rem',
-                      color: '#a8c4e0',
+                      color: '#2d4a6b',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.4rem',
@@ -397,7 +397,7 @@ export default function NewCoursePage() {
                     <button
                       type="button"
                       onClick={() => removeTopic(t)}
-                      style={{ background: 'none', border: 'none', color: '#6b88a8', cursor: 'pointer', padding: 0, fontSize: '0.9rem', lineHeight: 1 }}
+                      style={{ background: 'none', border: 'none', color: '#5a7a96', cursor: 'pointer', padding: 0, fontSize: '0.9rem', lineHeight: 1 }}
                     >
                       ×
                     </button>
@@ -405,7 +405,7 @@ export default function NewCoursePage() {
                 ))}
               </div>
             )}
-            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+            <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               Add each topic and press Enter or click + Add. Students will see this list before enrolling.
             </p>
           </div>
@@ -467,9 +467,9 @@ export default function NewCoursePage() {
                       style={{
                         padding: '0.5rem 1rem',
                         borderRadius: '8px',
-                        border: selectedDays.includes(day) ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                        backgroundColor: selectedDays.includes(day) ? '#003d35' : '#060f1a',
-                        color: selectedDays.includes(day) ? '#00C2A8' : '#6b88a8',
+                        border: selectedDays.includes(day) ? '1px solid #00C2A8' : '1px solid #C5D5E4',
+                        backgroundColor: selectedDays.includes(day) ? '#E0F7F4' : '#FFFFFF',
+                        color: selectedDays.includes(day) ? '#00C2A8' : '#5a7a96',
                         cursor: 'pointer',
                         fontSize: '0.8rem',
                         fontWeight: 500,
@@ -493,9 +493,9 @@ export default function NewCoursePage() {
                       style={{
                         padding: '0.4rem 1rem',
                         borderRadius: '6px',
-                        border: durationUnit === unit ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                        backgroundColor: durationUnit === unit ? '#003d35' : '#060f1a',
-                        color: durationUnit === unit ? '#00C2A8' : '#6b88a8',
+                        border: durationUnit === unit ? '1px solid #00C2A8' : '1px solid #C5D5E4',
+                        backgroundColor: durationUnit === unit ? '#E0F7F4' : '#FFFFFF',
+                        color: durationUnit === unit ? '#00C2A8' : '#5a7a96',
                         cursor: 'pointer',
                         fontSize: '0.8rem',
                         fontWeight: 600,
@@ -548,13 +548,13 @@ export default function NewCoursePage() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: '0.75rem',
-                                backgroundColor: '#060f1a',
-                                border: '1px solid #1e3a5f',
+                                backgroundColor: '#EEF3F8',
+                                border: '1px solid #C5D5E4',
                                 borderRadius: '8px',
                                 padding: '0.5rem 0.875rem',
                               }}
                             >
-                              <span style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, width: '90px', flexShrink: 0 }}>
+                              <span style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, width: '90px', flexShrink: 0 }}>
                                 {session.day}
                               </span>
                               <input
@@ -575,7 +575,7 @@ export default function NewCoursePage() {
                       </div>
                     ))}
                   </div>
-                  <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.5rem' }}>
+                  <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.5rem' }}>
                     Dates are auto-generated from today. You can adjust any date (e.g. to skip a holiday).
                   </p>
                 </div>
@@ -587,7 +587,7 @@ export default function NewCoursePage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                     <label style={{ ...labelStyle, marginBottom: 0 }}>Class Start Times</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#6b88a8', fontSize: '0.75rem' }}>Timezone:</span>
+                      <span style={{ color: '#5a7a96', fontSize: '0.75rem' }}>Timezone:</span>
                       <select
                         value={timezone}
                         onChange={(e) => setTimezone(e.target.value)}
@@ -606,18 +606,18 @@ export default function NewCoursePage() {
                         <div
                           key={day}
                           style={{
-                            backgroundColor: '#060f1a',
-                            border: '1px solid #1e3a5f',
+                            backgroundColor: '#EEF3F8',
+                            border: '1px solid #C5D5E4',
                             borderRadius: '8px',
                             padding: '0.75rem 0.875rem',
                           }}
                         >
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                            <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 600 }}>{day}</span>
+                            <span style={{ color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 600 }}>{day}</span>
                             <button
                               type="button"
                               onClick={() => addTimeSlot(day)}
-                              style={{ background: 'none', border: '1px solid #1e3a5f', color: '#00C2A8', borderRadius: '5px', padding: '0.2rem 0.5rem', fontSize: '0.75rem', cursor: 'pointer' }}
+                              style={{ background: 'none', border: '1px solid #C5D5E4', color: '#00C2A8', borderRadius: '5px', padding: '0.2rem 0.5rem', fontSize: '0.75rem', cursor: 'pointer' }}
                             >
                               + Add time
                             </button>
@@ -633,12 +633,12 @@ export default function NewCoursePage() {
                                     onChange={(e) => updateTimeSlot(day, idx, e.target.value)}
                                     style={{ ...inputStyle, padding: '0.4rem 0.625rem' }}
                                   />
-                                  {utcT && <span style={{ color: '#6b88a8', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>UTC {utcT}</span>}
+                                  {utcT && <span style={{ color: '#5a7a96', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>UTC {utcT}</span>}
                                   {times.length > 1 && (
                                     <button
                                       type="button"
                                       onClick={() => removeTimeSlot(day, idx)}
-                                      style={{ background: 'none', border: 'none', color: '#6b88a8', cursor: 'pointer', fontSize: '1rem', padding: '0 0.25rem' }}
+                                      style={{ background: 'none', border: 'none', color: '#5a7a96', cursor: 'pointer', fontSize: '1rem', padding: '0 0.25rem' }}
                                     >
                                       ×
                                     </button>
@@ -651,7 +651,7 @@ export default function NewCoursePage() {
                       )
                     })}
                   </div>
-                  <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                  <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
                     Set one or more start times per day. The same time applies to all weeks.
                   </p>
                 </div>
@@ -671,9 +671,9 @@ export default function NewCoursePage() {
                 />
               </div>
 
-              <div style={{ padding: '0.75rem 1rem', backgroundColor: '#0a2240', borderRadius: '8px', border: '1px solid #1e3a5f' }}>
+              <div style={{ padding: '0.75rem 1rem', backgroundColor: '#0a2240', borderRadius: '8px', border: '1px solid #C5D5E4' }}>
                 <p style={{ color: '#38bdf8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.25rem' }}>Google Meet link auto-generated</p>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem' }}>A Google Meet link will be automatically created and shared with students when your course is approved.</p>
+                <p style={{ color: '#5a7a96', fontSize: '0.75rem' }}>A Google Meet link will be automatically created and shared with students when your course is approved.</p>
               </div>
             </>
           )}
@@ -690,7 +690,7 @@ export default function NewCoursePage() {
                 placeholder="e.g. https://drive.google.com/... or https://youtube.com/..."
                 style={inputStyle}
               />
-              <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+              <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
                 Paste a link to your course content (Google Drive folder, YouTube playlist, etc.). Only enrolled students will see this link.
               </p>
             </div>
@@ -698,7 +698,7 @@ export default function NewCoursePage() {
 
           {/* Google Classroom URL */}
           <div>
-            <label style={labelStyle}>Google Classroom Link <span style={{ color: '#6b88a8', fontWeight: 400 }}>(optional)</span></label>
+            <label style={labelStyle}>Google Classroom Link <span style={{ color: '#5a7a96', fontWeight: 400 }}>(optional)</span></label>
             <input
               type="url"
               value={form.classroomUrl}
@@ -706,7 +706,7 @@ export default function NewCoursePage() {
               placeholder="https://classroom.google.com/c/..."
               style={inputStyle}
             />
-            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+            <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               If you use Google Classroom for materials and assignments, paste the invite link here. Students will receive it in their enrollment email.
             </p>
           </div>
@@ -727,9 +727,9 @@ export default function NewCoursePage() {
                     flex: 1,
                     padding: '0.625rem 0.75rem',
                     borderRadius: '8px',
-                    border: feeType === opt.value ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                    backgroundColor: feeType === opt.value ? '#003d35' : '#060f1a',
-                    color: feeType === opt.value ? '#00C2A8' : '#6b88a8',
+                    border: feeType === opt.value ? '1px solid #00C2A8' : '1px solid #C5D5E4',
+                    backgroundColor: feeType === opt.value ? '#E0F7F4' : '#FFFFFF',
+                    color: feeType === opt.value ? '#00C2A8' : '#5a7a96',
                     cursor: 'pointer',
                     textAlign: 'left',
                   }}
@@ -759,7 +759,7 @@ export default function NewCoursePage() {
                       You receive: <strong>${(parseFloat(form.feeUsd) * 0.8).toFixed(2)}</strong> (80%)
                       {feeType === 'PER_SESSION' ? ' per session' : ' of full course fee'}
                     </p>
-                    <p style={{ color: '#6b88a8', fontSize: '0.75rem' }}>
+                    <p style={{ color: '#5a7a96', fontSize: '0.75rem' }}>
                       Platform: ${(parseFloat(form.feeUsd) * 0.2).toFixed(2)} (20%)
                     </p>
                   </>
@@ -796,12 +796,12 @@ export default function NewCoursePage() {
               onClick={() => router.back()}
               style={{
                 backgroundColor: 'transparent',
-                color: '#6b88a8',
+                color: '#5a7a96',
                 padding: '0.875rem 1.5rem',
                 borderRadius: '10px',
                 fontWeight: 600,
                 fontSize: '1rem',
-                border: '1px solid #1e3a5f',
+                border: '1px solid #C5D5E4',
                 cursor: 'pointer',
               }}
             >

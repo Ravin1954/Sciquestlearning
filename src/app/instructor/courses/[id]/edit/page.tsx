@@ -111,15 +111,15 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.75rem',
   borderRadius: '8px',
-  backgroundColor: '#060f1a',
-  border: '1px solid #1e3a5f',
-  color: '#e8edf5',
+  backgroundColor: '#EEF3F8',
+  border: '1px solid #C5D5E4',
+  color: '#0B1A2E',
   fontSize: '0.875rem',
   fontFamily: "'DM Sans', sans-serif",
 }
 
 const labelStyle: React.CSSProperties = {
-  color: '#a8c4e0',
+  color: '#2d4a6b',
   fontSize: '0.875rem',
   fontWeight: 600,
   display: 'block',
@@ -309,7 +309,7 @@ export default function EditCoursePage() {
   if (fetching) {
     return (
       <DashboardLayout role="instructor">
-        <p style={{ color: '#6b88a8' }}>Loading...</p>
+        <p style={{ color: '#5a7a96' }}>Loading...</p>
       </DashboardLayout>
     )
   }
@@ -317,10 +317,10 @@ export default function EditCoursePage() {
   return (
     <DashboardLayout role="instructor">
       <div style={{ maxWidth: '680px' }}>
-        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.25rem' }}>
+        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.25rem' }}>
           Edit Course
         </h1>
-        <p style={{ color: '#6b88a8', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+        <p style={{ color: '#5a7a96', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
           {courseStatus === 'APPROVED'
             ? 'Editing an approved course will send it back for admin review.'
             : 'Make your changes and resubmit for admin review.'}
@@ -351,9 +351,9 @@ export default function EditCoursePage() {
                     flex: 1,
                     padding: '1rem',
                     borderRadius: '10px',
-                    border: courseType === opt.value ? '2px solid #00C2A8' : '1px solid #1e3a5f',
-                    backgroundColor: courseType === opt.value ? '#003d35' : '#060f1a',
-                    color: courseType === opt.value ? '#00C2A8' : '#6b88a8',
+                    border: courseType === opt.value ? '2px solid #00C2A8' : '1px solid #C5D5E4',
+                    backgroundColor: courseType === opt.value ? '#E0F7F4' : '#FFFFFF',
+                    color: courseType === opt.value ? '#00C2A8' : '#5a7a96',
                     cursor: 'pointer',
                     textAlign: 'left',
                   }}
@@ -388,16 +388,16 @@ export default function EditCoursePage() {
                 placeholder="e.g. Cell Division, Genetics..."
                 style={{ ...inputStyle, flex: 1 }}
               />
-              <button type="button" onClick={addTopic} style={{ padding: '0.75rem 1.25rem', borderRadius: '8px', backgroundColor: '#003d35', border: '1px solid #00C2A8', color: '#00C2A8', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              <button type="button" onClick={addTopic} style={{ padding: '0.75rem 1.25rem', borderRadius: '8px', backgroundColor: '#E0F7F4', border: '1px solid #00A896', color: '#00A896', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                 + Add
               </button>
             </div>
             {topics.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                 {topics.map((t) => (
-                  <span key={t} style={{ backgroundColor: '#0a2240', border: '1px solid #1e3a5f', borderRadius: '6px', padding: '0.3rem 0.65rem', fontSize: '0.8rem', color: '#a8c4e0', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span key={t} style={{ backgroundColor: '#0a2240', border: '1px solid #C5D5E4', borderRadius: '6px', padding: '0.3rem 0.65rem', fontSize: '0.8rem', color: '#2d4a6b', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     {t}
-                    <button type="button" onClick={() => removeTopic(t)} style={{ background: 'none', border: 'none', color: '#6b88a8', cursor: 'pointer', padding: 0, fontSize: '0.9rem', lineHeight: 1 }}>×</button>
+                    <button type="button" onClick={() => removeTopic(t)} style={{ background: 'none', border: 'none', color: '#5a7a96', cursor: 'pointer', padding: 0, fontSize: '0.9rem', lineHeight: 1 }}>×</button>
                   </span>
                 ))}
               </div>
@@ -432,9 +432,9 @@ export default function EditCoursePage() {
                   style={{
                     padding: '0.4rem 1rem',
                     borderRadius: '6px',
-                    border: durationUnit === unit ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                    backgroundColor: durationUnit === unit ? '#003d35' : '#060f1a',
-                    color: durationUnit === unit ? '#00C2A8' : '#6b88a8',
+                    border: durationUnit === unit ? '1px solid #00C2A8' : '1px solid #C5D5E4',
+                    backgroundColor: durationUnit === unit ? '#E0F7F4' : '#FFFFFF',
+                    color: durationUnit === unit ? '#00C2A8' : '#5a7a96',
                     cursor: 'pointer',
                     fontSize: '0.8rem',
                     fontWeight: 600,
@@ -445,7 +445,7 @@ export default function EditCoursePage() {
               ))}
             </div>
             <input required type="number" min="1" max={durationUnit === 'WEEKS' ? 52 : 365} value={form.durationWeeks} onChange={set('durationWeeks')} placeholder={durationUnit === 'WEEKS' ? 'e.g. 8' : 'e.g. 1'} style={inputStyle} />
-            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+            <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               {durationUnit === 'DAYS' && parseInt(form.durationWeeks) === 1 ? 'Single-day course' : `Number of ${durationUnit.toLowerCase()} the course runs`}
             </p>
           </div>}
@@ -460,7 +460,7 @@ export default function EditCoursePage() {
               onChange={set('startDate')}
               style={{ ...inputStyle, colorScheme: 'dark' }}
             />
-            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+            <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               The date the first session takes place.
             </p>
           </div>}
@@ -479,7 +479,7 @@ export default function EditCoursePage() {
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {DAYS.map((day) => (
-                    <button key={day} type="button" onClick={() => toggleDay(day)} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: selectedDays.includes(day) ? '1px solid #00C2A8' : '1px solid #1e3a5f', backgroundColor: selectedDays.includes(day) ? '#003d35' : '#060f1a', color: selectedDays.includes(day) ? '#00C2A8' : '#6b88a8', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500 }}>
+                    <button key={day} type="button" onClick={() => toggleDay(day)} style={{ padding: '0.5rem 1rem', borderRadius: '8px', border: selectedDays.includes(day) ? '1px solid #00C2A8' : '1px solid #C5D5E4', backgroundColor: selectedDays.includes(day) ? '#E0F7F4' : '#FFFFFF', color: selectedDays.includes(day) ? '#00C2A8' : '#5a7a96', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 500 }}>
                       {day}
                     </button>
                   ))}
@@ -491,7 +491,7 @@ export default function EditCoursePage() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                     <label style={{ ...labelStyle, marginBottom: 0 }}>Class Start Times</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ color: '#6b88a8', fontSize: '0.75rem' }}>Timezone:</span>
+                      <span style={{ color: '#5a7a96', fontSize: '0.75rem' }}>Timezone:</span>
                       <select value={timezone} onChange={(e) => setTimezone(e.target.value)} style={{ ...inputStyle, width: 'auto', padding: '0.375rem 0.625rem', fontSize: '0.8rem' }}>
                         {TIMEZONES.map((tz) => <option key={tz} value={tz}>{tz}</option>)}
                       </select>
@@ -501,10 +501,10 @@ export default function EditCoursePage() {
                     {DAYS.filter((d) => selectedDays.includes(d)).map((day) => {
                       const times = dayTimes[day] || ['']
                       return (
-                        <div key={day} style={{ backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.75rem 0.875rem' }}>
+                        <div key={day} style={{ backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '8px', padding: '0.75rem 0.875rem' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                            <span style={{ color: '#e8edf5', fontSize: '0.875rem', fontWeight: 600 }}>{day}</span>
-                            <button type="button" onClick={() => addTimeSlot(day)} style={{ background: 'none', border: '1px solid #1e3a5f', color: '#00C2A8', borderRadius: '5px', padding: '0.2rem 0.5rem', fontSize: '0.75rem', cursor: 'pointer' }}>
+                            <span style={{ color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 600 }}>{day}</span>
+                            <button type="button" onClick={() => addTimeSlot(day)} style={{ background: 'none', border: '1px solid #C5D5E4', color: '#00C2A8', borderRadius: '5px', padding: '0.2rem 0.5rem', fontSize: '0.75rem', cursor: 'pointer' }}>
                               + Add time
                             </button>
                           </div>
@@ -513,7 +513,7 @@ export default function EditCoursePage() {
                               <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.5rem', alignItems: 'center' }}>
                                 <input type="time" value={t} onChange={(e) => updateTimeSlot(day, idx, e.target.value)} style={{ ...inputStyle, padding: '0.4rem 0.625rem' }} />
                                 {times.length > 1 && (
-                                  <button type="button" onClick={() => removeTimeSlot(day, idx)} style={{ background: 'none', border: 'none', color: '#6b88a8', cursor: 'pointer', fontSize: '1rem', padding: '0 0.25rem' }}>×</button>
+                                  <button type="button" onClick={() => removeTimeSlot(day, idx)} style={{ background: 'none', border: 'none', color: '#5a7a96', cursor: 'pointer', fontSize: '1rem', padding: '0 0.25rem' }}>×</button>
                                 )}
                               </div>
                             ))}
@@ -522,7 +522,7 @@ export default function EditCoursePage() {
                       )
                     })}
                   </div>
-                  <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                  <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
                     Use &quot;+ Add time&quot; to add multiple sessions on the same day.
                   </p>
                 </div>
@@ -545,7 +545,7 @@ export default function EditCoursePage() {
 
           {/* Google Classroom URL */}
           <div>
-            <label style={labelStyle}>Google Classroom Link <span style={{ color: '#6b88a8', fontWeight: 400 }}>(optional)</span></label>
+            <label style={labelStyle}>Google Classroom Link <span style={{ color: '#5a7a96', fontWeight: 400 }}>(optional)</span></label>
             <input
               type="url"
               value={form.classroomUrl}
@@ -553,7 +553,7 @@ export default function EditCoursePage() {
               placeholder="https://classroom.google.com/c/..."
               style={inputStyle}
             />
-            <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+            <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               Students will receive this link in their enrollment email.
             </p>
           </div>
@@ -574,9 +574,9 @@ export default function EditCoursePage() {
                     flex: 1,
                     padding: '0.625rem 0.75rem',
                     borderRadius: '8px',
-                    border: feeType === opt.value ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                    backgroundColor: feeType === opt.value ? '#003d35' : '#060f1a',
-                    color: feeType === opt.value ? '#00C2A8' : '#6b88a8',
+                    border: feeType === opt.value ? '1px solid #00C2A8' : '1px solid #C5D5E4',
+                    backgroundColor: feeType === opt.value ? '#E0F7F4' : '#FFFFFF',
+                    color: feeType === opt.value ? '#00C2A8' : '#5a7a96',
                     cursor: 'pointer',
                     textAlign: 'left',
                   }}
@@ -590,7 +590,7 @@ export default function EditCoursePage() {
             {form.feeUsd && parseFloat(form.feeUsd) > 0 && (
               <div style={{ marginTop: '0.5rem', display: 'flex', gap: '1.5rem' }}>
                 <p style={{ color: '#00C2A8', fontSize: '0.75rem' }}>You receive: <strong>${(parseFloat(form.feeUsd) * 0.8).toFixed(2)}</strong> (80%){feeType === 'PER_SESSION' ? ' per session' : ' of full course fee'}</p>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem' }}>Platform: ${(parseFloat(form.feeUsd) * 0.2).toFixed(2)} (20%)</p>
+                <p style={{ color: '#5a7a96', fontSize: '0.75rem' }}>Platform: ${(parseFloat(form.feeUsd) * 0.2).toFixed(2)} (20%)</p>
               </div>
             )}
           </div>
@@ -610,7 +610,7 @@ export default function EditCoursePage() {
             <button
               type="button"
               onClick={() => router.push('/instructor')}
-              style={{ backgroundColor: 'transparent', color: '#6b88a8', padding: '0.875rem 1.5rem', borderRadius: '10px', fontWeight: 600, fontSize: '1rem', border: '1px solid #1e3a5f', cursor: 'pointer' }}
+              style={{ backgroundColor: 'transparent', color: '#5a7a96', padding: '0.875rem 1.5rem', borderRadius: '10px', fontWeight: 600, fontSize: '1rem', border: '1px solid #C5D5E4', cursor: 'pointer' }}
             >
               Cancel
             </button>

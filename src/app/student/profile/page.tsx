@@ -27,8 +27,8 @@ const TIMEZONES = [
 
 const inp: React.CSSProperties = {
   width: '100%', padding: '0.625rem 0.875rem', borderRadius: '8px',
-  backgroundColor: '#060f1a', border: '1px solid #1e3a5f',
-  color: '#e8edf5', fontSize: '0.875rem', boxSizing: 'border-box',
+  backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4',
+  color: '#0B1A2E', fontSize: '0.875rem', boxSizing: 'border-box',
 }
 
 interface Profile {
@@ -96,49 +96,49 @@ export default function StudentProfilePage() {
   return (
     <DashboardLayout role="student">
       <div style={{ maxWidth: '680px' }}>
-        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.25rem' }}>
+        <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.25rem' }}>
           My Profile
         </h1>
-        <p style={{ color: '#6b88a8', fontSize: '0.9rem', marginBottom: '2rem' }}>
+        <p style={{ color: '#5a7a96', fontSize: '0.9rem', marginBottom: '2rem' }}>
           Your registration details on SciQuest Learning.
         </p>
 
         {!profile ? (
-          <p style={{ color: '#6b88a8' }}>Loading...</p>
+          <p style={{ color: '#5a7a96' }}>Loading...</p>
         ) : (
           <>
             {/* Account info */}
-            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-              <p style={{ color: '#6b88a8', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '1rem' }}>Account Info</p>
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <p style={{ color: '#5a7a96', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '1rem' }}>Account Info</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
-                  <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>First Name</p>
-                  <p style={{ color: '#e8edf5', fontWeight: 600 }}>{profile.firstName || '—'}</p>
+                  <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>First Name</p>
+                  <p style={{ color: '#0B1A2E', fontWeight: 600 }}>{profile.firstName || '—'}</p>
                 </div>
                 <div>
-                  <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Last Name</p>
-                  <p style={{ color: '#e8edf5', fontWeight: 600 }}>{profile.lastName || '—'}</p>
+                  <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Last Name</p>
+                  <p style={{ color: '#0B1A2E', fontWeight: 600 }}>{profile.lastName || '—'}</p>
                 </div>
                 <div style={{ gridColumn: '1 / -1' }}>
-                  <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Email</p>
-                  <p style={{ color: '#e8edf5' }}>{profile.email || '—'}</p>
+                  <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Email</p>
+                  <p style={{ color: '#0B1A2E' }}>{profile.email || '—'}</p>
                 </div>
                 {profile.createdAt && (
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Registered On</p>
-                    <p style={{ color: '#a8c4e0' }}>{new Date(profile.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>Registered On</p>
+                    <p style={{ color: '#2d4a6b' }}>{new Date(profile.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
                 )}
               </div>
-              <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.75rem' }}>
+              <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.75rem' }}>
                 To change your name or email, click the Account button in the sidebar.
               </p>
             </div>
 
             {/* Subjects of interest */}
             {profile.subjects && profile.subjects.length > 0 && (
-              <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.75rem' }}>Subjects of Interest</p>
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+                <p style={{ color: '#5a7a96', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.75rem' }}>Subjects of Interest</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                   {profile.subjects.map((s) => (
                     <span key={s} style={{ backgroundColor: '#003d35', color: '#00C2A8', padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 600 }}>
@@ -150,9 +150,9 @@ export default function StudentProfilePage() {
             )}
 
             {/* Editable personal info */}
-            <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
+            <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
+                <p style={{ color: '#5a7a96', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>
                   Personal Details
                 </p>
                 {!editing && (
@@ -175,11 +175,11 @@ export default function StudentProfilePage() {
                 <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
-                      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Age</p>
+                      <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Age</p>
                       <input type="number" min="10" max="20" value={form.age} onChange={(e) => setForm((f) => ({ ...f, age: e.target.value }))} placeholder="e.g. 14" style={inp} />
                     </div>
                     <div>
-                      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Gender</p>
+                      <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Gender</p>
                       <select value={form.gender} onChange={(e) => setForm((f) => ({ ...f, gender: e.target.value }))} style={inp}>
                         <option value="">Select gender</option>
                         <option value="Male">Male</option>
@@ -189,23 +189,23 @@ export default function StudentProfilePage() {
                       </select>
                     </div>
                     <div>
-                      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Father's Name</p>
+                      <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Father's Name</p>
                       <input value={form.fathersName} onChange={(e) => setForm((f) => ({ ...f, fathersName: e.target.value }))} placeholder="e.g. Robert Johnson" style={inp} />
                     </div>
                     <div>
-                      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Mother's Name</p>
+                      <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Mother's Name</p>
                       <input value={form.mothersName} onChange={(e) => setForm((f) => ({ ...f, mothersName: e.target.value }))} placeholder="e.g. Linda Johnson" style={inp} />
                     </div>
                   </div>
                   <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Country</p>
+                    <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Country</p>
                     <select value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} style={inp}>
                       <option value="">Select country</option>
                       {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
                     </select>
                   </div>
                   <div>
-                    <p style={{ color: '#a8c4e0', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Timezone</p>
+                    <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Timezone</p>
                     <select value={form.timezone} onChange={(e) => setForm((f) => ({ ...f, timezone: e.target.value }))} style={inp}>
                       {TIMEZONES.map((tz) => <option key={tz} value={tz}>{tz}</option>)}
                     </select>
@@ -215,7 +215,7 @@ export default function StudentProfilePage() {
                     <button type="submit" disabled={saving} style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', border: 'none', padding: '0.625rem 1.5rem', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem', opacity: saving ? 0.7 : 1 }}>
                       {saving ? 'Saving...' : 'Save Changes'}
                     </button>
-                    <button type="button" onClick={() => { setEditing(false); setError('') }} style={{ backgroundColor: 'transparent', color: '#6b88a8', border: '1px solid #1e3a5f', padding: '0.625rem 1rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>
+                    <button type="button" onClick={() => { setEditing(false); setError('') }} style={{ backgroundColor: 'transparent', color: '#5a7a96', border: '1px solid #C5D5E4', padding: '0.625rem 1rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '0.875rem' }}>
                       Cancel
                     </button>
                   </div>
@@ -231,8 +231,8 @@ export default function StudentProfilePage() {
                     { label: 'Timezone', value: profile.timezone },
                   ].map(({ label, value }) => (
                     <div key={label}>
-                      <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginBottom: '0.25rem' }}>{label}</p>
-                      <p style={{ color: value ? '#e8edf5' : '#3a5070', fontStyle: value ? 'normal' : 'italic', fontSize: '0.875rem' }}>
+                      <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>{label}</p>
+                      <p style={{ color: value ? '#0B1A2E' : '#3a5070', fontStyle: value ? 'normal' : 'italic', fontSize: '0.875rem' }}>
                         {value || 'Not provided'}
                       </p>
                     </div>

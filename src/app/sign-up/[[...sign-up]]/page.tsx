@@ -5,7 +5,7 @@ export default function SignUpPage() {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#0B1A2E',
+        backgroundColor: '#EEF3F8',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -18,7 +18,7 @@ export default function SignUpPage() {
           <span style={{ color: '#00C2A8' }}>SciQuest</span>
           <span style={{ color: '#F5C842' }}> Learning</span>
         </h1>
-        <p style={{ color: '#6b88a8', marginTop: '0.5rem' }}>Create your account to get started</p>
+        <p style={{ color: '#5a7a96', marginTop: '0.5rem' }}>Create your account to get started</p>
       </div>
       <SignUp />
     </div>

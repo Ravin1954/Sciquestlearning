@@ -3,13 +3,13 @@ import NavBar from '@/components/NavBar'
 
 export default function CheckoutSuccessPage() {
   return (
-    <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#EEF3F8', minHeight: '100vh' }}>
       <NavBar />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 64px)', padding: '2rem' }}>
         <div
           style={{
-            backgroundColor: '#0f2240',
-            border: '1px solid #1e3a5f',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #C5D5E4',
             borderRadius: '16px',
             padding: '3rem 2.5rem',
             maxWidth: '520px',
@@ -38,18 +38,18 @@ export default function CheckoutSuccessPage() {
               fontFamily: 'Fraunces, serif',
               fontSize: '1.875rem',
               fontWeight: 700,
-              color: '#e8edf5',
+              color: '#0B1A2E',
               marginBottom: '0.75rem',
             }}
           >
             You're Enrolled!
           </h1>
 
-          <p style={{ color: '#6b88a8', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+          <p style={{ color: '#5a7a96', lineHeight: 1.7, marginBottom: '0.75rem' }}>
             Your payment was successful. Check your email for your Zoom meeting link and class schedule.
           </p>
 
-          <p style={{ color: '#6b88a8', lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.875rem' }}>
+          <p style={{ color: '#5a7a96', lineHeight: 1.7, marginBottom: '2rem', fontSize: '0.875rem' }}>
             You'll receive a reminder email 20 minutes before each class session.
           </p>
 
@@ -72,12 +72,12 @@ export default function CheckoutSuccessPage() {
               href="/courses"
               style={{
                 backgroundColor: 'transparent',
-                color: '#a8c4e0',
+                color: '#2d4a6b',
                 padding: '0.75rem 1.5rem',
                 borderRadius: '10px',
                 fontWeight: 600,
                 textDecoration: 'none',
-                border: '1px solid #1e3a5f',
+                border: '1px solid #C5D5E4',
                 fontSize: '0.9rem',
               }}
             >

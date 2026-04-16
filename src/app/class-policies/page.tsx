@@ -15,7 +15,7 @@ const tocItems = [
 
 export default function ClassPoliciesPage() {
   return (
-    <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
+    <div style={{ backgroundColor: '#EEF3F8', minHeight: '100vh' }}>
       <NavBar />
       <div style={{ maxWidth: '860px', margin: '0 auto', padding: '3rem 1.5rem' }}>
 
@@ -24,17 +24,17 @@ export default function ClassPoliciesPage() {
           <span style={{ backgroundColor: '#00C2A822', color: '#00C2A8', padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Instructor Resources
           </span>
-          <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '2.25rem', fontWeight: 700, color: '#e8edf5', margin: '1rem 0 0.5rem' }}>
+          <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '2.25rem', fontWeight: 700, color: '#0B1A2E', margin: '1rem 0 0.5rem' }}>
             Class Policies
           </h1>
-          <p style={{ color: '#6b88a8', fontSize: '0.95rem' }}>
+          <p style={{ color: '#5a7a96', fontSize: '0.95rem' }}>
             Listing requirements that all instructors must follow before submitting a course for approval.
           </p>
         </div>
 
         {/* Table of Contents */}
-        <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', marginBottom: '2.5rem' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1rem', marginBottom: '1rem' }}>Table of Contents</h2>
+        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '2.5rem' }}>
+          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1rem', marginBottom: '1rem' }}>Table of Contents</h2>
           <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             {tocItems.map((item) => (
               <li key={item.id}>
@@ -51,17 +51,17 @@ export default function ClassPoliciesPage() {
 
         {/* Section 1 */}
         <section id="introduction" style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #1e3a5f' }}>
+          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #C5D5E4' }}>
             1. Introduction to Class Listings on SciQuest Learning
           </h2>
-          <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
-            <p style={{ color: '#a8c4e0', lineHeight: 1.8, marginBottom: '1rem' }}>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
+            <p style={{ color: '#2d4a6b', lineHeight: 1.8, marginBottom: '1rem' }}>
               SciQuest Learning is a curated platform connecting qualified science and mathematics instructors with middle and high school students seeking live, instructor-led online classes. Our mission is to provide students and families with clear, accurate, and trustworthy course information so they can make informed enrollment decisions.
             </p>
-            <p style={{ color: '#a8c4e0', lineHeight: 1.8, marginBottom: '1rem' }}>
+            <p style={{ color: '#2d4a6b', lineHeight: 1.8, marginBottom: '1rem' }}>
               All instructors are required to create course listings that are honest, complete, and aligned with SciQuest Learning&apos;s academic standards. A well-written listing builds trust with families, increases enrollment, and sets clear expectations for students before they join your class.
             </p>
-            <p style={{ color: '#a8c4e0', lineHeight: 1.8 }}>
+            <p style={{ color: '#2d4a6b', lineHeight: 1.8 }}>
               Every course listing submitted to SciQuest Learning is reviewed by our admin team before it is published. Listings that do not meet our requirements will be rejected with specific feedback, and instructors will be asked to revise and resubmit.
             </p>
           </div>
@@ -69,19 +69,19 @@ export default function ClassPoliciesPage() {
 
         {/* Section 2 */}
         <section id="basic-elements" style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #1e3a5f' }}>
+          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #C5D5E4' }}>
             2. Basic Elements of Class Listings
           </h2>
-          <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
-            <p style={{ color: '#a8c4e0', lineHeight: 1.8, marginBottom: '1.25rem' }}>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
+            <p style={{ color: '#2d4a6b', lineHeight: 1.8, marginBottom: '1.25rem' }}>
               Every course listing must include the following elements:
             </p>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
                 <thead>
                   <tr style={{ backgroundColor: '#0a1e3a' }}>
-                    <th style={{ color: '#e8edf5', padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #1e3a5f', fontWeight: 700, width: '30%' }}>Element</th>
-                    <th style={{ color: '#e8edf5', padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #1e3a5f', fontWeight: 700 }}>Requirement</th>
+                    <th style={{ color: '#0B1A2E', padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #C5D5E4', fontWeight: 700, width: '30%' }}>Element</th>
+                    <th style={{ color: '#0B1A2E', padding: '0.75rem 1rem', textAlign: 'left', borderBottom: '1px solid #C5D5E4', fontWeight: 700 }}>Requirement</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -97,8 +97,8 @@ export default function ClassPoliciesPage() {
                     { element: 'Topics Covered', req: 'List at least 5 specific topics that will be taught in the course.' },
                   ].map((row, i) => (
                     <tr key={row.element} style={{ backgroundColor: i % 2 === 0 ? 'transparent' : '#0a1e3a' }}>
-                      <td style={{ color: '#F5C842', padding: '0.75rem 1rem', borderBottom: '1px solid #1e3a5f', fontWeight: 600, verticalAlign: 'top' }}>{row.element}</td>
-                      <td style={{ color: '#a8c4e0', padding: '0.75rem 1rem', borderBottom: '1px solid #1e3a5f', lineHeight: 1.6 }}>{row.req}</td>
+                      <td style={{ color: '#F5C842', padding: '0.75rem 1rem', borderBottom: '1px solid #C5D5E4', fontWeight: 600, verticalAlign: 'top' }}>{row.element}</td>
+                      <td style={{ color: '#2d4a6b', padding: '0.75rem 1rem', borderBottom: '1px solid #C5D5E4', lineHeight: 1.6 }}>{row.req}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -109,11 +109,11 @@ export default function ClassPoliciesPage() {
 
         {/* Section 3 */}
         <section id="course-description" style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #1e3a5f' }}>
+          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #C5D5E4' }}>
             3. Basic Elements of Course Description
           </h2>
-          <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <p style={{ color: '#a8c4e0', lineHeight: 1.8 }}>
+          <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <p style={{ color: '#2d4a6b', lineHeight: 1.8 }}>
               The course description is the most important part of your listing. It is what students and parents read to decide whether to enroll. Your description must be:
             </p>
 
@@ -124,15 +124,15 @@ export default function ClassPoliciesPage() {
             ].map((item) => (
               <div key={item.label} style={{ display: 'flex', gap: '0.75rem' }}>
                 <span style={{ color: '#00C2A8', fontWeight: 700, flexShrink: 0, marginTop: '0.1rem' }}>✓</span>
-                <p style={{ color: '#a8c4e0', lineHeight: 1.7, margin: 0 }}>
-                  <span style={{ color: '#e8edf5', fontWeight: 600 }}>{item.label} — </span>{item.text}
+                <p style={{ color: '#2d4a6b', lineHeight: 1.7, margin: 0 }}>
+                  <span style={{ color: '#0B1A2E', fontWeight: 600 }}>{item.label} — </span>{item.text}
                 </p>
               </div>
             ))}
 
             <div>
-              <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.5rem' }}>Structured — A good course description should cover:</p>
-              <ul style={{ color: '#a8c4e0', lineHeight: 1.8, paddingLeft: '1.25rem', margin: 0 }}>
+              <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.5rem' }}>Structured — A good course description should cover:</p>
+              <ul style={{ color: '#2d4a6b', lineHeight: 1.8, paddingLeft: '1.25rem', margin: 0 }}>
                 <li>What the course is about and what topics it covers</li>
                 <li>Who the course is designed for (grade level, prior knowledge expected)</li>
                 <li>What students will be able to do or understand by the end of the course</li>
@@ -140,8 +140,8 @@ export default function ClassPoliciesPage() {
               </ul>
             </div>
 
-            <p style={{ color: '#a8c4e0', lineHeight: 1.8 }}>
-              <span style={{ color: '#e8edf5', fontWeight: 600 }}>Minimum length: </span>100 words. Descriptions shorter than 100 words will not be approved.
+            <p style={{ color: '#2d4a6b', lineHeight: 1.8 }}>
+              <span style={{ color: '#0B1A2E', fontWeight: 600 }}>Minimum length: </span>100 words. Descriptions shorter than 100 words will not be approved.
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -159,7 +159,7 @@ export default function ClassPoliciesPage() {
 
         {/* Section 4 */}
         <section id="special-considerations" style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #1e3a5f' }}>
+          <h2 style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid #C5D5E4' }}>
             4. Special Considerations
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -190,32 +190,32 @@ export default function ClassPoliciesPage() {
                 body: 'If your course listing is rejected, you will receive specific remarks explaining what needs to be changed. You may edit your listing and resubmit it for review. Repeated submissions that do not address the stated feedback may result in a temporary suspension of your instructor account.',
               },
             ].map((item) => (
-              <div key={item.title} style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.25rem' }}>
-                <h3 style={{ color: '#e8edf5', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.5rem' }}>{item.title}</h3>
-                <p style={{ color: '#a8c4e0', lineHeight: 1.8, margin: 0, fontSize: '0.9rem' }}>{item.body}</p>
+              <div key={item.title} style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.25rem' }}>
+                <h3 style={{ color: '#0B1A2E', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.5rem' }}>{item.title}</h3>
+                <p style={{ color: '#2d4a6b', lineHeight: 1.8, margin: 0, fontSize: '0.9rem' }}>{item.body}</p>
               </div>
             ))}
 
             {/* COPPA Section */}
-            <div style={{ backgroundColor: '#0f2240', border: '2px solid #F5C842', borderRadius: '12px', padding: '1.25rem' }}>
+            <div style={{ backgroundColor: '#FFFFFF', border: '2px solid #F5C842', borderRadius: '12px', padding: '1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                 <span style={{ fontSize: '1rem' }}>⚠️</span>
                 <h3 style={{ color: '#F5C842', fontWeight: 700, fontSize: '0.95rem', margin: 0 }}>COPPA Compliance (Children Under 13)</h3>
               </div>
-              <p style={{ color: '#a8c4e0', lineHeight: 1.8, marginBottom: '1rem', fontSize: '0.9rem' }}>
+              <p style={{ color: '#2d4a6b', lineHeight: 1.8, marginBottom: '1rem', fontSize: '0.9rem' }}>
                 The Children&apos;s Online Privacy Protection Act (COPPA) applies to online services directed at children under the age of 13. If your course is intended for or may attract students under 13, you must:
               </p>
-              <ul style={{ color: '#a8c4e0', lineHeight: 1.8, paddingLeft: '1.25rem', margin: '0 0 1rem 0', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <li><span style={{ color: '#e8edf5', fontWeight: 600 }}>Clearly indicate the minimum age</span> in your course listing. If your course is suitable for students under 13, state this explicitly in the description.</li>
-                <li><span style={{ color: '#e8edf5', fontWeight: 600 }}>Not collect any personal information</span> from students under 13 directly. Do not ask students to share their name, email, location, photos, or any other personal details during class sessions or through any external means.</li>
-                <li><span style={{ color: '#e8edf5', fontWeight: 600 }}>Direct all communication to parents or guardians.</span> For students under 13, correspondence regarding enrollment, schedules, and course matters should be addressed to the parent or guardian, not the student.</li>
-                <li><span style={{ color: '#e8edf5', fontWeight: 600 }}>Obtain verifiable parental consent</span> before engaging with students under 13. SciQuest Learning requires that parents or guardians complete enrollment on behalf of children under 13.</li>
-                <li><span style={{ color: '#e8edf5', fontWeight: 600 }}>Not record sessions</span> without explicit written consent from the parent or guardian of every student under 13 in the session.</li>
+              <ul style={{ color: '#2d4a6b', lineHeight: 1.8, paddingLeft: '1.25rem', margin: '0 0 1rem 0', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <li><span style={{ color: '#0B1A2E', fontWeight: 600 }}>Clearly indicate the minimum age</span> in your course listing. If your course is suitable for students under 13, state this explicitly in the description.</li>
+                <li><span style={{ color: '#0B1A2E', fontWeight: 600 }}>Not collect any personal information</span> from students under 13 directly. Do not ask students to share their name, email, location, photos, or any other personal details during class sessions or through any external means.</li>
+                <li><span style={{ color: '#0B1A2E', fontWeight: 600 }}>Direct all communication to parents or guardians.</span> For students under 13, correspondence regarding enrollment, schedules, and course matters should be addressed to the parent or guardian, not the student.</li>
+                <li><span style={{ color: '#0B1A2E', fontWeight: 600 }}>Obtain verifiable parental consent</span> before engaging with students under 13. SciQuest Learning requires that parents or guardians complete enrollment on behalf of children under 13.</li>
+                <li><span style={{ color: '#0B1A2E', fontWeight: 600 }}>Not record sessions</span> without explicit written consent from the parent or guardian of every student under 13 in the session.</li>
               </ul>
-              <p style={{ color: '#a8c4e0', lineHeight: 1.8, margin: 0, fontSize: '0.9rem' }}>
+              <p style={{ color: '#2d4a6b', lineHeight: 1.8, margin: 0, fontSize: '0.9rem' }}>
                 Instructors who fail to comply with COPPA requirements risk immediate removal of their course listings and suspension of their instructor account. SciQuest Learning takes the privacy and safety of young students seriously and expects all instructors to do the same.
               </p>
-              <p style={{ color: '#6b88a8', fontSize: '0.8rem', marginTop: '0.75rem', marginBottom: 0 }}>
+              <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginTop: '0.75rem', marginBottom: 0 }}>
                 For more information, visit the FTC&apos;s official COPPA guidance at{' '}
                 <span style={{ color: '#00C2A8' }}>ftc.gov/coppa</span>.
               </p>

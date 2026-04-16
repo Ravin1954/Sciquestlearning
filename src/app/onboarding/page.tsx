@@ -85,15 +85,15 @@ const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '0.75rem',
   borderRadius: '8px',
-  backgroundColor: '#060f1a',
-  border: '1px solid #1e3a5f',
-  color: '#e8edf5',
+  backgroundColor: '#EEF3F8',
+  border: '1px solid #C5D5E4',
+  color: '#0B1A2E',
   fontSize: '0.875rem',
   fontFamily: "'DM Sans', sans-serif",
 }
 
 const labelStyle: React.CSSProperties = {
-  color: '#a8c4e0',
+  color: '#2d4a6b',
   fontSize: '0.875rem',
   fontWeight: 600,
   display: 'block',
@@ -101,14 +101,14 @@ const labelStyle: React.CSSProperties = {
 }
 
 const sectionLabel: React.CSSProperties = {
-  color: '#6b88a8',
+  color: '#5a7a96',
   fontSize: '0.7rem',
   textTransform: 'uppercase',
   letterSpacing: '0.1em',
   fontWeight: 700,
   marginBottom: '0.75rem',
   paddingBottom: '0.5rem',
-  borderBottom: '1px solid #1e3a5f',
+  borderBottom: '1px solid #C5D5E4',
 }
 
 function OnboardingContent() {
@@ -218,7 +218,7 @@ function OnboardingContent() {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#0B1A2E',
+        backgroundColor: '#EEF3F8',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -229,8 +229,8 @@ function OnboardingContent() {
         style={{
           width: '100%',
           maxWidth: '580px',
-          backgroundColor: '#0f2240',
-          border: '1px solid #1e3a5f',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #C5D5E4',
           borderRadius: '16px',
           padding: '2.5rem',
         }}
@@ -241,10 +241,10 @@ function OnboardingContent() {
             <span style={{ fontFamily: 'Fraunces, serif', color: '#00C2A8', fontSize: '1.5rem', fontWeight: 700 }}>SciQuest</span>
             <span style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.5rem' }}> Learning</span>
           </div>
-          <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.5rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.375rem' }}>
+          <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.5rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.375rem' }}>
             {role === 'instructor' ? 'Complete Your Instructor Profile' : 'Student Registration'}
           </h1>
-          <p style={{ color: '#6b88a8', fontSize: '0.875rem', marginBottom: '1.25rem' }}>
+          <p style={{ color: '#5a7a96', fontSize: '0.875rem', marginBottom: '1.25rem' }}>
             {role === 'instructor'
               ? 'Tell students about your qualifications and what you teach.'
               : 'Create your student profile to browse and enroll in courses.'}
@@ -272,9 +272,9 @@ function OnboardingContent() {
                     style={{
                       padding: '1rem',
                       borderRadius: '10px',
-                      border: role === value ? '2px solid #00C2A8' : '2px solid #1e3a5f',
-                      backgroundColor: role === value ? '#003d35' : '#060f1a',
-                      color: role === value ? '#00C2A8' : '#6b88a8',
+                      border: role === value ? '2px solid #00C2A8' : '2px solid #C5D5E4',
+                      backgroundColor: role === value ? '#003d35' : '#EEF3F8',
+                      color: role === value ? '#00C2A8' : '#5a7a96',
                       cursor: 'pointer',
                       textAlign: 'center',
                     }}
@@ -295,7 +295,7 @@ function OnboardingContent() {
                 <p style={{ color: '#00C2A8', fontWeight: 600, fontSize: '0.875rem' }}>
                   {role === 'instructor' ? 'Instructor Account' : 'Student Account'}
                 </p>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem' }}>Your role has been assigned by the platform.</p>
+                <p style={{ color: '#5a7a96', fontSize: '0.75rem' }}>Your role has been assigned by the platform.</p>
               </div>
             </div>
           )}
@@ -316,7 +316,7 @@ function OnboardingContent() {
               ))}
             </select>
             {role === 'instructor' && (
-              <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+              <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
                 Instructor payouts via Stripe are currently supported for US-based instructors only.
               </p>
             )}
@@ -420,7 +420,7 @@ function OnboardingContent() {
                   placeholder="Paste a Google Drive link to your certificates/degrees (optional)"
                   style={inputStyle}
                 />
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
                   Upload your documents to Google Drive and share the link here. This helps us verify your credentials.
                 </p>
               </div>
@@ -450,9 +450,9 @@ function OnboardingContent() {
                   style={{
                     padding: '0.625rem',
                     borderRadius: '8px',
-                    border: selectedSubjects.includes(s) ? '1px solid #00C2A8' : '1px solid #1e3a5f',
-                    backgroundColor: selectedSubjects.includes(s) ? '#003d35' : '#060f1a',
-                    color: selectedSubjects.includes(s) ? '#00C2A8' : '#6b88a8',
+                    border: selectedSubjects.includes(s) ? '1px solid #00C2A8' : '1px solid #C5D5E4',
+                    backgroundColor: selectedSubjects.includes(s) ? '#003d35' : '#EEF3F8',
+                    color: selectedSubjects.includes(s) ? '#00C2A8' : '#5a7a96',
                     cursor: 'pointer',
                     fontSize: '0.8rem',
                     fontWeight: 500,
@@ -499,7 +499,7 @@ function OnboardingContent() {
 
 export default function OnboardingPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: '#0B1A2E' }} />}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', backgroundColor: '#EEF3F8' }} />}>
       <OnboardingContent />
     </Suspense>
   )

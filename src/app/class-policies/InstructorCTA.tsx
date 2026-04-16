@@ -9,8 +9,8 @@ export default function InstructorCTA() {
   if (role !== 'instructor' && role !== 'admin') return null
 
   return (
-    <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem', textAlign: 'center' }}>
-      <p style={{ color: '#a8c4e0', marginBottom: '1rem', fontSize: '0.9rem' }}>
+    <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', textAlign: 'center' }}>
+      <p style={{ color: '#2d4a6b', marginBottom: '1rem', fontSize: '0.9rem' }}>
         Ready to submit a course? Make sure your listing follows all the requirements above.
       </p>
       <Link

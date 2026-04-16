@@ -34,10 +34,10 @@ interface Enrollment {
 }
 
 const S = {
-  card: { backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' } as React.CSSProperties,
-  h1: { fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.25rem' },
-  sub: { color: '#6b88a8', fontSize: '0.9rem', marginBottom: '2rem' },
-  h2: { fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#e8edf5', marginBottom: '1rem' },
+  card: { backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' } as React.CSSProperties,
+  h1: { fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.25rem' },
+  sub: { color: '#5a7a96', fontSize: '0.9rem', marginBottom: '2rem' },
+  h2: { fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '1rem' },
 }
 
 const subjectColors: Record<string, string> = {
@@ -73,10 +73,10 @@ function FeedbackForm({ enrollmentId, onSubmitted }: { enrollmentId: string; onS
   }
 
   return (
-    <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#0a1a30', borderRadius: '8px', border: '1px solid #1e3a5f' }}>
+    <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#0a1a30', borderRadius: '8px', border: '1px solid #C5D5E4' }}>
       <p style={{ color: '#F5C842', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem' }}>Rate this class</p>
 
-      <p style={{ color: '#a8c4e0', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Did the instructor show up and conduct the class?</p>
+      <p style={{ color: '#2d4a6b', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Did the instructor show up and conduct the class?</p>
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
         {[{ val: true, label: 'Yes, attended' }, { val: false, label: 'No, did not attend' }].map((opt) => (
           <button
@@ -85,8 +85,8 @@ function FeedbackForm({ enrollmentId, onSubmitted }: { enrollmentId: string; onS
             onClick={() => setAttended(opt.val)}
             style={{
               padding: '0.375rem 0.875rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', border: 'none',
-              backgroundColor: attended === opt.val ? (opt.val ? '#003d35' : '#3d0f0f') : '#0f2240',
-              color: attended === opt.val ? (opt.val ? '#00C2A8' : '#f87171') : '#6b88a8',
+              backgroundColor: attended === opt.val ? (opt.val ? '#003d35' : '#3d0f0f') : '#FFFFFF',
+              color: attended === opt.val ? (opt.val ? '#00C2A8' : '#f87171') : '#5a7a96',
               outline: attended === opt.val ? `1px solid ${opt.val ? '#00C2A8' : '#f87171'}` : 'none',
             }}
           >
@@ -97,14 +97,14 @@ function FeedbackForm({ enrollmentId, onSubmitted }: { enrollmentId: string; onS
 
       {attended && (
         <>
-          <p style={{ color: '#a8c4e0', fontSize: '0.8rem', marginBottom: '0.375rem' }}>Rate the class (1–5 stars)</p>
+          <p style={{ color: '#2d4a6b', fontSize: '0.8rem', marginBottom: '0.375rem' }}>Rate the class (1–5 stars)</p>
           <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '0.75rem' }}>
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 type="button"
                 onClick={() => setRating(star)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: star <= rating ? '#F5C842' : '#1e3a5f' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: star <= rating ? '#F5C842' : '#C5D5E4' }}
               >
                 ★
               </button>
@@ -115,7 +115,7 @@ function FeedbackForm({ enrollmentId, onSubmitted }: { enrollmentId: string; onS
             onChange={(e) => setComment(e.target.value)}
             placeholder="Optional comment about the class..."
             rows={2}
-            style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.8rem', resize: 'vertical', fontFamily: "'DM Sans', sans-serif" }}
+            style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.8rem', resize: 'vertical', fontFamily: "'DM Sans', sans-serif" }}
           />
         </>
       )}
@@ -169,12 +169,12 @@ export default function StudentPage() {
       </div>
 
       {loading ? (
-        <p style={{ color: '#6b88a8' }}>Loading...</p>
+        <p style={{ color: '#5a7a96' }}>Loading...</p>
       ) : enrollments.length === 0 ? (
         <div style={{ ...S.card, textAlign: 'center', padding: '4rem 2rem' }}>
           <p style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎓</p>
-          <p style={{ color: '#e8edf5', fontWeight: 600, fontSize: '1.125rem', marginBottom: '0.5rem' }}>No courses yet</p>
-          <p style={{ color: '#6b88a8', marginBottom: '1.5rem' }}>Browse our catalog to find live classes that match your interests.</p>
+          <p style={{ color: '#0B1A2E', fontWeight: 600, fontSize: '1.125rem', marginBottom: '0.5rem' }}>No courses yet</p>
+          <p style={{ color: '#5a7a96', marginBottom: '1.5rem' }}>Browse our catalog to find live classes that match your interests.</p>
           <Link href="/courses" style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none' }}>
             Browse Courses →
           </Link>
@@ -188,8 +188,8 @@ export default function StudentPage() {
               { label: 'This Week', value: enrollments.filter((e) => e.course.daysOfWeek.length > 0).length },
             ].map((m) => (
               <div key={m.label} style={S.card}>
-                <p style={{ color: '#6b88a8', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.25rem' }}>{m.label}</p>
-                <p style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#e8edf5' }}>{m.value}</p>
+                <p style={{ color: '#5a7a96', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.25rem' }}>{m.label}</p>
+                <p style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#0B1A2E' }}>{m.value}</p>
               </div>
             ))}
           </div>
@@ -215,11 +215,11 @@ export default function StudentPage() {
                           {isLive ? 'Live' : 'Self-Paced'}
                         </span>
                       </div>
-                      <h3 style={{ color: '#e8edf5', fontWeight: 600, fontSize: '1.0625rem', marginBottom: '0.375rem' }}>{course.title}</h3>
-                      <p style={{ color: '#6b88a8', fontSize: '0.825rem', marginBottom: '0.25rem' }}>
+                      <h3 style={{ color: '#0B1A2E', fontWeight: 600, fontSize: '1.0625rem', marginBottom: '0.375rem' }}>{course.title}</h3>
+                      <p style={{ color: '#5a7a96', fontSize: '0.825rem', marginBottom: '0.25rem' }}>
                         Instructor: {course.instructor.firstName} {course.instructor.lastName}
                       </p>
-                      <p style={{ color: '#6b88a8', fontSize: '0.825rem' }}>
+                      <p style={{ color: '#5a7a96', fontSize: '0.825rem' }}>
                         {course.courseType === 'SELF_PACED'
                           ? `Self-Paced · Study anytime · ${course.durationWeeks > 0 ? `${course.durationWeeks} weeks` : 'Lifetime access'}`
                           : `${course.daysOfWeek.join(', ')} · ${course.startTimeUtc} UTC · ${course.sessionDurationMins} min/session`}
@@ -233,7 +233,7 @@ export default function StudentPage() {
                             Access Course →
                           </a>
                         ) : (
-                          <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Content pending</span>
+                          <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>Content pending</span>
                         )
                       ) : enrollment.zoomJoinUrl ? (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
@@ -248,7 +248,7 @@ export default function StudentPage() {
                           )}
                         </div>
                       ) : (
-                        <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Link pending</span>
+                        <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>Link pending</span>
                       )}
                       {course.classroomUrl && (
                         <a href={course.classroomUrl} target="_blank" rel="noopener noreferrer"
@@ -262,7 +262,7 @@ export default function StudentPage() {
                   {/* Feedback section — only for live courses */}
                   {isLive && (
                     hasFeedback ? (
-                      <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', backgroundColor: '#0a1a30', borderRadius: '8px', border: '1px solid #1e3a5f' }}>
+                      <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', backgroundColor: '#0a1a30', borderRadius: '8px', border: '1px solid #C5D5E4' }}>
                         <p style={{ color: '#00C2A8', fontSize: '0.8rem', fontWeight: 600 }}>
                           {enrollment.feedback?.attended === false
                             ? 'You reported the instructor did not attend.'

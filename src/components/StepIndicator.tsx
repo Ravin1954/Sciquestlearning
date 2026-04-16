@@ -23,8 +23,8 @@ export default function StepIndicator({ currentStep, role }: StepIndicatorProps)
               justifyContent: 'center',
               fontSize: '0.8rem',
               fontWeight: 700,
-              backgroundColor: currentStep === step.number ? '#00C2A8' : currentStep > step.number ? '#003d35' : '#1e3a5f',
-              color: currentStep === step.number ? '#0B1A2E' : currentStep > step.number ? '#00C2A8' : '#6b88a8',
+              backgroundColor: currentStep === step.number ? '#00C2A8' : currentStep > step.number ? '#E0F7F4' : '#C5D5E4',
+              color: currentStep === step.number ? '#0B1A2E' : currentStep > step.number ? '#00A896' : '#5a7a96',
               border: currentStep > step.number ? '2px solid #00C2A8' : 'none',
             }}>
               {currentStep > step.number ? '✓' : step.number}
@@ -32,13 +32,13 @@ export default function StepIndicator({ currentStep, role }: StepIndicatorProps)
             <span style={{
               fontSize: '0.8rem',
               fontWeight: currentStep === step.number ? 600 : 400,
-              color: currentStep === step.number ? '#e8edf5' : '#6b88a8',
+              color: currentStep === step.number ? '#0B1A2E' : '#5a7a96',
             }}>
               {step.label}
             </span>
           </div>
           {i < steps.length - 1 && (
-            <div style={{ width: '40px', height: '2px', backgroundColor: currentStep > 1 ? '#00C2A8' : '#1e3a5f', margin: '0 0.75rem' }} />
+            <div style={{ width: '40px', height: '2px', backgroundColor: currentStep > 1 ? '#00A896' : '#C5D5E4', margin: '0 0.75rem' }} />
           )}
         </div>
       ))}

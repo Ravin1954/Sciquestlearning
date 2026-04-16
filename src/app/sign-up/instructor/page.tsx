@@ -6,7 +6,7 @@ export default function InstructorSignUpPage() {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#0B1A2E',
+        backgroundColor: '#EEF3F8',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -19,7 +19,7 @@ export default function InstructorSignUpPage() {
           <span style={{ color: '#00C2A8' }}>SciQuest</span>
           <span style={{ color: '#F5C842' }}> Learning</span>
         </h1>
-        <p style={{ color: '#6b88a8', marginBottom: '1.25rem' }}>Apply to teach on SciQuest</p>
+        <p style={{ color: '#5a7a96', marginBottom: '1.25rem' }}>Apply to teach on SciQuest</p>
         <StepIndicator currentStep={1} role="instructor" />
       </div>
       <SignUp forceRedirectUrl="/onboarding?role=instructor" />

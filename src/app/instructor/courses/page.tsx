@@ -75,10 +75,10 @@ function getNextSession(scheduleJson: string | undefined): { label: string; mins
 }
 
 const S = {
-  card: { backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' } as React.CSSProperties,
-  h1: { fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#e8edf5', marginBottom: '0.25rem' },
-  sub: { color: '#6b88a8', fontSize: '0.9rem', marginBottom: '2rem' },
-  h2: { fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#e8edf5', marginBottom: '1rem' },
+  card: { backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' } as React.CSSProperties,
+  h1: { fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.25rem' },
+  sub: { color: '#5a7a96', fontSize: '0.9rem', marginBottom: '2rem' },
+  h2: { fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '1rem' },
 }
 
 export default function MyCoursesPage() {
@@ -169,7 +169,7 @@ export default function MyCoursesPage() {
         </Link>
       </div>
 
-      {loading ? <p style={{ color: '#6b88a8' }}>Loading...</p> : (
+      {loading ? <p style={{ color: '#5a7a96' }}>Loading...</p> : (
         <>
           {/* Upcoming Classes */}
           {approved.length > 0 && (
@@ -183,11 +183,11 @@ export default function MyCoursesPage() {
                   const nextLabel = nextSession && !isClassTime ? nextSession.label : ''
                   const meetLink = c.zoomJoinUrl || c.zoomStartUrl
                   return (
-                    <div key={c.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '0.75rem', borderColor: isClassTime ? '#00C2A8' : '#1e3a5f' }}>
+                    <div key={c.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '0.75rem', borderColor: isClassTime ? '#00C2A8' : '#C5D5E4' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                       <div>
-                        <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
-                        <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                        <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
+                        <p style={{ color: '#5a7a96', fontSize: '0.8rem' }}>
                           {c.daysOfWeek.join(', ')} · {formatLocalTime(c.startTimeUtc)} · {c.sessionDurationMins} min · {c._count.enrollments} students
                         </p>
                         {nextLabel && (
@@ -217,45 +217,45 @@ export default function MyCoursesPage() {
                               Course Materials →
                             </a>
                           ) : (
-                            <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>No content URL</span>
+                            <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>No content URL</span>
                           )
                         ) : meetLink ? (
                           <a href={meetLink.startsWith('http') ? meetLink : `https://${meetLink}`} target="_blank" rel="noopener noreferrer"
-                            style={{ backgroundColor: isClassTime ? '#00C2A8' : '#1e3a5f', color: isClassTime ? '#0B1A2E' : '#6b88a8', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                            style={{ backgroundColor: isClassTime ? '#00C2A8' : '#C5D5E4', color: isClassTime ? '#0B1A2E' : '#5a7a96', padding: '0.5rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
                             {isClassTime ? 'Start Class →' : 'Open Meet Link'}
                           </a>
                         ) : (
-                          <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>Meeting link pending</span>
+                          <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>Meeting link pending</span>
                         )}
                       </div>
                       </div>
 
                     {/* Roster panel */}
                     {rosterCourseId === c.id && (
-                      <div style={{ borderTop: '1px solid #1e3a5f', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                      <div style={{ borderTop: '1px solid #C5D5E4', paddingTop: '1rem', marginTop: '0.5rem' }}>
                         <p style={{ color: '#F5C842', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem' }}>
                           Enrolled Students — verify names against Google Meet waiting room
                         </p>
                         {rosterLoading ? (
-                          <p style={{ color: '#6b88a8', fontSize: '0.85rem' }}>Loading roster...</p>
+                          <p style={{ color: '#5a7a96', fontSize: '0.85rem' }}>Loading roster...</p>
                         ) : rosterData.length === 0 ? (
-                          <p style={{ color: '#6b88a8', fontSize: '0.85rem' }}>No students enrolled.</p>
+                          <p style={{ color: '#5a7a96', fontSize: '0.85rem' }}>No students enrolled.</p>
                         ) : (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                             {rosterData.map((s, i) => (
-                              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.6rem 1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                <span style={{ color: '#e8edf5', fontWeight: 600, fontSize: '0.875rem' }}>{s.studentName}</span>
-                                <span style={{ color: '#6b88a8', fontSize: '0.8rem' }}>{s.email}</span>
+                              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '8px', padding: '0.6rem 1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                <span style={{ color: '#0B1A2E', fontWeight: 600, fontSize: '0.875rem' }}>{s.studentName}</span>
+                                <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>{s.email}</span>
                               </div>
                             ))}
                           </div>
                         )}
-                        <p style={{ color: '#6b88a8', fontSize: '0.75rem', marginTop: '0.75rem', lineHeight: 1.5 }}>
+                        <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.75rem', lineHeight: 1.5 }}>
                           Admit students whose name in Google Meet matches the student name above. If they appear as "Guest", ask them to re-join and type their child's name.
                         </p>
 
                         {/* Message Students */}
-                        <div style={{ marginTop: '1.25rem', borderTop: '1px solid #1e3a5f', paddingTop: '1rem' }}>
+                        <div style={{ marginTop: '1.25rem', borderTop: '1px solid #C5D5E4', paddingTop: '1rem' }}>
                           <p style={{ color: '#00C2A8', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem' }}>
                             Message All Students
                           </p>
@@ -264,20 +264,20 @@ export default function MyCoursesPage() {
                               placeholder="Subject (e.g. Please review Chapter 3 before class)"
                               value={msgSubject}
                               onChange={(e) => setMsgSubject(e.target.value)}
-                              style={{ padding: '0.6rem 0.875rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.825rem', fontFamily: "'DM Sans', sans-serif" }}
+                              style={{ padding: '0.6rem 0.875rem', borderRadius: '6px', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.825rem', fontFamily: "'DM Sans', sans-serif" }}
                             />
                             <textarea
                               placeholder="Your message to students/parents..."
                               value={msgBody}
                               onChange={(e) => setMsgBody(e.target.value)}
                               rows={4}
-                              style={{ padding: '0.6rem 0.875rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.825rem', fontFamily: "'DM Sans', sans-serif", resize: 'vertical' }}
+                              style={{ padding: '0.6rem 0.875rem', borderRadius: '6px', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.825rem', fontFamily: "'DM Sans', sans-serif", resize: 'vertical' }}
                             />
                             <input
                               placeholder="Attachment link (optional — Google Drive, PDF, etc.)"
                               value={msgAttachment}
                               onChange={(e) => setMsgAttachment(e.target.value)}
-                              style={{ padding: '0.6rem 0.875rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.825rem', fontFamily: "'DM Sans', sans-serif" }}
+                              style={{ padding: '0.6rem 0.875rem', borderRadius: '6px', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.825rem', fontFamily: "'DM Sans', sans-serif" }}
                             />
                             {msgResult && (
                               <p style={{
@@ -322,8 +322,8 @@ export default function MyCoursesPage() {
                   <div key={c.id} style={{ ...S.card, border: '1px solid #7f1d1d' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: c.rejectionRemark ? '0.75rem' : 0 }}>
                       <div>
-                        <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
-                        <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                        <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
+                        <p style={{ color: '#5a7a96', fontSize: '0.8rem' }}>
                           {c.subject.replace('_', ' ')} · {c.durationWeeks} weeks · ${Number(c.feeUsd).toFixed(2)}
                         </p>
                       </div>
@@ -353,7 +353,7 @@ export default function MyCoursesPage() {
               <p style={{ color: '#f87171', backgroundColor: '#3d0f0f', padding: '0.75rem', borderRadius: '8px', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{deleteError}</p>
             )}
             {courses.length === 0 ? (
-              <div style={{ ...S.card, textAlign: 'center', color: '#6b88a8', padding: '3rem' }}>
+              <div style={{ ...S.card, textAlign: 'center', color: '#5a7a96', padding: '3rem' }}>
                 No courses yet.{' '}
                 <Link href="/instructor/courses/new" style={{ color: '#00C2A8' }}>Create your first course →</Link>
               </div>
@@ -363,14 +363,14 @@ export default function MyCoursesPage() {
                   <div key={c.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                       <div style={{ flex: 1 }}>
-                        <p style={{ color: '#e8edf5', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
-                        <p style={{ color: '#6b88a8', fontSize: '0.8rem' }}>
+                        <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
+                        <p style={{ color: '#5a7a96', fontSize: '0.8rem' }}>
                           {c.subject.replace('_', ' ')} · ${Number(c.feeUsd).toFixed(2)} · {c._count.enrollments} enrolled
                         </p>
                         {c.topics && c.topics.length > 0 && (
                           <ol style={{ margin: '0.5rem 0 0 1rem', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
                             {c.topics.map((topic, i) => (
-                              <li key={i} style={{ color: '#a8c4e0', fontSize: '0.8rem' }}>{topic}</li>
+                              <li key={i} style={{ color: '#2d4a6b', fontSize: '0.8rem' }}>{topic}</li>
                             ))}
                           </ol>
                         )}
@@ -387,7 +387,7 @@ export default function MyCoursesPage() {
                         )}
                         <Link
                           href={`/instructor/courses/${c.id}/edit`}
-                          style={{ backgroundColor: 'transparent', color: '#a8c4e0', border: '1px solid #1e3a5f', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none' }}
+                          style={{ backgroundColor: 'transparent', color: '#2d4a6b', border: '1px solid #C5D5E4', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none' }}
                         >
                           Edit
                         </Link>
@@ -407,14 +407,14 @@ export default function MyCoursesPage() {
                     {recordingCourseId === c.id && (() => {
                       const recs: { label: string; url: string }[] = (() => { try { return JSON.parse(c.recordingsJson || '[]') } catch { return [] } })()
                       return (
-                        <div style={{ borderTop: '1px solid #1e3a5f', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                        <div style={{ borderTop: '1px solid #C5D5E4', paddingTop: '1rem', marginTop: '0.5rem' }}>
                           <p style={{ color: '#a855f7', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem' }}>📹 Session Recordings</p>
                           {recs.length > 0 && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginBottom: '0.75rem' }}>
                               {recs.map((r, i) => (
-                                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', borderRadius: '8px', padding: '0.5rem 0.875rem' }}>
+                                <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '8px', padding: '0.5rem 0.875rem' }}>
                                   <div>
-                                    <span style={{ color: '#e8edf5', fontSize: '0.8rem', fontWeight: 600 }}>{r.label}</span>
+                                    <span style={{ color: '#0B1A2E', fontSize: '0.8rem', fontWeight: 600 }}>{r.label}</span>
                                     <a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: '#a855f7', fontSize: '0.75rem', marginLeft: '0.75rem', textDecoration: 'none' }}>View →</a>
                                   </div>
                                   <button
@@ -435,13 +435,13 @@ export default function MyCoursesPage() {
                               placeholder="Label (e.g. Apr 12 — Cell Biology)"
                               value={recordingLabel}
                               onChange={(e) => setRecordingLabel(e.target.value)}
-                              style={{ flex: 1, minWidth: '180px', padding: '0.5rem 0.75rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.8rem' }}
+                              style={{ flex: 1, minWidth: '180px', padding: '0.5rem 0.75rem', borderRadius: '6px', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.8rem' }}
                             />
                             <input
                               placeholder="Google Drive / YouTube link"
                               value={recordingUrl}
                               onChange={(e) => setRecordingUrl(e.target.value)}
-                              style={{ flex: 2, minWidth: '220px', padding: '0.5rem 0.75rem', borderRadius: '6px', backgroundColor: '#060f1a', border: '1px solid #1e3a5f', color: '#e8edf5', fontSize: '0.8rem' }}
+                              style={{ flex: 2, minWidth: '220px', padding: '0.5rem 0.75rem', borderRadius: '6px', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.8rem' }}
                             />
                             <button
                               disabled={recordingSaving || !recordingLabel.trim() || !recordingUrl.trim()}

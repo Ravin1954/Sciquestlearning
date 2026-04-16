@@ -66,7 +66,7 @@ export default function InstructorProfilePage() {
     return (
       <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
         <NavBar />
-        <div style={{ textAlign: 'center', padding: '6rem', color: '#6b88a8' }}>Loading...</div>
+        <div style={{ textAlign: 'center', padding: '6rem', color: '#5a7a96' }}>Loading...</div>
       </div>
     )
   }
@@ -75,7 +75,7 @@ export default function InstructorProfilePage() {
     return (
       <div style={{ backgroundColor: '#0B1A2E', minHeight: '100vh' }}>
         <NavBar />
-        <div style={{ textAlign: 'center', padding: '6rem', color: '#6b88a8' }}>Instructor not found.</div>
+        <div style={{ textAlign: 'center', padding: '6rem', color: '#5a7a96' }}>Instructor not found.</div>
       </div>
     )
   }
@@ -99,13 +99,13 @@ export default function InstructorProfilePage() {
         {/* Back link */}
         <Link
           href="/courses"
-          style={{ color: '#6b88a8', fontSize: '0.875rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', marginBottom: '2rem' }}
+          style={{ color: '#5a7a96', fontSize: '0.875rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', marginBottom: '2rem' }}
         >
           ← Back to Browse Courses
         </Link>
 
         {/* Profile header */}
-        <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '16px', padding: '2rem', marginBottom: '2rem' }}>
+        <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '16px', padding: '2rem', marginBottom: '2rem' }}>
           <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
 
             {/* Avatar */}
@@ -122,7 +122,7 @@ export default function InstructorProfilePage() {
 
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-                <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#e8edf5' }}>
+                <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.75rem', fontWeight: 700, color: '#0B1A2E' }}>
                   {instructor.firstName} {instructor.lastName}
                 </h1>
                 <span style={{ backgroundColor: '#003d35', color: '#00C2A8', padding: '0.2rem 0.75rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700 }}>
@@ -131,7 +131,7 @@ export default function InstructorProfilePage() {
               </div>
 
               {instructor.country && (
-                <p style={{ color: '#6b88a8', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
+                <p style={{ color: '#5a7a96', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
                   📍 {instructor.country}
                 </p>
               )}
@@ -161,7 +161,7 @@ export default function InstructorProfilePage() {
                   <span style={{ fontFamily: 'Fraunces, serif', color: '#F5C842', fontSize: '1.25rem', fontWeight: 700 }}>
                     {instructor.courses.length}
                   </span>
-                  <span style={{ color: '#6b88a8', fontSize: '0.8rem', marginLeft: '0.35rem' }}>
+                  <span style={{ color: '#5a7a96', fontSize: '0.8rem', marginLeft: '0.35rem' }}>
                     course{instructor.courses.length !== 1 ? 's' : ''}
                   </span>
                 </div>
@@ -170,7 +170,7 @@ export default function InstructorProfilePage() {
                     <span style={{ fontFamily: 'Fraunces, serif', color: '#38bdf8', fontSize: '1.25rem', fontWeight: 700 }}>
                       {liveCourses.length}
                     </span>
-                    <span style={{ color: '#6b88a8', fontSize: '0.8rem', marginLeft: '0.35rem' }}>live</span>
+                    <span style={{ color: '#5a7a96', fontSize: '0.8rem', marginLeft: '0.35rem' }}>live</span>
                   </div>
                 )}
                 {selfPacedCourses.length > 0 && (
@@ -178,7 +178,7 @@ export default function InstructorProfilePage() {
                     <span style={{ fontFamily: 'Fraunces, serif', color: '#c084fc', fontSize: '1.25rem', fontWeight: 700 }}>
                       {selfPacedCourses.length}
                     </span>
-                    <span style={{ color: '#6b88a8', fontSize: '0.8rem', marginLeft: '0.35rem' }}>self-paced</span>
+                    <span style={{ color: '#5a7a96', fontSize: '0.8rem', marginLeft: '0.35rem' }}>self-paced</span>
                   </div>
                 )}
               </div>
@@ -192,29 +192,29 @@ export default function InstructorProfilePage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 
             {instructor.aboutMe && (
-              <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
-                <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1rem', marginBottom: '0.75rem' }}>
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
+                <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1rem', marginBottom: '0.75rem' }}>
                   About
                 </h2>
-                <p style={{ color: '#a8c4e0', fontSize: '0.875rem', lineHeight: 1.7 }}>
+                <p style={{ color: '#2d4a6b', fontSize: '0.875rem', lineHeight: 1.7 }}>
                   {instructor.aboutMe}
                 </p>
               </div>
             )}
 
             {instructor.qualifications && (
-              <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
-                <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1rem', marginBottom: '0.75rem' }}>
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
+                <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1rem', marginBottom: '0.75rem' }}>
                   Qualifications &amp; Experience
                 </h2>
-                <p style={{ color: '#a8c4e0', fontSize: '0.875rem', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+                <p style={{ color: '#2d4a6b', fontSize: '0.875rem', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
                   {instructor.qualifications}
                 </p>
               </div>
             )}
 
             {!instructor.aboutMe && !instructor.qualifications && (
-              <div style={{ backgroundColor: '#0f2240', border: '1px solid #1e3a5f', borderRadius: '12px', padding: '1.5rem' }}>
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
                 <p style={{ color: '#3a5070', fontStyle: 'italic', fontSize: '0.875rem' }}>
                   This instructor has not yet added a bio.
                 </p>
@@ -225,7 +225,7 @@ export default function InstructorProfilePage() {
           {/* Right: Courses */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-              <h2 style={{ fontFamily: 'Fraunces, serif', color: '#e8edf5', fontSize: '1.25rem' }}>
+              <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.25rem' }}>
                 Courses by {instructor.firstName}
               </h2>
 
@@ -238,9 +238,9 @@ export default function InstructorProfilePage() {
                       onClick={() => setActiveTab(t)}
                       style={{
                         padding: '0.3rem 0.75rem', borderRadius: '6px', border: '1px solid',
-                        borderColor: activeTab === t ? '#00C2A8' : '#1e3a5f',
+                        borderColor: activeTab === t ? '#00C2A8' : '#C5D5E4',
                         backgroundColor: activeTab === t ? '#003d35' : 'transparent',
-                        color: activeTab === t ? '#00C2A8' : '#6b88a8',
+                        color: activeTab === t ? '#00C2A8' : '#5a7a96',
                         cursor: 'pointer', fontSize: '0.78rem', fontWeight: activeTab === t ? 700 : 400,
                       }}
                     >
@@ -252,7 +252,7 @@ export default function InstructorProfilePage() {
             </div>
 
             {displayCourses.length === 0 ? (
-              <p style={{ color: '#6b88a8', fontSize: '0.875rem' }}>No courses in this category.</p>
+              <p style={{ color: '#5a7a96', fontSize: '0.875rem' }}>No courses in this category.</p>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
                 {coursesWithInstructor.map((course) => (
