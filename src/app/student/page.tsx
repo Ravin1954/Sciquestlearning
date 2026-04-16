@@ -15,6 +15,7 @@ interface Enrollment {
   id: string
   zoomJoinUrl: string
   enrolledAt: string
+  accessExpiresAt: string | null
   feedback: Feedback | null
   student?: { firstName: string; lastName: string }
   course: {
@@ -202,6 +203,11 @@ export default function StudentPage() {
               const color = subjectColors[course.subject] || '#00C2A8'
               const hasFeedback = enrollment.feedback !== null || feedbackSubmitted.has(enrollment.id)
               const isLive = course.courseType === 'LIVE'
+              const accessExpiresAt = enrollment.accessExpiresAt ? new Date(enrollment.accessExpiresAt) : null
+              const isExpired = accessExpiresAt ? accessExpiresAt < new Date() : false
+              const expiryLabel = accessExpiresAt
+                ? accessExpiresAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+                : null
 
               return (
                 <div key={enrollment.id} style={S.card}>
@@ -227,14 +233,34 @@ export default function StudentPage() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
                       {course.courseType === 'SELF_PACED' ? (
-                        course.contentUrl ? (
-                          <a href={course.contentUrl.startsWith('http') ? course.contentUrl : `https://${course.contentUrl}`} target="_blank" rel="noopener noreferrer"
-                            style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
-                            Access Course →
-                          </a>
-                        ) : (
-                          <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>Content pending</span>
-                        )
+                        <>
+                          {expiryLabel && (
+                            <span style={{ fontSize: '0.72rem', fontWeight: 600, padding: '0.2rem 0.6rem', borderRadius: '4px', backgroundColor: isExpired ? '#FEF2F2' : '#FEF9C3', color: isExpired ? '#dc2626' : '#92400e' }}>
+                              {isExpired ? `Expired ${expiryLabel}` : `Expires ${expiryLabel}`}
+                            </span>
+                          )}
+                          {isExpired ? (
+                            <button onClick={async () => { const r = await fetch('/api/checkout/renew', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ courseId: course.id }) }); const d = await r.json(); if (d.url) window.location.href = d.url }}
+                              style={{ backgroundColor: '#F5C842', color: '#0B1A2E', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                              Renew Access →
+                            </button>
+                          ) : course.contentUrl ? (
+                            <>
+                              <a href={course.contentUrl.startsWith('http') ? course.contentUrl : `https://${course.contentUrl}`} target="_blank" rel="noopener noreferrer"
+                                style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                                Access Course →
+                              </a>
+                              {expiryLabel && (
+                                <button onClick={async () => { const r = await fetch('/api/checkout/renew', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ courseId: course.id }) }); const d = await r.json(); if (d.url) window.location.href = d.url }}
+                                  style={{ backgroundColor: 'transparent', color: '#5a7a96', padding: '0.3rem 0.75rem', borderRadius: '8px', fontWeight: 600, border: '1px solid #C5D5E4', cursor: 'pointer', fontSize: '0.72rem', whiteSpace: 'nowrap' }}>
+                                  Renew Access
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>Content pending</span>
+                          )}
+                        </>
                       ) : enrollment.zoomJoinUrl ? (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
                           <a href={enrollment.zoomJoinUrl} target="_blank" rel="noopener noreferrer"

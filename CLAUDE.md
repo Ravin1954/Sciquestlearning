@@ -11,7 +11,7 @@ Node is at `/opt/homebrew/bin/node`. Always export `PATH="/opt/homebrew/bin:$PAT
 - Clerk v7 for auth (Google + email; roles via `publicMetadata.role`: admin | instructor | student)
 - Prisma v7 + PostgreSQL
 - Stripe v20 + Stripe Connect (80/20 split)
-- Zoom Server-to-Server OAuth
+- Google Meet (instructors share Meet links; no Zoom)
 - Resend for email
 
 ## Brand
@@ -21,12 +21,12 @@ Node is at `/opt/homebrew/bin/node`. Always export `PATH="/opt/homebrew/bin:$PAT
 
 ## User Roles
 - **Admin**: approve/reject courses, view all metrics/revenue
-- **Instructor**: create courses (pending until approved), earnings, Zoom start link
-- **Student**: browse approved courses, enroll via Stripe, join Zoom sessions
+- **Instructor**: create courses (pending until approved), earnings, Google Meet link
+- **Student**: browse approved courses, enroll via Stripe, join Google Meet sessions
 
 ## Key Technical Flows
-1. Instructor submits course → PENDING → Admin approves → Zoom meeting auto-created → email sent
-2. Student enrolls → Stripe Checkout → 80% to instructor (Stripe Connect), 20% platform → enrollment record + Zoom join URL → confirmation email
+1. Instructor submits course → PENDING → Admin approves → email sent (instructor adds their Google Meet link)
+2. Student enrolls → Stripe Checkout → 80% to instructor (Stripe Connect), 20% platform → enrollment record + Google Meet link → confirmation email
 3. Cron job every minute → find sessions starting in 19–21 min → send reminder emails via Resend
 
 ## Database (Prisma)

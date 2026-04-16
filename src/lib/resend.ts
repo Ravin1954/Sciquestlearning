@@ -67,6 +67,7 @@ export async function sendEnrollmentConfirmationEmail(
   schedule: string,
   studentName?: string,
   classroomUrl?: string,
+  accessExpiresDate?: string,
 ) {
   const isLive = !!zoomJoinUrl && zoomJoinUrl.startsWith('http')
   await resend.emails.send({
@@ -82,7 +83,9 @@ export async function sendEnrollmentConfirmationEmail(
           <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Schedule</td><td style="padding:0.5rem;">${schedule}</td></tr>
           ${isLive ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Google Meet Link</td><td style="padding:0.5rem;"><a href="${zoomJoinUrl}" style="color:#00C2A8;">${zoomJoinUrl}</a></td></tr>` : ''}
           ${classroomUrl ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Google Classroom</td><td style="padding:0.5rem;"><a href="${classroomUrl}" style="color:#00C2A8;">${classroomUrl}</a></td></tr>` : ''}
+          ${accessExpiresDate ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Access Expires</td><td style="padding:0.5rem; color:#d97706; font-weight:600;">${accessExpiresDate}</td></tr>` : ''}
         </table>
+        ${accessExpiresDate ? `<div style="background:#fff8e1; border-left:4px solid #F5C842; padding:0.875rem 1.25rem; border-radius:0 8px 8px 0; margin:1rem 0;"><p style="margin:0; color:#7a5800; font-size:0.9rem;">Your access to this self-paced course is valid until <strong>${accessExpiresDate}</strong>. You can renew your access from your student dashboard before or after expiry.</p></div>` : ''}
         ${isLive && studentName ? `
         <div style="background:#fff8e1; border-left:4px solid #F5C842; padding:1rem 1.25rem; border-radius:0 8px 8px 0; margin: 1.25rem 0;">
           <p style="margin:0 0 0.5rem; font-weight:700; color:#7a5800;">Important: Joining Google Meet</p>
@@ -310,6 +313,51 @@ export async function sendContactFormEmail(
         <h3 style="color:#0B1A2E;">Message:</h3>
         <p style="background:#f5f5f5; padding:1rem; border-radius:8px; white-space:pre-wrap;">${message}</p>
         <p style="margin-top:1.5rem; color:#666; font-size:0.85rem;">Reply directly to this email to respond to ${name}.</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendAccessExpiryWarningEmail(
+  studentEmail: string,
+  studentName: string,
+  courseTitle: string,
+  expiryDate: string,
+  renewUrl: string,
+) {
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: studentEmail,
+    subject: `Your access to "${courseTitle}" expires in 30 days`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Hi ${studentName},</h2>
+        <p>Your access to <strong>${courseTitle}</strong> will expire in <strong>30 days</strong> on <strong style="color:#d97706;">${expiryDate}</strong>.</p>
+        <p>Renew now to continue your learning without interruption.</p>
+        <p><a href="${renewUrl}" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block;">Renew Access →</a></p>
+        <p style="margin-top:2rem; color:#666;">SciQuest Learning Team</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendAccessExpiredEmail(
+  studentEmail: string,
+  studentName: string,
+  courseTitle: string,
+  renewUrl: string,
+) {
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: studentEmail,
+    subject: `Your access to "${courseTitle}" has expired`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Hi ${studentName},</h2>
+        <p>Your 1-year access to <strong>${courseTitle}</strong> has now <strong style="color:#dc2626;">expired</strong>.</p>
+        <p>You can renew your access for another year to continue using all course materials.</p>
+        <p><a href="${renewUrl}" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block;">Renew Access →</a></p>
+        <p style="margin-top:2rem; color:#666;">SciQuest Learning Team</p>
       </div>
     `,
   })

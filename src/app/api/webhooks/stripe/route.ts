@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as {
-      metadata?: { courseId?: string; studentId?: string; selectedSessionsJson?: string }
+      metadata?: { courseId?: string; studentId?: string; selectedSessionsJson?: string; isRenewal?: string }
       payment_intent?: string
       amount_total?: number
     }
@@ -34,20 +34,51 @@ export async function POST(req: Request) {
     const instructorPayout = amountPaid * 0.8
     const platformFee = amountPaid * 0.2
 
-    await prisma.enrollment.create({
-      data: {
-        studentId,
-        courseId,
-        stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : '',
-        amountPaidUsd: amountPaid,
-        instructorPayoutUsd: instructorPayout,
-        platformFeeUsd: platformFee,
-        zoomJoinUrl,
-        selectedSessionsJson: selectedSessionsJson || '',
-      },
-    })
+    // Self-paced courses expire 1 year from enrollment
+    const accessExpiresAt = course.courseType === 'SELF_PACED'
+      ? new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
+      : null
+
+    const isRenewal = session.metadata?.isRenewal === 'true'
+
+    if (isRenewal) {
+      // Extend existing enrollment by 1 year from now
+      const existing = await prisma.enrollment.findFirst({
+        where: { studentId, courseId },
+        orderBy: { enrolledAt: 'desc' },
+      })
+      if (existing) {
+        const base = existing.accessExpiresAt && existing.accessExpiresAt > new Date()
+          ? existing.accessExpiresAt
+          : new Date()
+        await prisma.enrollment.update({
+          where: { id: existing.id },
+          data: {
+            accessExpiresAt: new Date(base.getTime() + 365 * 24 * 60 * 60 * 1000),
+            stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : existing.stripePaymentIntentId,
+          },
+        })
+      }
+    } else {
+      await prisma.enrollment.create({
+        data: {
+          studentId,
+          courseId,
+          stripePaymentIntentId: typeof session.payment_intent === 'string' ? session.payment_intent : '',
+          amountPaidUsd: amountPaid,
+          instructorPayoutUsd: instructorPayout,
+          platformFeeUsd: platformFee,
+          zoomJoinUrl,
+          selectedSessionsJson: selectedSessionsJson || '',
+          accessExpiresAt,
+        },
+      })
+    }
 
     const accessLink = course.courseType === 'SELF_PACED' ? (course.contentUrl || '') : zoomJoinUrl
+    const expiryDateStr = accessExpiresAt
+      ? accessExpiresAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      : null
     // Build schedule string from selected sessions if available
     let schedule: string
     if (selectedSessionsJson) {
@@ -62,7 +93,7 @@ export async function POST(req: Request) {
         ? `${course.daysOfWeek.join(', ')} at ${course.startTimeUtc} UTC`
         : 'Self-paced — access anytime'
     }
-    await sendEnrollmentConfirmationEmail(student.email, course.title, accessLink, schedule, `${student.firstName} ${student.lastName}`, course.classroomUrl || undefined)
+    await sendEnrollmentConfirmationEmail(student.email, course.title, accessLink, schedule, `${student.firstName} ${student.lastName}`, course.classroomUrl || undefined, expiryDateStr || undefined)
 
     // Notify admin of new enrollment
     sendEnrollmentNotificationEmail(

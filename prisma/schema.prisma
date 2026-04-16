@@ -81,6 +81,7 @@ model Enrollment {
   enrolledAt            DateTime  @default(now())
   instructorPaidOut     Boolean   @default(false)
   instructorPaidOutAt   DateTime?
+  accessExpiresAt       DateTime?
   feedback              Feedback?
 }
 

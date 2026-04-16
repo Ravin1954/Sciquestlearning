@@ -20,5 +20,15 @@ export async function GET() {
     orderBy: { enrolledAt: 'desc' },
   })
 
-  return NextResponse.json(enrollments)
+  // For self-paced courses, keep only the most recent enrollment per course
+  const seen = new Set<string>()
+  const deduped = enrollments.filter((e) => {
+    if (e.course.courseType === 'SELF_PACED') {
+      if (seen.has(e.courseId)) return false
+      seen.add(e.courseId)
+    }
+    return true
+  })
+
+  return NextResponse.json(deduped)
 }
