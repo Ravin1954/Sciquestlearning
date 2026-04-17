@@ -395,7 +395,7 @@ export default function EditCoursePage() {
             {topics.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
                 {topics.map((t) => (
-                  <span key={t} style={{ backgroundColor: '#0a2240', border: '1px solid #C5D5E4', borderRadius: '6px', padding: '0.3rem 0.65rem', fontSize: '0.8rem', color: '#2d4a6b', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span key={t} style={{ backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '6px', padding: '0.3rem 0.65rem', fontSize: '0.8rem', color: '#2d4a6b', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     {t}
                     <button type="button" onClick={() => removeTopic(t)} style={{ background: 'none', border: 'none', color: '#5a7a96', cursor: 'pointer', padding: 0, fontSize: '0.9rem', lineHeight: 1 }}>×</button>
                   </span>

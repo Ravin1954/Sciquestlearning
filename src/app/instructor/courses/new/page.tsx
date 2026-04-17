@@ -382,7 +382,7 @@ export default function NewCoursePage() {
                   <span
                     key={t}
                     style={{
-                      backgroundColor: '#0a2240',
+                      backgroundColor: '#EEF3F8',
                       border: '1px solid #C5D5E4',
                       borderRadius: '6px',
                       padding: '0.3rem 0.65rem',
@@ -671,7 +671,7 @@ export default function NewCoursePage() {
                 />
               </div>
 
-              <div style={{ padding: '0.75rem 1rem', backgroundColor: '#0a2240', borderRadius: '8px', border: '1px solid #C5D5E4' }}>
+              <div style={{ padding: '0.75rem 1rem', backgroundColor: '#EEF3F8', borderRadius: '8px', border: '1px solid #C5D5E4' }}>
                 <p style={{ color: '#38bdf8', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.25rem' }}>Google Meet link auto-generated</p>
                 <p style={{ color: '#5a7a96', fontSize: '0.75rem' }}>A Google Meet link will be automatically created and shared with students when your course is approved.</p>
               </div>

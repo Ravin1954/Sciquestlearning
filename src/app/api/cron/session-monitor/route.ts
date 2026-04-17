@@ -103,6 +103,12 @@ export async function GET(req: Request) {
   let cancellations = 0
 
   for (const course of courses) {
+    // Skip if course hasn't started yet
+    if (course.startDate) {
+      const startDate = new Date(course.startDate)
+      if (startDate > now) continue
+    }
+
     const enrollmentCount = course.enrollments.length
     let cancelled: string[] = []
     try { cancelled = JSON.parse(course.cancelledSessionsJson || '[]') } catch { cancelled = [] }
