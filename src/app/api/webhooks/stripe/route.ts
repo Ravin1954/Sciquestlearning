@@ -23,7 +23,7 @@ export async function POST(req: Request) {
     const { courseId, studentId, selectedSessionsJson } = session.metadata || {}
     if (!courseId || !studentId) return NextResponse.json({ ok: true })
 
-    const course = await prisma.course.findUnique({ where: { id: courseId } })
+    const course = await prisma.course.findUnique({ where: { id: courseId }, include: { instructor: true } })
     const student = await prisma.user.findUnique({ where: { id: studentId } })
 
     if (!course || !student) return NextResponse.json({ ok: true })
@@ -101,14 +101,14 @@ export async function POST(req: Request) {
       student.email,
       course.title,
       amountPaid,
+      `${course.instructor.firstName} ${course.instructor.lastName}`,
+      schedule,
     ).catch((err) => console.error('[email] enrollment notification failed:', err))
 
     // Notify instructor of new enrollment
-    const instructor = await prisma.user.findUnique({ where: { id: course.instructorId } })
-    if (instructor) {
-      sendInstructorEnrollmentNotificationEmail(
-        instructor.email,
-        instructor.firstName,
+    sendInstructorEnrollmentNotificationEmail(
+        course.instructor.email,
+        course.instructor.firstName,
         `${student.firstName} ${student.lastName}`,
         student.email,
         course.title,
@@ -116,7 +116,6 @@ export async function POST(req: Request) {
         amountPaid,
         instructorPayout,
       ).catch((err) => console.error('[email] instructor enrollment notification failed:', err))
-    }
   }
 
   return NextResponse.json({ ok: true })
