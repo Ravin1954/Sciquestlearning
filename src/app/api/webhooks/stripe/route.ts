@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/db'
-import { sendEnrollmentConfirmationEmail, sendEnrollmentNotificationEmail } from '@/lib/resend'
+import { sendEnrollmentConfirmationEmail, sendEnrollmentNotificationEmail, sendInstructorEnrollmentNotificationEmail } from '@/lib/resend'
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -102,6 +102,21 @@ export async function POST(req: Request) {
       course.title,
       amountPaid,
     ).catch((err) => console.error('[email] enrollment notification failed:', err))
+
+    // Notify instructor of new enrollment
+    const instructor = await prisma.user.findUnique({ where: { id: course.instructorId } })
+    if (instructor) {
+      sendInstructorEnrollmentNotificationEmail(
+        instructor.email,
+        instructor.firstName,
+        `${student.firstName} ${student.lastName}`,
+        student.email,
+        course.title,
+        schedule,
+        amountPaid,
+        instructorPayout,
+      ).catch((err) => console.error('[email] instructor enrollment notification failed:', err))
+    }
   }
 
   return NextResponse.json({ ok: true })

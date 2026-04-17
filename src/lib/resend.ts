@@ -145,6 +145,39 @@ export async function sendInstructorNoShowWarningEmail(
   })
 }
 
+export async function sendInstructorEnrollmentNotificationEmail(
+  instructorEmail: string,
+  instructorFirstName: string,
+  studentName: string,
+  studentEmail: string,
+  courseTitle: string,
+  schedule: string,
+  amountPaid: number,
+  _instructorPayout: number,
+) {
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: instructorEmail,
+    subject: `New enrollment in "${courseTitle}" — ${studentName}`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Hi ${instructorFirstName},</h2>
+        <p>Great news! A new student has enrolled in your course <strong>${courseTitle}</strong>.</p>
+        <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Student Name</td><td style="padding:0.5rem;">${studentName}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Student Email</td><td style="padding:0.5rem;">${studentEmail}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Course</td><td style="padding:0.5rem;">${courseTitle}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Schedule</td><td style="padding:0.5rem;">${schedule}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Course Fee</td><td style="padding:0.5rem;">$${amountPaid.toFixed(2)}</td></tr>
+        </table>
+        <p>Please make sure you are available at the scheduled time for this student.</p>
+        <p><a href="https://sciquestlearning.com/instructor" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700;">View Your Dashboard →</a></p>
+        <p style="margin-top:2rem; color:#666;">SciQuest Learning Team</p>
+      </div>
+    `,
+  })
+}
+
 export async function sendSessionWarningEmail(
   instructorEmail: string,
   instructorFirstName: string,
