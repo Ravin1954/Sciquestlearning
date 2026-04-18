@@ -38,6 +38,15 @@ export default function NavBar() {
                 Class Policies
               </Link>
             )}
+            {isSignedIn && !isInstructor && (
+              <Link
+                href="/student-policies"
+                style={{ color: '#2d4a6b' }}
+                className="hover:text-gray-900 transition-colors text-sm font-medium"
+              >
+                Student Policies
+              </Link>
+            )}
             <Link
               href="/contact"
               style={{ color: '#2d4a6b' }}
