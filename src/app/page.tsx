@@ -266,6 +266,81 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* About Us Section */}
+      <section id="about" style={{ padding: '5rem 1.5rem', backgroundColor: '#FFFFFF' }}>
+        <div style={{ maxWidth: '860px', margin: '0 auto', textAlign: 'center' }}>
+          <div
+            style={{
+              display: 'inline-block',
+              backgroundColor: '#E0F7F4',
+              color: '#00A896',
+              padding: '0.375rem 1rem',
+              borderRadius: '9999px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              letterSpacing: '0.05em',
+              marginBottom: '1rem',
+            }}
+          >
+            ABOUT US
+          </div>
+
+          <h2
+            style={{
+              fontFamily: 'Fraunces, serif',
+              fontSize: '2rem',
+              fontWeight: 700,
+              color: '#0B1A2E',
+              marginBottom: '2.5rem',
+            }}
+          >
+            Who We Are
+          </h2>
+
+          {/* Circular science images */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem', marginBottom: '2.75rem', flexWrap: 'wrap' }}>
+            {[
+              { url: 'https://images.unsplash.com/photo-1532094349884-543559fee8e8?w=140&h=140&fit=crop&crop=center', alt: 'Science lab test tubes' },
+              { url: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=140&h=140&fit=crop&crop=center', alt: 'Microscope biology' },
+              { url: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=140&h=140&fit=crop&crop=center', alt: 'Mathematics chalkboard' },
+              { url: 'https://images.unsplash.com/photo-1628863353691-0071c8c1874c?w=140&h=140&fit=crop&crop=center', alt: 'Chemistry beakers' },
+              { url: 'https://images.unsplash.com/photo-1581093458791-9f3c3900df4b?w=140&h=140&fit=crop&crop=center', alt: 'Students in science lab' },
+            ].map((img) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={img.url}
+                src={img.url}
+                alt={img.alt}
+                style={{
+                  width: '110px',
+                  height: '110px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '3px solid #00C2A8',
+                  boxShadow: '0 4px 12px rgba(0,194,168,0.25)',
+                }}
+              />
+            ))}
+          </div>
+
+          <p style={{ color: '#2d4a6b', fontSize: '1rem', lineHeight: 1.85, marginBottom: '1.5rem' }}>
+            Welcome to SciQuestLearning.com, your gateway to an exciting and interactive world of science education!
+            At SciQuest Learning, we are dedicated to inspiring curiosity and deep understanding in Biology, Zoology,
+            Chemistry, and Mathematics for Middle School and High School students. Our platform offers engaging,
+            interactive learning experiences designed to make complex concepts simple, enjoyable, and meaningful.
+          </p>
+
+          <p style={{ color: '#2d4a6b', fontSize: '1rem', lineHeight: 1.85 }}>
+            We also warmly invite passionate educators and subject experts to join our growing community of instructors.
+            Teachers can register on our platform, design and deliver courses tailored to the needs of middle and high
+            school learners, and set their own course fees. With a structured and transparent system managed by our
+            administration, instructors are supported every step of the way and receive timely payments as per scheduled
+            due dates. Together, we aim to create a dynamic learning environment that benefits both students and
+            educators alike.
+          </p>
+        </div>
+      </section>
+
       {/* Subjects Section */}
       <section style={{ padding: '5rem 1.5rem', backgroundColor: '#EEF3F8' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>

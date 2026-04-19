@@ -23,6 +23,13 @@ export default function NavBar() {
 
           <div className="hidden md:flex items-center gap-6">
             <Link
+              href="/#about"
+              style={{ color: '#2d4a6b' }}
+              className="hover:text-gray-900 transition-colors text-sm font-medium"
+            >
+              About Us
+            </Link>
+            <Link
               href="/courses"
               style={{ color: '#2d4a6b' }}
               className="hover:text-gray-900 transition-colors text-sm font-medium"
