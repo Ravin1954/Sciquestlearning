@@ -406,10 +406,10 @@ export default function CoursePageClient() {
             <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
               <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.125rem', marginBottom: '0.875rem' }}>Course Details</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {!isLive && course.startDate && (
+                {course.startDate && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: '#5a7a96', fontSize: '0.875rem' }}>Start Date</span>
-                    <span style={{ color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>
+                    <span style={{ color: '#00A896', fontSize: '0.875rem', fontWeight: 700 }}>
                       {new Date(course.startDate + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </span>
                   </div>

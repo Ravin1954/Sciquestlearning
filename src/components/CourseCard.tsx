@@ -25,6 +25,7 @@ interface CourseCardProps {
     sessionDurationMins: number
     feeUsd: number | string
     feeType?: string
+    startDate?: string
     status?: 'PENDING' | 'APPROVED' | 'REJECTED'
     instructor?: {
       id?: string
@@ -160,6 +161,14 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
           </p>
         ) : (
           <>
+            {course.startDate && (
+              <p style={{ color: '#2d4a6b', fontSize: '0.8rem' }}>
+                <span style={{ color: '#5a7a96' }}>Starts: </span>
+                <strong style={{ color: '#00A896' }}>
+                  {new Date(course.startDate + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                </strong>
+              </p>
+            )}
             <p style={{ color: '#2d4a6b', fontSize: '0.8rem' }}>
               <span style={{ color: '#5a7a96' }}>Schedule: </span>
               {course.daysOfWeek.join(', ')} at {(() => {
