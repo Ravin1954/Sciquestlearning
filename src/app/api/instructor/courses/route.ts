@@ -28,6 +28,8 @@ export async function GET() {
       zoomStartUrl: true,
       contentUrl: true,
       topics: true,
+      scheduleJson: true,
+      cancelledSessionsJson: true,
       rejectionRemark: true,
       _count: { select: { enrollments: true } },
     },
