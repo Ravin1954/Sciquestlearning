@@ -2,6 +2,24 @@ import { Resend } from 'resend'
 
 export const resend = new Resend(process.env.RESEND_API_KEY)
 
+const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+
+function formatSessionTimes(utcTimeStr: string, dayName: string): string {
+  const dayIdx = DAY_NAMES.indexOf(dayName)
+  if (dayIdx < 0) return `<p>${dayName} at ${utcTimeStr} UTC</p>`
+  const [h, m] = utcTimeStr.split(':').map(Number)
+  // Jan 5 2025 is a Sunday — use as stable reference
+  const date = new Date(Date.UTC(2025, 0, 5 + dayIdx, h, m, 0))
+  const fmt = (tz: string) => date.toLocaleString('en-US', { weekday: 'long', hour: 'numeric', minute: '2-digit', hour12: true, timeZone: tz })
+  return `
+    <table style="border-collapse:collapse; margin:0.5rem 0; font-size:0.9rem;">
+      <tr><td style="padding:0.2rem 1rem 0.2rem 0; color:#555; font-weight:600; white-space:nowrap;">Eastern Time (ET)</td><td style="color:#1a1a2e;">${fmt('America/New_York')}</td></tr>
+      <tr><td style="padding:0.2rem 1rem 0.2rem 0; color:#555; font-weight:600; white-space:nowrap;">India (IST)</td><td style="color:#1a1a2e;">${fmt('Asia/Kolkata')}</td></tr>
+      <tr><td style="padding:0.2rem 1rem 0.2rem 0; color:#555; font-weight:600; white-space:nowrap;">South Korea (KST)</td><td style="color:#1a1a2e;">${fmt('Asia/Seoul')}</td></tr>
+      <tr><td style="padding:0.2rem 1rem 0.2rem 0; color:#555; font-weight:600; white-space:nowrap;">UTC</td><td style="color:#1a1a2e;">${dayName} at ${utcTimeStr} UTC</td></tr>
+    </table>`
+}
+
 export async function sendAdminNewCourseEmail(
   instructorName: string,
   instructorEmail: string,
@@ -68,6 +86,8 @@ export async function sendEnrollmentConfirmationEmail(
   studentName?: string,
   classroomUrl?: string,
   accessExpiresDate?: string,
+  daysOfWeek?: string[],
+  startTimeUtc?: string,
 ) {
   const isLive = !!zoomJoinUrl && zoomJoinUrl.startsWith('http')
   await resend.emails.send({
@@ -80,7 +100,7 @@ export async function sendEnrollmentConfirmationEmail(
         <p>You are now enrolled in <strong>${courseTitle}</strong>.</p>
         <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
           ${studentName ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Student Name</td><td style="padding:0.5rem;">${studentName}</td></tr>` : ''}
-          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Schedule</td><td style="padding:0.5rem;">${schedule}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600; vertical-align:top;">Schedule</td><td style="padding:0.5rem;">${schedule}${isLive && daysOfWeek && startTimeUtc ? daysOfWeek.map((d) => formatSessionTimes(startTimeUtc, d)).join('') : ''}</td></tr>
           ${isLive ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Google Meet Link</td><td style="padding:0.5rem;"><a href="${zoomJoinUrl}" style="color:#00C2A8;">${zoomJoinUrl}</a></td></tr>` : ''}
           ${classroomUrl ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Google Classroom</td><td style="padding:0.5rem;"><a href="${classroomUrl}" style="color:#00C2A8;">${classroomUrl}</a></td></tr>` : ''}
           ${accessExpiresDate ? `<tr><td style="padding:0.5rem; color:#555; font-weight:600;">Access Expires</td><td style="padding:0.5rem; color:#d97706; font-weight:600;">${accessExpiresDate}</td></tr>` : ''}
@@ -408,6 +428,7 @@ export async function sendInstructorClassRosterEmail(
   startTime: string,
   meetUrl: string,
   students: { name: string; email: string }[],
+  dayName?: string,
 ) {
   const rows = students.map((s) =>
     `<tr>
@@ -424,6 +445,7 @@ export async function sendInstructorClassRosterEmail(
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
         <h2 style="color: #0B1A2E;">Hi ${instructorFirstName},</h2>
         <p>Your class <strong>${courseTitle}</strong> starts at <strong>${startTime}</strong> — in about 20 minutes.</p>
+        ${dayName ? formatSessionTimes(startTime.replace(' UTC',''), dayName) : ''}
 
         <h3 style="color: #0B1A2E; margin-top: 1.5rem;">Enrolled Students (${students.length})</h3>
         <p style="color:#555; font-size:0.9rem;">Please admit only these students when they knock to join your Google Meet room.</p>
@@ -450,16 +472,23 @@ export async function sendReminderEmail(
   email: string,
   courseTitle: string,
   zoomUrl: string,
-  startTime: string
+  startTime: string,
+  dayName?: string,
 ) {
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: email,
     subject: `Class starting in 20 minutes: ${courseTitle}`,
     html: `
-      <h2>Your class starts in 20 minutes!</h2>
-      <p><strong>${courseTitle}</strong> starts at ${startTime}.</p>
-      <p><a href="${zoomUrl}">Join Now</a></p>
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Your class starts in 20 minutes!</h2>
+        <p><strong>${courseTitle}</strong> starts at <strong>${startTime}</strong>.</p>
+        ${dayName ? formatSessionTimes(startTime.replace(' UTC',''), dayName) : ''}
+        <p style="margin-top:1.25rem;">
+          <a href="${zoomUrl}" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block;">Join Class Now →</a>
+        </p>
+        <p style="margin-top:2rem; color:#666; font-size:0.85rem;">SciQuest Learning Team</p>
+      </div>
     `,
   })
 }

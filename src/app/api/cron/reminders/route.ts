@@ -43,7 +43,8 @@ export async function GET(req: Request) {
           enrollment.student.email,
           course.title,
           enrollment.zoomJoinUrl || zoomUrl,
-          startDisplay
+          startDisplay,
+          todayName,
         )
         sent++
       }
@@ -60,6 +61,7 @@ export async function GET(req: Request) {
         startDisplay,
         course.zoomStartUrl || zoomUrl,
         students,
+        todayName,
       )
       sent++
     }
