@@ -332,8 +332,8 @@ export default function CoursePageClient() {
                       <div
                         key={gi}
                         style={{
-                          backgroundColor: anySelected ? '#003d35' : '#EEF3F8',
-                          border: `1px solid ${anySelected ? '#00C2A8' : '#C5D5E4'}`,
+                          backgroundColor: anySelected ? '#E0F7F4' : '#F8FAFC',
+                          border: `1px solid ${anySelected ? '#00A896' : '#C5D5E4'}`,
                           borderRadius: '8px',
                           padding: '0.625rem 0.875rem',
                         }}
@@ -361,8 +361,8 @@ export default function CoursePageClient() {
                                     }}
                                     style={{ accentColor: '#00C2A8' }}
                                   />
-                                  <span style={{ color: alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#5a7a96', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
-                                    <strong style={{ color: alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#2d4a6b' }}>{g.dateLabel}</strong> — {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓' : ''}
+                                  <span style={{ color: alreadyPaid ? '#16a34a' : isSelected ? '#00796B' : '#2d4a6b', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
+                                    <strong style={{ color: alreadyPaid ? '#16a34a' : isSelected ? '#00796B' : '#0B1A2E' }}>{g.dateLabel}</strong> — {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓' : ''}
                                   </span>
                                 </label>
                               )
@@ -377,8 +377,8 @@ export default function CoursePageClient() {
                                   onChange={() => !alreadyPaid && !isCancelled && toggleSession(s.label)}
                                   style={{ accentColor: alreadyPaid ? '#22c55e' : '#00C2A8', width: '15px', height: '15px' }}
                                 />
-                                <span style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#5a7a96', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
-                                  <strong style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#2d4a6b' }}>{g.dateLabel}</strong> — {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓ Paid' : ` — $${feePerSession.toFixed(2)}`}
+                                <span style={{ color: isCancelled ? '#dc2626' : alreadyPaid ? '#16a34a' : isSelected ? '#00796B' : '#2d4a6b', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
+                                  <strong style={{ color: isCancelled ? '#dc2626' : alreadyPaid ? '#16a34a' : isSelected ? '#00796B' : '#0B1A2E' }}>{g.dateLabel}</strong> — {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓ Paid' : ` — $${feePerSession.toFixed(2)}`}
                                 </span>
                               </label>
                             )
