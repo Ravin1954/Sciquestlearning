@@ -12,7 +12,7 @@ function isSessionLive(daysOfWeek: string[], startTimeUtc: string, sessionDurati
   const nowUtcMins = now.getUTCHours() * 60 + now.getUTCMinutes()
   const [h, m] = startTimeUtc.split(':').map(Number)
   const sessionStartMins = h * 60 + m
-  const windowStart = sessionStartMins - 15
+  const windowStart = sessionStartMins - 20
   const windowEnd = sessionStartMins + Math.max(sessionDurationMins, 120)
   for (const day of daysOfWeek) {
     const dayIdx = DAY_NAMES.indexOf(day)
@@ -324,7 +324,7 @@ export default function StudentPage() {
                               <>
                                 <span style={{ color: '#5a7a96', fontSize: '0.75rem', textAlign: 'right' }}>{nextSession}</span>
                                 <span style={{ color: '#5a7a96', fontSize: '0.72rem', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', padding: '0.25rem 0.6rem', borderRadius: '4px' }}>
-                                  Join link will appear 15 min before class
+                                  Join link will appear 20 min before class
                                 </span>
                               </>
                             )}
