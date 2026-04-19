@@ -51,6 +51,7 @@ interface Course {
   feeUsd: number
   durationWeeks: number
   zoomJoinUrl: string | null
+  cancelledSessionsJson: string | null
   createdAt: string
   instructor: { firstName: string; lastName: string; email: string }
   _count: { enrollments: number }
@@ -111,6 +112,7 @@ export default function AdminPage() {
   const [payoutMsg, setPayoutMsg] = useState<{ id: string; success: boolean; text: string } | null>(null)
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [meetLoading, setMeetLoading] = useState<string | null>(null)
+  const [clearCancelLoading, setClearCancelLoading] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [instructors, setInstructors] = useState<Instructor[]>([])
@@ -191,6 +193,13 @@ export default function AdminPage() {
       setPayoutMsg({ id: enrollmentId, success: false, text: 'Network error' })
     }
     setPayoutLoading(null)
+  }
+
+  const handleClearCancellations = async (courseId: string) => {
+    setClearCancelLoading(courseId)
+    await fetch(`/api/admin/courses/${courseId}/clear-cancellations`, { method: 'POST' })
+    setCourses((prev) => prev.map((c) => c.id === courseId ? { ...c, cancelledSessionsJson: '[]' } : c))
+    setClearCancelLoading(null)
   }
 
   const handleGenerateMeet = async (courseId: string) => {
@@ -447,6 +456,40 @@ export default function AdminPage() {
                       style={{ ...S.btn('#0B1A2E', '#00C2A8'), opacity: meetLoading === course.id ? 0.5 : 1 }}
                     >
                       {meetLoading === course.id ? 'Generating...' : 'Generate Meet Link'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Courses with Cancelled Sessions */}
+          {courses.filter((c) => c.status === 'APPROVED' && c.courseType === 'LIVE' && (() => { try { return JSON.parse(c.cancelledSessionsJson || '[]').length > 0 } catch { return false } })()).length > 0 && (
+            <div style={{ marginBottom: '2.5rem' }}>
+              <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '0.5rem' }}>
+                Courses with Cancelled Sessions
+                <span style={{ backgroundColor: '#F5C842', color: '#0B1A2E', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
+                  action needed
+                </span>
+              </h2>
+              <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '1rem' }}>
+                These courses had all sessions automatically cancelled due to no enrollments. Clear cancellations to make sessions available again for students to enroll.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {courses.filter((c) => c.status === 'APPROVED' && c.courseType === 'LIVE' && (() => { try { return JSON.parse(c.cancelledSessionsJson || '[]').length > 0 } catch { return false } })()).map((course) => (
+                  <div key={course.id} style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+                    <div>
+                      <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem' }}>{course.title}</p>
+                      <p style={{ color: '#5a7a96', fontSize: '0.8rem' }}>
+                        by {course.instructor.firstName} {course.instructor.lastName} · {course._count.enrollments} enrolled
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleClearCancellations(course.id)}
+                      disabled={clearCancelLoading === course.id}
+                      style={{ ...S.btn('#0B1A2E', '#F5C842'), opacity: clearCancelLoading === course.id ? 0.5 : 1 }}
+                    >
+                      {clearCancelLoading === course.id ? 'Clearing...' : 'Clear Cancellations'}
                     </button>
                   </div>
                 ))}
