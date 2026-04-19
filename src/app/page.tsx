@@ -298,13 +298,13 @@ export default function HomePage() {
           </h2>
 
           {/* Circular science images */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.25rem', marginBottom: '2.75rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.75rem', marginBottom: '2.75rem', flexWrap: 'wrap' }}>
             {[
-              { url: 'https://images.unsplash.com/photo-1532094349884-543559fee8e8?w=140&h=140&fit=crop&crop=center', alt: 'Science lab test tubes' },
-              { url: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=140&h=140&fit=crop&crop=center', alt: 'Microscope biology' },
-              { url: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=140&h=140&fit=crop&crop=center', alt: 'Mathematics chalkboard' },
-              { url: 'https://images.unsplash.com/photo-1628863353691-0071c8c1874c?w=140&h=140&fit=crop&crop=center', alt: 'Chemistry beakers' },
-              { url: 'https://images.unsplash.com/photo-1581093458791-9f3c3900df4b?w=140&h=140&fit=crop&crop=center', alt: 'Students in science lab' },
+              { url: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=200&h=200&fit=crop&crop=center', alt: 'Chemistry lab flasks' },
+              { url: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=200&h=200&fit=crop&crop=center', alt: 'Microscope biology' },
+              { url: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=200&h=200&fit=crop&crop=center', alt: 'Mathematics equations' },
+              { url: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=200&h=200&fit=crop&crop=center', alt: 'Science experiment' },
+              { url: 'https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=200&h=200&fit=crop&crop=center', alt: 'Biology nature science' },
             ].map((img) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -312,12 +312,12 @@ export default function HomePage() {
                 src={img.url}
                 alt={img.alt}
                 style={{
-                  width: '110px',
-                  height: '110px',
+                  width: '150px',
+                  height: '150px',
                   borderRadius: '50%',
                   objectFit: 'cover',
                   border: '3px solid #00C2A8',
-                  boxShadow: '0 4px 12px rgba(0,194,168,0.25)',
+                  boxShadow: '0 4px 14px rgba(0,194,168,0.3)',
                 }}
               />
             ))}
