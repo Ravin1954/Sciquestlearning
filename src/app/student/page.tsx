@@ -5,6 +5,38 @@ import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
 import DashboardLayout from '@/components/DashboardLayout'
 
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
+function isSessionLive(daysOfWeek: string[], startTimeUtc: string, sessionDurationMins: number, now: Date): boolean {
+  const nowUtcDay = now.getUTCDay()
+  const nowUtcMins = now.getUTCHours() * 60 + now.getUTCMinutes()
+  const [h, m] = startTimeUtc.split(':').map(Number)
+  const sessionStartMins = h * 60 + m
+  const windowStart = sessionStartMins - 15
+  const windowEnd = sessionStartMins + Math.max(sessionDurationMins, 120)
+  for (const day of daysOfWeek) {
+    const dayIdx = DAY_NAMES.indexOf(day)
+    if (dayIdx === nowUtcDay && nowUtcMins >= windowStart && nowUtcMins <= windowEnd) return true
+  }
+  return false
+}
+
+function getNextSession(daysOfWeek: string[], startTimeUtc: string, now: Date): string {
+  const nowTotalMins = now.getUTCDay() * 1440 + now.getUTCHours() * 60 + now.getUTCMinutes()
+  const [h, m] = startTimeUtc.split(':').map(Number)
+  let minDiff = Infinity
+  let nextDay = ''
+  for (const day of daysOfWeek) {
+    const dayIdx = DAY_NAMES.indexOf(day)
+    if (dayIdx < 0) continue
+    let sessionMins = dayIdx * 1440 + h * 60 + m
+    if (sessionMins <= nowTotalMins) sessionMins += 7 * 1440
+    const diff = sessionMins - nowTotalMins
+    if (diff < minDiff) { minDiff = diff; nextDay = day }
+  }
+  return nextDay ? `Next class: ${nextDay} at ${startTimeUtc} UTC` : ''
+}
+
 interface Feedback {
   attended: boolean
   rating: number
@@ -140,6 +172,12 @@ export default function StudentPage() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<Set<string>>(new Set())
+  const [now, setNow] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     fetch('/api/student/enrollments')
@@ -261,19 +299,38 @@ export default function StudentPage() {
                             <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>Content pending</span>
                           )}
                         </>
-                      ) : enrollment.zoomJoinUrl ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
-                          <a href={enrollment.zoomJoinUrl} target="_blank" rel="noopener noreferrer"
-                            style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
-                            Join Class →
-                          </a>
-                          {studentName && (
-                            <p style={{ color: '#F5C842', fontSize: '0.7rem', textAlign: 'right', maxWidth: '180px', lineHeight: 1.4, margin: 0 }}>
-                              Enter name as: <strong>{studentName}</strong>
-                            </p>
-                          )}
-                        </div>
-                      ) : (
+                      ) : enrollment.zoomJoinUrl ? (() => {
+                        const live = isSessionLive(course.daysOfWeek, course.startTimeUtc, course.sessionDurationMins, now)
+                        const nextSession = getNextSession(course.daysOfWeek, course.startTimeUtc, now)
+                        return (
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
+                            {live ? (
+                              <>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block', boxShadow: '0 0 0 2px #bbf7d0' }} />
+                                  <span style={{ color: '#22c55e', fontSize: '0.72rem', fontWeight: 700 }}>Class is live now</span>
+                                </div>
+                                <a href={enrollment.zoomJoinUrl} target="_blank" rel="noopener noreferrer"
+                                  style={{ backgroundColor: '#00C2A8', color: '#0B1A2E', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                                  Join Class →
+                                </a>
+                                {studentName && (
+                                  <p style={{ color: '#F5C842', fontSize: '0.7rem', textAlign: 'right', maxWidth: '180px', lineHeight: 1.4, margin: 0 }}>
+                                    Enter name as: <strong>{studentName}</strong>
+                                  </p>
+                                )}
+                              </>
+                            ) : (
+                              <>
+                                <span style={{ color: '#5a7a96', fontSize: '0.75rem', textAlign: 'right' }}>{nextSession}</span>
+                                <span style={{ color: '#5a7a96', fontSize: '0.72rem', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', padding: '0.25rem 0.6rem', borderRadius: '4px' }}>
+                                  Join link will appear 15 min before class
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        )
+                      })() : (
                         <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>Link pending</span>
                       )}
                       {course.classroomUrl && (
