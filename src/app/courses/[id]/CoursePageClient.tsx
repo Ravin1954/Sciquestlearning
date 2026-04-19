@@ -338,10 +338,7 @@ export default function CoursePageClient() {
                           padding: '0.625rem 0.875rem',
                         }}
                       >
-                        <p style={{ color: '#2d4a6b', fontSize: '0.825rem', fontWeight: 600, marginBottom: g.sessions.length > 1 ? '0.5rem' : 0 }}>
-                          {g.dateLabel}
-                        </p>
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: g.sessions.length > 1 ? 0 : '0.25rem' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                           {g.sessions.map((s) => {
                             const isCancelled = cancelledKeys.some((k) => { const [kDay, kTime] = k.split('|'); return s.day === kDay && s.utcTime === kTime })
                             const alreadyPaid = enrolledSessions.has(s.label)
@@ -365,7 +362,7 @@ export default function CoursePageClient() {
                                     style={{ accentColor: '#00C2A8' }}
                                   />
                                   <span style={{ color: alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#5a7a96', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
-                                    {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓' : ''}
+                                    <strong style={{ color: alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#2d4a6b' }}>{g.dateLabel}</strong> — {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓' : ''}
                                   </span>
                                 </label>
                               )
@@ -381,7 +378,7 @@ export default function CoursePageClient() {
                                   style={{ accentColor: alreadyPaid ? '#22c55e' : '#00C2A8', width: '15px', height: '15px' }}
                                 />
                                 <span style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#5a7a96', fontSize: '0.825rem', fontWeight: (isSelected || alreadyPaid) ? 600 : 400 }}>
-                                  {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓ Paid' : ` — $${feePerSession.toFixed(2)}`}
+                                  <strong style={{ color: isCancelled ? '#f87171' : alreadyPaid ? '#22c55e' : isSelected ? '#00C2A8' : '#2d4a6b' }}>{g.dateLabel}</strong> — {formatUtcTime(s.utcTime)}{isCancelled ? ' (Cancelled)' : alreadyPaid ? ' ✓ Paid' : ` — $${feePerSession.toFixed(2)}`}
                                 </span>
                               </label>
                             )
