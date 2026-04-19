@@ -401,6 +401,51 @@ export async function sendAccessExpiredEmail(
   })
 }
 
+export async function sendInstructorClassRosterEmail(
+  instructorEmail: string,
+  instructorFirstName: string,
+  courseTitle: string,
+  startTime: string,
+  meetUrl: string,
+  students: { name: string; email: string }[],
+) {
+  const rows = students.map((s) =>
+    `<tr>
+      <td style="padding:0.5rem 0.75rem; border-bottom:1px solid #e5e7eb; color:#1a1a2e;">${s.name}</td>
+      <td style="padding:0.5rem 0.75rem; border-bottom:1px solid #e5e7eb; color:#555;">${s.email}</td>
+    </tr>`
+  ).join('')
+
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: instructorEmail,
+    subject: `Class starting in 20 minutes — ${courseTitle} (${students.length} student${students.length !== 1 ? 's' : ''})`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Hi ${instructorFirstName},</h2>
+        <p>Your class <strong>${courseTitle}</strong> starts at <strong>${startTime}</strong> — in about 20 minutes.</p>
+
+        <h3 style="color: #0B1A2E; margin-top: 1.5rem;">Enrolled Students (${students.length})</h3>
+        <p style="color:#555; font-size:0.9rem;">Please admit only these students when they knock to join your Google Meet room.</p>
+        <table style="width:100%; border-collapse:collapse; margin: 0.75rem 0; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;">
+          <thead>
+            <tr style="background:#EEF3F8;">
+              <th style="padding:0.5rem 0.75rem; text-align:left; color:#0B1A2E; font-size:0.85rem;">Student Name</th>
+              <th style="padding:0.5rem 0.75rem; text-align:left; color:#0B1A2E; font-size:0.85rem;">Email</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+
+        <p style="margin-top:1.5rem;">
+          <a href="${meetUrl}" style="background:#00C2A8; color:#0B1A2E; padding:0.75rem 1.5rem; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block;">Start Class →</a>
+        </p>
+        <p style="margin-top:2rem; color:#666; font-size:0.85rem;">SciQuest Learning Team</p>
+      </div>
+    `,
+  })
+}
+
 export async function sendReminderEmail(
   email: string,
   courseTitle: string,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { sendReminderEmail, sendAccessExpiryWarningEmail, sendAccessExpiredEmail } from '@/lib/resend'
+import { sendReminderEmail, sendInstructorClassRosterEmail, sendAccessExpiryWarningEmail, sendAccessExpiredEmail } from '@/lib/resend'
 
 // Called by Railway cron every minute
 // Sends reminders for sessions starting in 19–21 minutes
@@ -48,12 +48,18 @@ export async function GET(req: Request) {
         sent++
       }
 
-      // Remind instructor (with start URL)
-      await sendReminderEmail(
+      // Send instructor the class roster with student list
+      const students = course.enrollments.map((e) => ({
+        name: `${e.student.firstName} ${e.student.lastName}`,
+        email: e.student.email,
+      }))
+      await sendInstructorClassRosterEmail(
         course.instructor.email,
+        course.instructor.firstName,
         course.title,
+        startDisplay,
         course.zoomStartUrl || zoomUrl,
-        startDisplay
+        students,
       )
       sent++
     }
