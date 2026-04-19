@@ -32,6 +32,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     parseFloat(feeUsd) !== Number(course.feeUsd) ||
     (contentUrl || null) !== course.contentUrl
 
+  // Clear cancelled sessions when the instructor reschedules (start date changed)
+  const startDateChanged = (startDate || '') !== (course.startDate || '')
+  const hasCancelledSessions = (() => {
+    try { return JSON.parse(course.cancelledSessionsJson || '[]').length > 0 } catch { return false }
+  })()
+  const clearCancellations = startDateChanged && hasCancelledSessions
+
   const updated = await prisma.course.update({
     where: { id },
     data: {
@@ -54,6 +61,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       scheduleJson: scheduleJson || '',
       recordingsJson: recordingsJson || '[]',
       ...(contentChanged ? { status: 'PENDING', rejectionRemark: null } : {}),
+      ...(clearCancellations ? { cancelledSessionsJson: '[]' } : {}),
     },
   })
 

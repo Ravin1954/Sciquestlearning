@@ -134,6 +134,7 @@ export default function EditCoursePage() {
   const [error, setError] = useState('')
   const [courseStatus, setCourseStatus] = useState<string>('')
   const [rejectionRemark, setRejectionRemark] = useState<string | null>(null)
+  const [isCancelled, setIsCancelled] = useState(false)
   const [courseType, setCourseType] = useState<'LIVE' | 'SELF_PACED'>('LIVE')
   const [selectedDays, setSelectedDays] = useState<string[]>([])
   const [timezone, setTimezone] = useState('America/New_York')
@@ -167,6 +168,10 @@ export default function EditCoursePage() {
         setCourseStatus(course.status || '')
         setCourseType(course.courseType || 'LIVE')
         setSelectedDays(course.daysOfWeek || [])
+        try {
+          const cancelled = JSON.parse(course.cancelledSessionsJson || '[]')
+          setIsCancelled(Array.isArray(cancelled) && cancelled.length > 0)
+        } catch { setIsCancelled(false) }
         setTopics(course.topics || [])
         setRejectionRemark(course.rejectionRemark || null)
         setDurationUnit(course.durationUnit === 'DAYS' ? 'DAYS' : 'WEEKS')
@@ -325,6 +330,15 @@ export default function EditCoursePage() {
             ? 'Editing an approved course will send it back for admin review.'
             : 'Make your changes and resubmit for admin review.'}
         </p>
+
+        {isCancelled && (
+          <div style={{ backgroundColor: '#1a2d1a', border: '1px solid #2d5a2d', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
+            <p style={{ color: '#4ade80', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Reschedule this course</p>
+            <p style={{ color: '#86efac', fontSize: '0.875rem', lineHeight: 1.6 }}>
+              This course was cancelled because no students enrolled before the first session. Simply pick a new start date and update the class times below — your course will stay approved and be visible to students immediately. No admin review needed.
+            </p>
+          </div>
+        )}
 
         {rejectionRemark && (
           <div style={{ backgroundColor: '#3d0f0f', border: '1px solid #7f1d1d', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
@@ -605,7 +619,7 @@ export default function EditCoursePage() {
               disabled={loading}
               style={{ backgroundColor: loading ? '#005040' : '#00C2A8', color: '#0B1A2E', padding: '0.875rem 2rem', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}
             >
-              {loading ? 'Saving...' : courseStatus === 'REJECTED' ? 'Resubmit for Review →' : 'Save Changes →'}
+              {loading ? 'Saving...' : courseStatus === 'REJECTED' ? 'Resubmit for Review →' : isCancelled ? 'Reschedule Course →' : 'Save Changes →'}
             </button>
             <button
               type="button"

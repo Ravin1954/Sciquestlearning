@@ -99,7 +99,6 @@ export default function MyCoursesPage() {
   const [msgAttachment, setMsgAttachment] = useState('')
   const [msgSending, setMsgSending] = useState(false)
   const [msgResult, setMsgResult] = useState<string | null>(null)
-  const [clearCancelLoading, setClearCancelLoading] = useState<string | null>(null)
 
   const handleViewRoster = async (courseId: string) => {
     if (rosterCourseId === courseId) { setRosterCourseId(null); setMsgResult(null); return }
@@ -138,13 +137,6 @@ export default function MyCoursesPage() {
       .then((r) => r.json())
       .then((c) => { setCourses(c); setLoading(false) })
   }, [])
-
-  const handleClearCancellations = async (courseId: string) => {
-    setClearCancelLoading(courseId)
-    await fetch(`/api/instructor/courses/${courseId}/clear-cancellations`, { method: 'POST' })
-    setCourses((prev) => prev.map((c) => c.id === courseId ? { ...c, cancelledSessionsJson: '[]' } : c))
-    setClearCancelLoading(null)
-  }
 
   const handleDelete = async (courseId: string) => {
     if (!confirm('Are you sure you want to delete this course? This cannot be undone.')) return
@@ -401,13 +393,12 @@ export default function MyCoursesPage() {
                           Edit
                         </Link>
                         {c.cancelledSessionsJson && (() => { try { return JSON.parse(c.cancelledSessionsJson).length > 0 } catch { return false } })() && (
-                          <button
-                            onClick={() => handleClearCancellations(c.id)}
-                            disabled={clearCancelLoading === c.id}
-                            style={{ backgroundColor: 'transparent', color: '#F5C842', border: '1px solid #F5C842', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', opacity: clearCancelLoading === c.id ? 0.5 : 1 }}
+                          <Link
+                            href={`/instructor/courses/${c.id}/edit`}
+                            style={{ backgroundColor: 'transparent', color: '#F5C842', border: '1px solid #F5C842', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap' }}
                           >
-                            {clearCancelLoading === c.id ? '...' : 'Reopen Sessions'}
-                          </button>
+                            Reschedule
+                          </Link>
                         )}
                         {c._count.enrollments === 0 && (
                           <button
