@@ -14,8 +14,6 @@ function formatSessionTimes(utcTimeStr: string, dayName: string): string {
   return `
     <table style="border-collapse:collapse; margin:0.5rem 0; font-size:0.9rem;">
       <tr><td style="padding:0.2rem 1rem 0.2rem 0; color:#555; font-weight:600; white-space:nowrap;">Eastern Time (ET)</td><td style="color:#1a1a2e;">${fmt('America/New_York')}</td></tr>
-      <tr><td style="padding:0.2rem 1rem 0.2rem 0; color:#555; font-weight:600; white-space:nowrap;">India (IST)</td><td style="color:#1a1a2e;">${fmt('Asia/Kolkata')}</td></tr>
-      <tr><td style="padding:0.2rem 1rem 0.2rem 0; color:#555; font-weight:600; white-space:nowrap;">South Korea (KST)</td><td style="color:#1a1a2e;">${fmt('Asia/Seoul')}</td></tr>
       <tr><td style="padding:0.2rem 1rem 0.2rem 0; color:#555; font-weight:600; white-space:nowrap;">UTC</td><td style="color:#1a1a2e;">${dayName} at ${utcTimeStr} UTC</td></tr>
     </table>`
 }
