@@ -325,8 +325,8 @@ export default function HomePage() {
 
           <p style={{ color: '#2d4a6b', fontSize: '1rem', lineHeight: 1.85, marginBottom: '1.5rem' }}>
             Welcome to SciQuestLearning.com, your gateway to an exciting and interactive world of science education!
-            At SciQuest Learning, we are dedicated to inspiring curiosity and deep understanding in Biology, Zoology,
-            Chemistry, and Mathematics for Middle School and High School students. Our platform offers engaging,
+            At SciQuest Learning, we are dedicated to inspiring curiosity and deep understanding in Biology, Chemistry,
+            Physical Science, and Mathematics for Middle School and High School students. Our platform offers engaging,
             interactive learning experiences designed to make complex concepts simple, enjoyable, and meaningful.
           </p>
 
