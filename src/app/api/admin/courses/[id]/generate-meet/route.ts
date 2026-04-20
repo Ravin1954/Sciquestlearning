@@ -17,14 +17,20 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   if (!course) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   if (course.courseType !== 'LIVE') return NextResponse.json({ error: 'Not a live course' }, { status: 400 })
 
-  const meetingUrl = await createGoogleMeetSpace()
+  let meetingUrl: string
+  try {
+    meetingUrl = await createGoogleMeetSpace()
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('Google Meet generation failed:', message)
+    return NextResponse.json({ error: `Meet generation failed: ${message}` }, { status: 500 })
+  }
 
   await prisma.course.update({
     where: { id },
     data: { zoomJoinUrl: meetingUrl, zoomStartUrl: meetingUrl },
   })
 
-  // Update all existing enrollments for this course with the new Meet link
   await prisma.enrollment.updateMany({
     where: { courseId: id },
     data: { zoomJoinUrl: meetingUrl },

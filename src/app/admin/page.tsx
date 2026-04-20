@@ -204,15 +204,19 @@ export default function AdminPage() {
 
   const handleGenerateMeet = async (courseId: string) => {
     setMeetLoading(courseId)
-    const res = await fetch(`/api/admin/courses/${courseId}/generate-meet`, { method: 'POST' })
-    const data = await res.json()
-    if (!res.ok) {
-      alert(`Failed to generate Meet link: ${data.error || 'Unknown error'}`)
-      setMeetLoading(null)
-      return
+    try {
+      const res = await fetch(`/api/admin/courses/${courseId}/generate-meet`, { method: 'POST' })
+      const data = await res.json()
+      if (!res.ok) {
+        alert(`Failed to generate Meet link: ${data.error || 'Unknown error'}`)
+        setMeetLoading(null)
+        return
+      }
+      const updated = await fetch('/api/admin/courses').then((r) => r.json())
+      setCourses(Array.isArray(updated) ? updated : [])
+    } catch (err) {
+      alert(`Failed to generate Meet link: ${err instanceof Error ? err.message : 'Network error'}`)
     }
-    const updated = await fetch('/api/admin/courses').then((r) => r.json())
-    setCourses(Array.isArray(updated) ? updated : [])
     setMeetLoading(null)
   }
 
