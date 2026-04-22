@@ -117,30 +117,32 @@ export default function CourseEnrollmentsPage() {
                         <span style={{ color: '#0B1A2E', fontWeight: 600 }}>${s.amountPaidUsd.toFixed(2)}</span>
                       </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setManageId(manageId === s.enrollmentId ? null : s.enrollmentId)
-                        setRefundReason('')
-                        setRefundAmount('')
-                        setRefundResult(null)
-                      }}
-                      style={{
-                        backgroundColor: manageId === s.enrollmentId ? '#f87171' : 'transparent',
-                        color: manageId === s.enrollmentId ? '#fff' : '#f87171',
-                        border: '1px solid #f87171',
-                        padding: '0.5rem 1.125rem',
-                        borderRadius: '8px',
-                        fontWeight: 600,
-                        fontSize: '0.875rem',
-                        cursor: 'pointer',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {manageId === s.enrollmentId ? 'Close' : 'Manage Enrollment'}
-                    </button>
+                    {course.courseType === 'LIVE' && (
+                      <button
+                        onClick={() => {
+                          setManageId(manageId === s.enrollmentId ? null : s.enrollmentId)
+                          setRefundReason('')
+                          setRefundAmount('')
+                          setRefundResult(null)
+                        }}
+                        style={{
+                          backgroundColor: manageId === s.enrollmentId ? '#f87171' : 'transparent',
+                          color: manageId === s.enrollmentId ? '#fff' : '#f87171',
+                          border: '1px solid #f87171',
+                          padding: '0.5rem 1.125rem',
+                          borderRadius: '8px',
+                          fontWeight: 600,
+                          fontSize: '0.875rem',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {manageId === s.enrollmentId ? 'Close' : 'Manage Enrollment'}
+                      </button>
+                    )}
                   </div>
 
-                  {manageId === s.enrollmentId && (
+                  {course.courseType === 'LIVE' && manageId === s.enrollmentId && (
                     <div style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid #C5D5E4' }}>
                       <p style={{ color: '#f87171', fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>
                         Refund Request
