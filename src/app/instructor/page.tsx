@@ -299,22 +299,64 @@ export default function InstructorPage() {
             ))}
           </div>
 
-          {/* Quick link to My Courses */}
-          <div style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem' }}>
-                {approved.length} active course{approved.length !== 1 ? 's' : ''}
-              </p>
-              <p style={{ color: '#5a7a96', fontSize: '0.875rem' }}>
-                View your full schedule, manage content, and add recordings.
-              </p>
+          {/* Course enrollment summary */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <h2 style={S.h2}>My Courses — Student Enrollment</h2>
+              <Link
+                href="/instructor/courses"
+                style={{ color: '#00C2A8', fontSize: '0.875rem', textDecoration: 'none', fontWeight: 600 }}
+              >
+                Manage Courses →
+              </Link>
             </div>
-            <Link
-              href="/instructor/courses"
-              style={{ backgroundColor: 'transparent', color: '#00C2A8', border: '1px solid #00C2A8', padding: '0.625rem 1.25rem', borderRadius: '8px', fontWeight: 700, textDecoration: 'none', fontSize: '0.875rem', whiteSpace: 'nowrap' }}
-            >
-              View My Courses →
-            </Link>
+            {approved.length === 0 ? (
+              <div style={{ ...S.card, textAlign: 'center', color: '#5a7a96', padding: '2rem' }}>
+                No active courses yet.{' '}
+                <Link href="/instructor/courses/new" style={{ color: '#00C2A8' }}>Create your first course →</Link>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {approved.map((c) => (
+                  <div
+                    key={c.id}
+                    style={{ ...S.card, padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '0.68rem', fontWeight: 700, textTransform: 'uppercase', padding: '0.15rem 0.5rem', borderRadius: '4px', backgroundColor: c.courseType === 'LIVE' ? '#0a2240' : '#2d1a4a', color: c.courseType === 'LIVE' ? '#38bdf8' : '#c084fc' }}>
+                          {c.courseType === 'LIVE' ? 'Live' : 'Self-Paced'}
+                        </span>
+                        <p style={{ color: '#0B1A2E', fontWeight: 600, fontSize: '0.925rem', margin: 0 }}>{c.title}</p>
+                      </div>
+                      {c.courseType === 'LIVE' && c.daysOfWeek.length > 0 && (
+                        <p style={{ color: '#5a7a96', fontSize: '0.775rem', margin: 0 }}>
+                          {c.daysOfWeek.join(', ')} · {formatLocalTime(c.startTimeUtc)}
+                        </p>
+                      )}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <div style={{ textAlign: 'center' }}>
+                        <p style={{ fontFamily: 'Fraunces, serif', fontSize: '1.5rem', fontWeight: 700, color: c._count.enrollments > 0 ? '#00C2A8' : '#5a7a96', margin: 0, lineHeight: 1 }}>
+                          {c._count.enrollments}
+                        </p>
+                        <p style={{ color: '#5a7a96', fontSize: '0.7rem', margin: 0 }}>
+                          student{c._count.enrollments !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                      {c._count.enrollments > 0 && (
+                        <Link
+                          href={`/instructor/courses/${c.id}/enrollments`}
+                          style={{ backgroundColor: 'transparent', color: '#F5C842', border: '1px solid #F5C842', padding: '0.375rem 0.875rem', borderRadius: '6px', fontWeight: 600, textDecoration: 'none', fontSize: '0.775rem', whiteSpace: 'nowrap' }}
+                        >
+                          View Roster →
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </>
       )}
