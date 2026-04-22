@@ -490,3 +490,66 @@ export async function sendReminderEmail(
     `,
   })
 }
+
+export async function sendRefundRequestEmail(
+  instructorName: string,
+  instructorEmail: string,
+  studentName: string,
+  studentEmail: string,
+  courseTitle: string,
+  amountPaid: number,
+  refundAmount: number,
+  reason: string,
+) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@sciquestlearning.com'
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: adminEmail,
+    subject: `Refund Request — ${studentName} in "${courseTitle}"`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Refund Request from Instructor</h2>
+        <p>An instructor has submitted a refund request. Please review and process via Stripe.</p>
+        <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Instructor</td><td style="padding:0.5rem;">${instructorName} (${instructorEmail})</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Student</td><td style="padding:0.5rem;">${studentName} (${studentEmail})</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Course</td><td style="padding:0.5rem;">${courseTitle}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Amount Paid by Student</td><td style="padding:0.5rem;">$${amountPaid.toFixed(2)}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600; color:#dc2626;">Refund Amount Requested</td><td style="padding:0.5rem; font-weight:700; color:#dc2626;">$${refundAmount.toFixed(2)}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Reason</td><td style="padding:0.5rem;">${reason}</td></tr>
+        </table>
+        <p style="margin-top:1.5rem; color:#666;">Please log in to Stripe and issue the refund to the student directly.</p>
+        <p style="color:#666;">SciQuest Learning Admin</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendStudentComplaintEmail(
+  studentName: string,
+  studentEmail: string,
+  courseTitle: string,
+  instructorName: string,
+  issueDescription: string,
+) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@sciquestlearning.com'
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: adminEmail,
+    subject: `Student Complaint — ${studentName} in "${courseTitle}"`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #0B1A2E;">Student Complaint Received</h2>
+        <p>A student has reported an issue. Please review and take appropriate action.</p>
+        <table style="width:100%; border-collapse:collapse; margin: 1rem 0;">
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Student</td><td style="padding:0.5rem;">${studentName} (${studentEmail})</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Course</td><td style="padding:0.5rem;">${courseTitle}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Instructor</td><td style="padding:0.5rem;">${instructorName}</td></tr>
+          <tr><td style="padding:0.5rem; color:#555; font-weight:600;">Issue Reported</td><td style="padding:0.5rem;">${issueDescription}</td></tr>
+        </table>
+        <p style="margin-top:1.5rem; color:#666;">Please investigate and respond to the student as appropriate.</p>
+        <p style="color:#666;">SciQuest Learning Admin</p>
+      </div>
+    `,
+  })
+}

@@ -92,8 +92,13 @@ export default function MyCoursesPage() {
   const [recordingUrl, setRecordingUrl] = useState('')
   const [recordingSaving, setRecordingSaving] = useState(false)
   const [rosterCourseId, setRosterCourseId] = useState<string | null>(null)
-  const [rosterData, setRosterData] = useState<{ studentName: string; email: string; enrolledAt: string }[]>([])
+  const [rosterData, setRosterData] = useState<{ enrollmentId: string; studentName: string; email: string; amountPaidUsd: number; enrolledAt: string }[]>([])
   const [rosterLoading, setRosterLoading] = useState(false)
+  const [manageEnrollmentId, setManageEnrollmentId] = useState<string | null>(null)
+  const [refundReason, setRefundReason] = useState('')
+  const [refundAmount, setRefundAmount] = useState('')
+  const [refundSubmitting, setRefundSubmitting] = useState(false)
+  const [refundResult, setRefundResult] = useState<string | null>(null)
   const [msgSubject, setMsgSubject] = useState('')
   const [msgBody, setMsgBody] = useState('')
   const [msgAttachment, setMsgAttachment] = useState('')
@@ -132,6 +137,27 @@ export default function MyCoursesPage() {
     setMsgSending(false)
   }
 
+  const handleRefundRequest = async (courseId: string, enrollmentId: string) => {
+    if (!refundReason.trim() || !refundAmount) { setRefundResult('error:Please fill in both reason and refund amount.'); return }
+    setRefundSubmitting(true)
+    setRefundResult(null)
+    const res = await fetch(`/api/instructor/courses/${courseId}/refund-request`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enrollmentId, reason: refundReason, refundAmount: parseFloat(refundAmount) }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setRefundResult('success:Refund request sent to SciQuest admin successfully.')
+      setRefundReason('')
+      setRefundAmount('')
+      setManageEnrollmentId(null)
+    } else {
+      setRefundResult(`error:${data.error || 'Failed to send request.'}`)
+    }
+    setRefundSubmitting(false)
+  }
+
   useEffect(() => {
     fetch('/api/instructor/courses')
       .then((r) => r.json())
@@ -153,6 +179,7 @@ export default function MyCoursesPage() {
   }
 
   const approved = courses.filter((c) => c.status === 'APPROVED')
+  const approvedLive = approved.filter((c) => c.courseType === 'LIVE')
   const rejected = courses.filter((c) => c.status === 'REJECTED')
 
   return (
@@ -172,12 +199,12 @@ export default function MyCoursesPage() {
 
       {loading ? <p style={{ color: '#5a7a96' }}>Loading...</p> : (
         <>
-          {/* Upcoming Classes */}
-          {approved.length > 0 && (
+          {/* Upcoming Classes — Live only */}
+          {approvedLive.length > 0 && (
             <div style={{ marginBottom: '2.5rem' }}>
               <h2 style={S.h2}>Upcoming Classes</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {approved.map((c) => {
+                {approvedLive.map((c) => {
                   const nextSession = c.courseType === 'LIVE' ? getNextSession(c.scheduleJson) : null
                   const minsUntil = nextSession?.minsUntil ?? Infinity
                   const isClassTime = minsUntil <= 30 && minsUntil >= -60 && c._count.enrollments > 0
@@ -242,11 +269,66 @@ export default function MyCoursesPage() {
                         ) : rosterData.length === 0 ? (
                           <p style={{ color: '#5a7a96', fontSize: '0.85rem' }}>No students enrolled.</p>
                         ) : (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                             {rosterData.map((s, i) => (
-                              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '8px', padding: '0.6rem 1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                <span style={{ color: '#0B1A2E', fontWeight: 600, fontSize: '0.875rem' }}>{s.studentName}</span>
-                                <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>{s.email}</span>
+                              <div key={i} style={{ backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '8px', padding: '0.6rem 1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                  <div>
+                                    <span style={{ color: '#0B1A2E', fontWeight: 600, fontSize: '0.875rem' }}>{s.studentName}</span>
+                                    <span style={{ color: '#5a7a96', fontSize: '0.8rem', marginLeft: '0.75rem' }}>{s.email}</span>
+                                  </div>
+                                  <button
+                                    onClick={() => {
+                                      setManageEnrollmentId(manageEnrollmentId === s.enrollmentId ? null : s.enrollmentId)
+                                      setRefundReason('')
+                                      setRefundAmount('')
+                                      setRefundResult(null)
+                                    }}
+                                    style={{ backgroundColor: 'transparent', color: '#f87171', border: '1px solid #f87171', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                  >
+                                    {manageEnrollmentId === s.enrollmentId ? 'Close' : 'Manage Enrollment'}
+                                  </button>
+                                </div>
+
+                                {manageEnrollmentId === s.enrollmentId && (
+                                  <div style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid #C5D5E4' }}>
+                                    <p style={{ color: '#f87171', fontWeight: 600, fontSize: '0.8rem', marginBottom: '0.5rem' }}>Refund Request</p>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem', fontSize: '0.8rem' }}>
+                                      <div><span style={{ color: '#5a7a96' }}>Student: </span><span style={{ color: '#0B1A2E', fontWeight: 600 }}>{s.studentName}</span></div>
+                                      <div><span style={{ color: '#5a7a96' }}>Amount Paid: </span><span style={{ color: '#0B1A2E', fontWeight: 600 }}>${s.amountPaidUsd.toFixed(2)}</span></div>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                      <textarea
+                                        placeholder="Reason for refund (e.g. I was unable to teach on Apr 21 due to an emergency)"
+                                        value={refundReason}
+                                        onChange={(e) => setRefundReason(e.target.value)}
+                                        rows={3}
+                                        style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.8rem', fontFamily: "'DM Sans', sans-serif", resize: 'vertical' }}
+                                      />
+                                      <input
+                                        type="number"
+                                        placeholder="Refund amount (e.g. 12.50)"
+                                        value={refundAmount}
+                                        onChange={(e) => setRefundAmount(e.target.value)}
+                                        min="0"
+                                        step="0.01"
+                                        style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.8rem' }}
+                                      />
+                                      {refundResult && (
+                                        <p style={{ fontSize: '0.78rem', padding: '0.4rem 0.75rem', borderRadius: '6px', backgroundColor: refundResult.startsWith('success') ? '#003d35' : '#3d0f0f', color: refundResult.startsWith('success') ? '#00C2A8' : '#f87171' }}>
+                                          {refundResult.replace(/^(success|error):/, '')}
+                                        </p>
+                                      )}
+                                      <button
+                                        onClick={() => handleRefundRequest(c.id, s.enrollmentId)}
+                                        disabled={refundSubmitting}
+                                        style={{ backgroundColor: '#f87171', color: '#fff', border: 'none', padding: '0.5rem 1rem', borderRadius: '6px', fontWeight: 700, fontSize: '0.8rem', cursor: refundSubmitting ? 'not-allowed' : 'pointer', opacity: refundSubmitting ? 0.6 : 1, alignSelf: 'flex-start' }}
+                                      >
+                                        {refundSubmitting ? 'Sending...' : 'Submit Refund Request to Admin'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>

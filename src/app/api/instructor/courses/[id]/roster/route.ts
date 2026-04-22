@@ -27,8 +27,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   })
 
   const roster = enrollments.map((e) => ({
+    enrollmentId: e.id,
     studentName: `${e.student.firstName} ${e.student.lastName}`,
     email: e.student.email,
+    amountPaidUsd: Number(e.amountPaidUsd),
     enrolledAt: e.enrolledAt,
     sessions: e.selectedSessionsJson ? (() => { try { return JSON.parse(e.selectedSessionsJson) } catch { return [] } })() : [],
   }))

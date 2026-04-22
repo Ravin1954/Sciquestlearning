@@ -173,6 +173,10 @@ export default function StudentPage() {
   const [loading, setLoading] = useState(true)
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<Set<string>>(new Set())
   const [now, setNow] = useState(new Date())
+  const [reportEnrollmentId, setReportEnrollmentId] = useState<string | null>(null)
+  const [reportIssue, setReportIssue] = useState('')
+  const [reportSubmitting, setReportSubmitting] = useState(false)
+  const [reportResult, setReportResult] = useState<string | null>(null)
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60000)
@@ -190,6 +194,25 @@ export default function StudentPage() {
 
   const handleFeedbackSubmitted = (enrollmentId: string) => {
     setFeedbackSubmitted((prev) => new Set([...prev, enrollmentId]))
+  }
+
+  const handleReportSubmit = async (enrollmentId: string) => {
+    if (!reportIssue.trim()) { setReportResult('error:Please describe the issue.'); return }
+    setReportSubmitting(true)
+    setReportResult(null)
+    const res = await fetch('/api/student/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enrollmentId, issueDescription: reportIssue }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setReportResult('success:Your complaint has been sent to the SciQuest admin. We will review and get back to you.')
+      setReportIssue('')
+    } else {
+      setReportResult(`error:${data.error || 'Failed to submit.'}`)
+    }
+    setReportSubmitting(false)
   }
 
   return (
@@ -359,6 +382,48 @@ export default function StudentPage() {
                       />
                     )
                   )}
+
+                  {/* Report Issue */}
+                  <div style={{ marginTop: '0.75rem' }}>
+                    <button
+                      onClick={() => {
+                        setReportEnrollmentId(reportEnrollmentId === enrollment.id ? null : enrollment.id)
+                        setReportIssue('')
+                        setReportResult(null)
+                      }}
+                      style={{ backgroundColor: 'transparent', color: '#f87171', border: '1px solid #f87171', padding: '0.3rem 0.875rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      {reportEnrollmentId === enrollment.id ? 'Cancel' : 'Report Issue'}
+                    </button>
+
+                    {reportEnrollmentId === enrollment.id && (
+                      <div style={{ marginTop: '0.75rem', padding: '1rem', backgroundColor: '#0a1a30', borderRadius: '8px', border: '1px solid #f87171' }}>
+                        <p style={{ color: '#f87171', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.5rem' }}>Report an Issue</p>
+                        <p style={{ color: '#5a7a96', fontSize: '0.78rem', marginBottom: '0.75rem' }}>
+                          Use this to report if the instructor did not show up, class was cancelled without notice, or any other concern.
+                        </p>
+                        <textarea
+                          placeholder="Describe the issue (e.g. Instructor did not show up for the April 21 class)"
+                          value={reportIssue}
+                          onChange={(e) => setReportIssue(e.target.value)}
+                          rows={3}
+                          style={{ width: '100%', padding: '0.5rem 0.75rem', borderRadius: '6px', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.8rem', resize: 'vertical', fontFamily: "'DM Sans', sans-serif", boxSizing: 'border-box' }}
+                        />
+                        {reportResult && (
+                          <p style={{ fontSize: '0.78rem', padding: '0.4rem 0.75rem', borderRadius: '6px', marginTop: '0.5rem', backgroundColor: reportResult.startsWith('success') ? '#003d35' : '#3d0f0f', color: reportResult.startsWith('success') ? '#00C2A8' : '#f87171' }}>
+                            {reportResult.replace(/^(success|error):/, '')}
+                          </p>
+                        )}
+                        <button
+                          onClick={() => handleReportSubmit(enrollment.id)}
+                          disabled={reportSubmitting}
+                          style={{ marginTop: '0.75rem', backgroundColor: '#f87171', color: '#fff', border: 'none', padding: '0.5rem 1.25rem', borderRadius: '6px', fontWeight: 700, fontSize: '0.8rem', cursor: reportSubmitting ? 'not-allowed' : 'pointer', opacity: reportSubmitting ? 0.6 : 1 }}
+                        >
+                          {reportSubmitting ? 'Submitting...' : 'Submit Complaint'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )
             })}
