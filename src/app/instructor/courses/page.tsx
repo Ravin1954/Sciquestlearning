@@ -214,7 +214,9 @@ export default function MyCoursesPage() {
                     <div key={c.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '0.75rem', borderColor: isClassTime ? '#00C2A8' : '#C5D5E4' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                       <div>
-                        <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
+                        <Link href={`/instructor/courses/${c.id}/enrollments`} style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem', display: 'block', textDecoration: 'none' }}>
+                          {c.title} <span style={{ color: '#00C2A8', fontSize: '0.75rem', fontWeight: 500 }}>View Enrollments →</span>
+                        </Link>
                         <p style={{ color: '#5a7a96', fontSize: '0.8rem' }}>
                           {c.daysOfWeek.join(', ')} · {formatLocalTime(c.startTimeUtc)} · {c.sessionDurationMins} min · {c._count.enrollments} students
                         </p>
@@ -446,7 +448,13 @@ export default function MyCoursesPage() {
                   <div key={c.id} style={{ ...S.card, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
                       <div style={{ flex: 1 }}>
-                        <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
+                        {c.status === 'APPROVED' && c._count.enrollments > 0 ? (
+                          <Link href={`/instructor/courses/${c.id}/enrollments`} style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem', display: 'block', textDecoration: 'none' }}>
+                            {c.title} <span style={{ color: '#00C2A8', fontSize: '0.75rem', fontWeight: 500 }}>View Enrollments →</span>
+                          </Link>
+                        ) : (
+                          <p style={{ color: '#0B1A2E', fontWeight: 600, marginBottom: '0.25rem' }}>{c.title}</p>
+                        )}
                         <p style={{ color: '#5a7a96', fontSize: '0.8rem' }}>
                           {c.subject.replace('_', ' ')} · ${Number(c.feeUsd).toFixed(2)} · {c._count.enrollments} enrolled
                         </p>
