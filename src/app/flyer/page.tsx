@@ -4,14 +4,14 @@ export default function FlyerPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#060f1a',
+      backgroundColor: '#EEF3F8',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       padding: '2rem',
       fontFamily: "'DM Sans', sans-serif",
     }}>
-      <p style={{ color: '#6b88a8', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+      <p style={{ color: '#5a7a96', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
         Print this page or screenshot it for community distribution
       </p>
 
