@@ -36,24 +36,6 @@ export default function NavBar() {
             >
               Browse Courses
             </Link>
-            {(!isSignedIn || isInstructor) && (
-              <Link
-                href="/class-policies"
-                style={{ color: '#2d4a6b' }}
-                className="hover:text-gray-900 transition-colors text-sm font-medium"
-              >
-                Class Policies
-              </Link>
-            )}
-            {(!isSignedIn || isInstructor) && (
-              <Link
-                href="/instructor-policies"
-                style={{ color: '#2d4a6b' }}
-                className="hover:text-gray-900 transition-colors text-sm font-medium"
-              >
-                Instructor Policies
-              </Link>
-            )}
             {isSignedIn && !isInstructor && (
               <Link
                 href="/student-policies"
