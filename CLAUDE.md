@@ -1,5 +1,11 @@
 # SciQuest Learning — Claude Context
 
+## Git Workflow — CRITICAL
+- **Always work on the `staging` branch.** Never commit feature changes directly to `main`.
+- Before starting any work: `git checkout staging && git pull origin staging`
+- Commit and push all changes to `origin/staging`
+- `main` is production — only merge staging → main when the owner explicitly approves a release
+
 ## Project
 Full-stack Next.js 14 (App Router) web app for SciQuest Learning — a live science/math tutoring platform for middle & high school students. Live at https://sciquestlearning.com
 

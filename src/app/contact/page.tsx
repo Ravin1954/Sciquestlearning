@@ -23,7 +23,7 @@ const labelStyle: React.CSSProperties = {
 }
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: '', email: '', role: 'Student', message: '' })
+  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', role: 'Student', message: '' })
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
@@ -36,11 +36,11 @@ export default function ContactPage() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, name: `${form.firstName} ${form.lastName}`.trim() }),
       })
       if (res.ok) {
         setSuccess(true)
-        setForm({ name: '', email: '', role: 'Student', message: '' })
+        setForm({ firstName: '', lastName: '', email: '', role: 'Student', message: '' })
       } else {
         const data = await res.json()
         setError(data.error || 'Something went wrong. Please try again.')
@@ -71,15 +71,27 @@ export default function ContactPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div>
-              <label style={labelStyle}>Your Name</label>
-              <input
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Enter your full name"
-                style={inputStyle}
-              />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label style={labelStyle}>First Name</label>
+                <input
+                  required
+                  value={form.firstName}
+                  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                  placeholder="First name"
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={labelStyle}>Last Name</label>
+                <input
+                  required
+                  value={form.lastName}
+                  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                  placeholder="Last name"
+                  style={inputStyle}
+                />
+              </div>
             </div>
 
             <div>
