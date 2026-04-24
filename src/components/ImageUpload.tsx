@@ -27,7 +27,8 @@ export default function ImageUpload({ value, onChange, label = 'Course Image' }:
     if (res.ok) {
       onChange(data.url)
     } else {
-      setError(data.error || 'Upload failed. Please try again.')
+      const msg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error)
+      setError(msg || 'Upload failed. Please try again.')
     }
     setUploading(false)
   }
