@@ -80,6 +80,7 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
             width: '100%',
             height: '160px',
             objectFit: 'cover',
+            objectPosition: 'top',
             display: 'block',
             flexShrink: 0,
           }}
