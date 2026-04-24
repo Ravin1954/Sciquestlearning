@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
+import ImageUpload from '@/components/ImageUpload'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const SUBJECTS = [
@@ -144,6 +145,7 @@ export default function EditCoursePage() {
   const [durationUnit, setDurationUnit] = useState<'WEEKS' | 'DAYS'>('WEEKS')
   const [feeType, setFeeType] = useState<'PER_SESSION' | 'LUMP_SUM'>('PER_SESSION')
 
+  const [imageUrl, setImageUrl] = useState('')
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -188,6 +190,7 @@ export default function EditCoursePage() {
           classroomUrl: course.classroomUrl || '',
           startDate: course.startDate || '',
         })
+        setImageUrl(course.imageUrl || '')
         // Pre-fill day times from scheduleJson (use first occurrence of each day)
         if (course.scheduleJson) {
           try {
@@ -299,6 +302,7 @@ export default function EditCoursePage() {
         scheduleJson,
         startDate: form.startDate,
         classroomUrl: form.classroomUrl || null,
+        imageUrl: imageUrl || null,
       }),
     })
 
@@ -390,6 +394,9 @@ export default function EditCoursePage() {
             <label style={labelStyle}>Course Description</label>
             <textarea required value={form.description} onChange={set('description')} rows={4} placeholder="Describe what students will learn..." style={{ ...inputStyle, resize: 'vertical' }} />
           </div>
+
+          {/* Course Image */}
+          <ImageUpload value={imageUrl} onChange={setImageUrl} label="Course Image" />
 
           {/* Topics */}
           <div>

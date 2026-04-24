@@ -51,6 +51,7 @@ model Course {
   feeUsd              Decimal      @db.Decimal(10, 2)
   feeType             String       @default("PER_SESSION")
   contentUrl          String?
+  imageUrl            String?
   gradeLevel          String       @default("")
   topics              String[]     @default([])
   scheduleJson        String       @default("")
