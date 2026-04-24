@@ -26,6 +26,7 @@ interface CourseCardProps {
     feeUsd: number | string
     feeType?: string
     startDate?: string
+    imageUrl?: string | null
     status?: 'PENDING' | 'APPROVED' | 'REJECTED'
     instructor?: {
       id?: string
@@ -64,13 +65,27 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
         backgroundColor: '#FFFFFF',
         border: '1px solid #C5D5E4',
         borderRadius: '12px',
-        padding: '1.5rem',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         gap: '0.75rem',
         boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
       }}
     >
+      {course.imageUrl && (
+        <img
+          src={course.imageUrl}
+          alt={course.title}
+          style={{
+            width: '100%',
+            height: '160px',
+            objectFit: 'cover',
+            display: 'block',
+            flexShrink: 0,
+          }}
+        />
+      )}
+      <div style={{ padding: '1.5rem', paddingTop: course.imageUrl ? '1rem' : '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
       <div className="flex items-start justify-between gap-2">
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <span
@@ -225,6 +240,7 @@ export default function CourseCard({ course, showStatus = false, showEnroll = tr
             View & Enroll
           </Link>
         )}
+      </div>
       </div>
     </div>
   )

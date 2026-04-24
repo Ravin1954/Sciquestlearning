@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
+import ImageUpload from '@/components/ImageUpload'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const SUBJECTS = [
@@ -129,6 +130,7 @@ export default function NewCoursePage() {
   const [topicInput, setTopicInput] = useState('')
   const [durationUnit, setDurationUnit] = useState<'WEEKS' | 'DAYS'>('WEEKS')
   const [feeType, setFeeType] = useState<'PER_SESSION' | 'LUMP_SUM'>('PER_SESSION')
+  const [imageUrl, setImageUrl] = useState('')
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -264,6 +266,7 @@ export default function NewCoursePage() {
         scheduleJson,
         startDate: form.startDate,
         classroomUrl: form.classroomUrl || null,
+        imageUrl: imageUrl || null,
       }),
     })
 
@@ -346,6 +349,9 @@ export default function NewCoursePage() {
               style={{ ...inputStyle, resize: 'vertical' }}
             />
           </div>
+
+          {/* Course Image */}
+          <ImageUpload value={imageUrl} onChange={setImageUrl} label="Course Image" />
 
           {/* Topics */}
           <div>

@@ -41,7 +41,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   const {
     title, description, subject, courseType, gradeLevel,
     durationWeeks, durationUnit, feeType, startDate, daysOfWeek, startTimeUtc, sessionDurationMins,
-    feeUsd, contentUrl, classroomUrl, topics, scheduleJson, recordingsJson,
+    feeUsd, contentUrl, classroomUrl, imageUrl, topics, scheduleJson, recordingsJson,
   } = body
 
   // Only reset to PENDING if content fields changed — schedule/date changes don't need re-approval
@@ -78,6 +78,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       feeUsd: parseFloat(feeUsd),
       contentUrl: contentUrl || null,
       classroomUrl: classroomUrl || null,
+      imageUrl: imageUrl || null,
       topics: Array.isArray(topics) ? topics : [],
       scheduleJson: scheduleJson || '',
       recordingsJson: recordingsJson || '[]',

@@ -35,6 +35,7 @@ interface Course {
   feeUsd: number
   topics: string[]
   status: string
+  imageUrl?: string
   recordingsJson?: string
   cancelledSessionsJson?: string
   instructor: { firstName: string; lastName: string; qualifications?: string }
@@ -260,6 +261,14 @@ export default function CoursePageClient() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem', alignItems: 'start' }}>
           {/* Main Content */}
           <div>
+            {course.imageUrl && (
+              <img
+                src={course.imageUrl}
+                alt={course.title}
+                style={{ width: '100%', height: '280px', objectFit: 'cover', borderRadius: '12px', marginBottom: '1.25rem', display: 'block' }}
+              />
+            )}
+
             <span style={{ backgroundColor: color + '22', color, padding: '0.25rem 0.75rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {subjectLabels[course.subject] || course.subject}
             </span>

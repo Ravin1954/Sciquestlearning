@@ -60,6 +60,7 @@ export async function POST(req: Request) {
     feeUsd,
     contentUrl,
     classroomUrl,
+    imageUrl,
     topics,
     scheduleJson,
   } = body
@@ -82,6 +83,7 @@ export async function POST(req: Request) {
       feeUsd: parseFloat(feeUsd),
       contentUrl: contentUrl || null,
       classroomUrl: classroomUrl || null,
+      imageUrl: imageUrl || null,
       topics: Array.isArray(topics) ? topics : [],
       scheduleJson: scheduleJson || '',
       status: 'PENDING',
