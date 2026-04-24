@@ -22,13 +22,18 @@ export default function ImageUpload({ value, onChange, label = 'Course Image' }:
     const formData = new FormData()
     formData.append('file', file)
 
-    const res = await fetch('/api/upload', { method: 'POST', body: formData })
-    const data = await res.json()
-    if (res.ok) {
-      onChange(data.url)
-    } else {
-      const msg = typeof data.error === 'string' ? data.error : JSON.stringify(data.error)
-      setError(msg || 'Upload failed. Please try again.')
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      let data: Record<string, unknown> = {}
+      try { data = await res.json() } catch { /* non-JSON response */ }
+      if (res.ok && data.url) {
+        onChange(data.url as string)
+      } else {
+        const msg = typeof data.error === 'string' ? data.error : `Upload failed (${res.status}). Check Cloudinary credentials.`
+        setError(msg)
+      }
+    } catch (err) {
+      setError(`Network error: ${String(err)}`)
     }
     setUploading(false)
   }
