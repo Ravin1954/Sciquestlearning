@@ -8,6 +8,9 @@ interface ImageUploadProps {
   label?: string
 }
 
+const CLOUD_NAME = 'dalpqyolv'
+const UPLOAD_PRESET = 'sciquest-unsigned'
+
 export default function ImageUpload({ value, onChange, label = 'Course Image' }: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
@@ -19,18 +22,21 @@ export default function ImageUpload({ value, onChange, label = 'Course Image' }:
 
     setUploading(true)
     setError('')
+
     const formData = new FormData()
     formData.append('file', file)
+    formData.append('upload_preset', UPLOAD_PRESET)
 
     try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData })
-      let data: Record<string, unknown> = {}
-      try { data = await res.json() } catch { /* non-JSON response */ }
-      if (res.ok && data.url) {
-        onChange(data.url as string)
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+      if (res.ok && data.secure_url) {
+        onChange(data.secure_url)
       } else {
-        const msg = typeof data.error === 'string' ? data.error : `Upload failed (${res.status}). Check Cloudinary credentials.`
-        setError(msg)
+        setError(data.error?.message || `Upload failed (${res.status}). Please try again.`)
       }
     } catch (err) {
       setError(`Network error: ${String(err)}`)
@@ -74,13 +80,13 @@ export default function ImageUpload({ value, onChange, label = 'Course Image' }:
         <div
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
-          onClick={() => inputRef.current?.click()}
+          onClick={() => !uploading && inputRef.current?.click()}
           style={{
             border: '2px dashed #C5D5E4',
             borderRadius: '10px',
             padding: '2rem',
             textAlign: 'center',
-            cursor: 'pointer',
+            cursor: uploading ? 'default' : 'pointer',
             backgroundColor: '#EEF3F8',
             transition: 'border-color 0.15s',
           }}
