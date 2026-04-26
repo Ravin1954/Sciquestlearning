@@ -19,6 +19,7 @@ model User {
   qualifications      String?
   aboutMe             String?
   certificatesUrl     String?
+  profileImageUrl     String?
   instructorStatus    InstructorStatus @default(NOT_APPLICABLE)
   rejectionRemark     String?
   subjects         String[]

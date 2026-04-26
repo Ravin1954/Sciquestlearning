@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
+import ImageUpload from '@/components/ImageUpload'
 
 const COUNTRIES = [
   'United States', 'Canada', 'United Kingdom', 'Australia', 'India',
@@ -24,12 +25,13 @@ interface Profile {
   qualifications: string
   aboutMe: string
   certificatesUrl: string
+  profileImageUrl: string
   instructorStatus: string
 }
 
 export default function InstructorProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null)
-  const [form, setForm] = useState({ country: '', qualifications: '', aboutMe: '', certificatesUrl: '' })
+  const [form, setForm] = useState({ country: '', qualifications: '', aboutMe: '', certificatesUrl: '', profileImageUrl: '' })
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -43,6 +45,7 @@ export default function InstructorProfilePage() {
         qualifications: data.qualifications || '',
         aboutMe: data.aboutMe || '',
         certificatesUrl: data.certificatesUrl || '',
+        profileImageUrl: data.profileImageUrl || '',
       })
     })
   }, [])
@@ -58,7 +61,7 @@ export default function InstructorProfilePage() {
     })
     if (res.ok) {
       const updated = await res.json()
-      setProfile((prev) => prev ? { ...prev, ...updated } : prev)
+      setProfile((prev) => prev ? { ...prev, ...updated, profileImageUrl: form.profileImageUrl } : prev)
       setEditing(false)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
@@ -92,6 +95,28 @@ export default function InstructorProfilePage() {
             {/* Account info (read-only from Clerk) */}
             <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
               <p style={{ color: '#5a7a96', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '1rem' }}>Account Info</p>
+
+              {/* Profile photo */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem' }}>
+                {profile.profileImageUrl ? (
+                  <img
+                    src={profile.profileImageUrl}
+                    alt="Profile"
+                    style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #00C2A8' }}
+                  />
+                ) : (
+                  <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#EEF3F8', border: '2px solid #C5D5E4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', color: '#5a7a96' }}>
+                    {profile.firstName?.[0] || '?'}
+                  </div>
+                )}
+                <div>
+                  <p style={{ color: '#0B1A2E', fontWeight: 600 }}>{profile.firstName} {profile.lastName}</p>
+                  <p style={{ color: '#5a7a96', fontSize: '0.8rem' }}>
+                    {profile.profileImageUrl ? 'Click Edit to change your photo' : 'Click Edit to add a profile photo'}
+                  </p>
+                </div>
+              </div>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
                   <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '0.25rem' }}>First Name</p>
@@ -151,6 +176,11 @@ export default function InstructorProfilePage() {
 
               {editing ? (
                 <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <ImageUpload
+                    value={form.profileImageUrl}
+                    onChange={(url) => setForm((f) => ({ ...f, profileImageUrl: url }))}
+                    label="Profile Photo"
+                  />
                   <div>
                     <p style={{ color: '#2d4a6b', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.375rem' }}>Country of Residence</p>
                     <select value={form.country} onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))} style={inp}>
