@@ -18,6 +18,7 @@ export async function GET() {
       qualifications: true,
       aboutMe: true,
       certificatesUrl: true,
+      profileImageUrl: true,
     },
   })
 
@@ -45,7 +46,7 @@ export async function PUT(req: Request) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const { qualifications, aboutMe, certificatesUrl, country } = body
+  const { qualifications, aboutMe, certificatesUrl, country, profileImageUrl } = body
 
   const user = await prisma.user.update({
     where: { clerkId: userId },
@@ -54,8 +55,9 @@ export async function PUT(req: Request) {
       ...(aboutMe !== undefined && { aboutMe }),
       ...(certificatesUrl !== undefined && { certificatesUrl }),
       ...(country !== undefined && { country }),
+      ...(profileImageUrl !== undefined && { profileImageUrl }),
     },
-    select: { qualifications: true, aboutMe: true, certificatesUrl: true, country: true },
+    select: { qualifications: true, aboutMe: true, certificatesUrl: true, country: true, profileImageUrl: true },
   })
 
   return NextResponse.json(user)
