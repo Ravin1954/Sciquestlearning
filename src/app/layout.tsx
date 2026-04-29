@@ -39,6 +39,10 @@ export const metadata: Metadata = {
   creator: 'SciQuest Learning',
   publisher: 'SciQuest Learning',
   category: 'Education',
+  icons: {
+    icon: '/icon-192.png',
+    apple: '/apple-touch-icon.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
