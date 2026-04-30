@@ -479,7 +479,7 @@ export default function EditCoursePage() {
               type="date"
               value={form.startDate}
               onChange={set('startDate')}
-              style={{ ...inputStyle, colorScheme: 'dark' }}
+              style={{ ...inputStyle, colorScheme: 'light' }}
             />
             <p style={{ color: '#5a7a96', fontSize: '0.75rem', marginTop: '0.375rem' }}>
               The date the first session takes place.
