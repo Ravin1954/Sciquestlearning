@@ -131,6 +131,8 @@ export default function NewCoursePage() {
   const [durationUnit, setDurationUnit] = useState<'WEEKS' | 'DAYS'>('WEEKS')
   const [feeType, setFeeType] = useState<'PER_SESSION' | 'LUMP_SUM'>('PER_SESSION')
   const [imageUrl, setImageUrl] = useState('')
+  const [bookedSlots, setBookedSlots] = useState<{ date: string; utcTime: string; courseTitle: string }[]>([])
+  const [conflicts, setConflicts] = useState<{ date: string; utcTime: string; courseTitle: string }[]>([])
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -143,6 +145,31 @@ export default function NewCoursePage() {
     classroomUrl: '',
     startDate: '',
   })
+
+  // Fetch instructor's existing booked sessions for conflict detection
+  useEffect(() => {
+    fetch('/api/instructor/schedule')
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setBookedSlots(data) })
+      .catch(() => {})
+  }, [])
+
+  // Check for conflicts whenever sessions or times change
+  useEffect(() => {
+    if (bookedSlots.length === 0 || sessions.length === 0) { setConflicts([]); return }
+    const found: { date: string; utcTime: string; courseTitle: string }[] = []
+    const schedule = buildSchedule()
+    for (const s of schedule) {
+      for (const ut of s.utcTimes) {
+        if (!ut) continue
+        const clash = bookedSlots.find((b) => b.date === s.date && b.utcTime === ut)
+        if (clash && !found.find((f) => f.date === clash.date && f.utcTime === clash.utcTime)) {
+          found.push(clash)
+        }
+      }
+    }
+    setConflicts(found)
+  }, [sessions, dayTimes, timezone, bookedSlots])
 
   // Auto-generate full session schedule whenever days or duration changes
   useEffect(() => {
@@ -773,6 +800,22 @@ export default function NewCoursePage() {
               </div>
             )}
           </div>
+
+          {conflicts.length > 0 && (
+            <div style={{ backgroundColor: '#3d2a00', border: '1px solid #F5C842', borderRadius: '8px', padding: '0.875rem 1rem' }}>
+              <p style={{ color: '#F5C842', fontWeight: 700, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                ⚠ Schedule Conflict Detected
+              </p>
+              {conflicts.map((c, i) => (
+                <p key={i} style={{ color: '#fde68a', fontSize: '0.8rem', marginBottom: '0.25rem' }}>
+                  • {new Date(c.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })} — already booked for <strong>{c.courseTitle}</strong>
+                </p>
+              ))}
+              <p style={{ color: '#fde68a', fontSize: '0.775rem', marginTop: '0.5rem', opacity: 0.8 }}>
+                You can still submit, but please adjust the dates to avoid overlapping classes.
+              </p>
+            </div>
+          )}
 
           {error && (
             <p style={{ color: '#f87171', backgroundColor: '#3d0f0f', padding: '0.75rem', borderRadius: '8px', fontSize: '0.875rem' }}>
