@@ -126,6 +126,7 @@ export async function GET(req: Request) {
           course.title,
           s.day,
           s.utcTime,
+          s.date,
         ).catch((e) => console.error('[warning email]', e))
         warnings++
         break // one warning per course is enough
