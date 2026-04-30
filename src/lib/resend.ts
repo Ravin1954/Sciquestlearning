@@ -66,12 +66,15 @@ export async function sendCourseRejectionEmail(instructorEmail: string, courseTi
   await resend.emails.send({
     from: process.env.RESEND_FROM_EMAIL!,
     to: instructorEmail,
-    subject: `Update on your course "${courseTitle}"`,
+    subject: `Action needed for your course "${courseTitle}"`,
     html: `
-      <h2>Course Not Approved</h2>
-      <p>Unfortunately, your course <strong>${courseTitle}</strong> was not approved at this time.</p>
-      ${remark ? `<p><strong>Reason:</strong> ${remark}</p>` : ''}
-      <p>Please log in to your instructor dashboard to edit your course and resubmit it for review.</p>
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 2rem; color: #1a1a2e;">
+        <h2 style="color: #d97706;">Modifications Requested</h2>
+        <p>Thank you for submitting <strong>${courseTitle}</strong>. Our team has reviewed it and would like you to make a few changes before it goes live.</p>
+        ${remark ? `<div style="background:#fffbeb; border-left:4px solid #d97706; padding:0.75rem 1rem; margin:1rem 0; border-radius:4px;"><p style="margin:0; font-weight:600; color:#92400e;">Changes needed:</p><p style="margin:0.5rem 0 0; color:#1a1a2e;">${remark}</p></div>` : ''}
+        <p>Simply log in to your instructor dashboard, open the course, make the requested changes, and click <strong>Resubmit for Review</strong>. You do not need to create a new course.</p>
+        <a href="https://sciquestlearning.com/instructor/courses" style="display:inline-block; margin-top:1rem; background:#00C2A8; color:#0B1A2E; padding:0.625rem 1.25rem; border-radius:8px; text-decoration:none; font-weight:700;">Go to My Courses</a>
+      </div>
     `,
   })
 }
