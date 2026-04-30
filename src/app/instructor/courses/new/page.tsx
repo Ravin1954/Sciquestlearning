@@ -568,7 +568,7 @@ export default function NewCoursePage() {
                                 value={session.date}
                                 min={new Date().toISOString().split('T')[0]}
                                 onChange={(e) => updateSessionDate(session.week, session.day, e.target.value)}
-                                style={{ ...inputStyle, flex: 1, colorScheme: 'dark', padding: '0.35rem 0.625rem' }}
+                                style={{ ...inputStyle, flex: 1, colorScheme: 'light', padding: '0.35rem 0.625rem' }}
                               />
                               {session.date && (
                                 <span style={{ color: '#00C2A8', fontSize: '0.78rem', whiteSpace: 'nowrap', flexShrink: 0 }}>
