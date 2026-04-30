@@ -345,9 +345,10 @@ export default function EditCoursePage() {
         )}
 
         {rejectionRemark && (
-          <div style={{ backgroundColor: '#3d0f0f', border: '1px solid #7f1d1d', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
-            <p style={{ color: '#f87171', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Admin remarks</p>
-            <p style={{ color: '#fca5a5', fontSize: '0.875rem', lineHeight: 1.6 }}>{rejectionRemark}</p>
+          <div style={{ backgroundColor: '#2d1b00', border: '1px solid #d97706', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem' }}>
+            <p style={{ color: '#fbbf24', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Modifications Requested</p>
+            <p style={{ color: '#fde68a', fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '0.5rem' }}>{rejectionRemark}</p>
+            <p style={{ color: '#fbbf24', fontSize: '0.75rem' }}>Please make the changes below and click <strong>Resubmit for Review</strong> when done.</p>
           </div>
         )}
 

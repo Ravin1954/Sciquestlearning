@@ -394,29 +394,29 @@ export default function AdminPage() {
                         <button
                           onClick={() => { setRejectingId(course.id); setRejectRemark('') }}
                           disabled={actionLoading === course.id + 'reject'}
-                          style={S.btn('#FFFFFF', '#dc2626')}
+                          style={S.btn('#FFFFFF', '#d97706')}
                         >
-                          Reject
+                          Request Modifications
                         </button>
                       </div>
                     </div>
                     {rejectingId === course.id && (
                       <div style={{ borderTop: '1px solid #C5D5E4', paddingTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <p style={{ color: '#f87171', fontSize: '0.8rem', fontWeight: 600 }}>Add remarks for the instructor:</p>
+                        <p style={{ color: '#fbbf24', fontSize: '0.8rem', fontWeight: 600 }}>What changes are needed? (shown to instructor on their edit page)</p>
                         <textarea
                           value={rejectRemark}
                           onChange={(e) => setRejectRemark(e.target.value)}
                           rows={3}
-                          placeholder="Explain what needs to be changed before resubmitting..."
-                          style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#EEF3F8', border: '1px solid #7f1d1d', color: '#0B1A2E', fontSize: '0.8rem', resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                          placeholder="e.g. Please add a detailed course description and update the pricing..."
+                          style={{ width: '100%', padding: '0.625rem', borderRadius: '8px', backgroundColor: '#EEF3F8', border: '1px solid #d97706', color: '#0B1A2E', fontSize: '0.8rem', resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }}
                         />
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           <button
                             onClick={() => handleAction(course.id, 'reject', rejectRemark)}
                             disabled={actionLoading === course.id + 'reject'}
-                            style={{ ...S.btn('#FFFFFF', '#dc2626'), opacity: actionLoading === course.id + 'reject' ? 0.5 : 1 }}
+                            style={{ ...S.btn('#FFFFFF', '#d97706'), opacity: actionLoading === course.id + 'reject' ? 0.5 : 1 }}
                           >
-                            {actionLoading === course.id + 'reject' ? '...' : 'Confirm Reject'}
+                            {actionLoading === course.id + 'reject' ? '...' : 'Send Request'}
                           </button>
                           <button
                             onClick={() => { setRejectingId(null); setRejectRemark('') }}
