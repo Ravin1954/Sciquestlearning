@@ -84,7 +84,7 @@ export async function POST(req: Request) {
             description: course.courseType === 'SELF_PACED'
               ? '1 year access from enrollment date'
               : isLumpSum
-                ? sessions.length > 0 ? `Full course fee — ${sessions.join(', ')}` : 'Full course fee'
+                ? sessions.length > 0 ? `Full course fee for ${sessions.length} session${sessions.length !== 1 ? 's' : ''}` : 'Full course fee'
                 : sessionCount > 1
                   ? `${sessionCount} sessions × $${feePerSession.toFixed(2)}/session`
                   : sessions[0] || course.title,
