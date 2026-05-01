@@ -278,7 +278,7 @@ export default function CoursePageClient() {
             </h1>
 
             <p style={{ color: '#5a7a96', marginBottom: '2rem' }}>
-              Taught by <span style={{ color: '#2d4a6b' }}>{isSignedIn ? `${course.instructor.firstName} ${course.instructor.lastName}` : 'Experienced and Qualified Instructors'}</span>
+              {isLive ? 'Taught by' : 'Designed by'} <span style={{ color: '#2d4a6b' }}>{isSignedIn ? `${course.instructor.firstName} ${course.instructor.lastName}` : 'Experienced and Qualified Instructors'}</span>
             </p>
 
             <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
