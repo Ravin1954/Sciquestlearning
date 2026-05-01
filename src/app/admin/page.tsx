@@ -859,7 +859,7 @@ export default function AdminPage() {
                       <td style={{ padding: '0.875rem 1rem', fontSize: '0.75rem', fontWeight: 600, color: c.courseType === 'SELF_PACED' ? '#00C2A8' : '#F5C842' }}>{c.courseType === 'SELF_PACED' ? 'Self-Paced' : 'Live'}</td>
                       <td style={{ padding: '0.875rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>${Number(c.feeUsd).toFixed(2)}</td>
                       <td style={{ padding: '0.875rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{c._count.enrollments}</td>
-                      <td style={{ padding: '0.875rem 1rem' }}><StatusBadge status={c.status} /></td>
+                      <td style={{ padding: '0.875rem 1rem' }}><StatusBadge status={c.status} hasRemark={!!c.rejectionRemark} /></td>
                       <td style={{ padding: '0.875rem 1rem' }}>
                         {confirmDeleteId === c.id ? (
                           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>

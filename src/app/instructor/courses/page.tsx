@@ -467,7 +467,7 @@ export default function MyCoursesPage() {
                         )}
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexShrink: 0 }}>
-                        <StatusBadge status={c.status} />
+                        <StatusBadge status={c.status} hasRemark={!!c.rejectionRemark} />
                         {c.status === 'APPROVED' && (
                           <button
                             onClick={() => setRecordingCourseId(recordingCourseId === c.id ? null : c.id)}
