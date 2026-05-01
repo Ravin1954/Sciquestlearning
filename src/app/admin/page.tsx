@@ -45,13 +45,25 @@ interface Metrics {
 interface Course {
   id: string
   title: string
+  description: string
   subject: string
   status: 'PENDING' | 'APPROVED' | 'REJECTED'
   courseType: 'LIVE' | 'SELF_PACED'
   feeUsd: number
+  feeType: string
   durationWeeks: number
+  gradeLevel: string
+  startDate: string
+  daysOfWeek: string[]
+  startTimeUtc: string
+  sessionDurationMins: number
+  scheduleJson: string
+  contentUrl: string | null
+  imageUrl: string | null
+  topics: string[]
   zoomJoinUrl: string | null
   cancelledSessionsJson: string | null
+  rejectionRemark: string | null
   createdAt: string
   instructor: { firstName: string; lastName: string; email: string }
   _count: { enrollments: number }
@@ -108,6 +120,7 @@ export default function AdminPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [rejectRemark, setRejectRemark] = useState('')
+  const [viewingCourseId, setViewingCourseId] = useState<string | null>(null)
   const [payoutLoading, setPayoutLoading] = useState<string | null>(null)
   const [payoutMsg, setPayoutMsg] = useState<{ id: string; success: boolean; text: string } | null>(null)
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
@@ -383,7 +396,13 @@ export default function AdminPage() {
                           by {course.instructor.firstName} {course.instructor.lastName} ({course.instructor.email})
                         </p>
                       </div>
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <button
+                          onClick={() => setViewingCourseId(viewingCourseId === course.id ? null : course.id)}
+                          style={{ ...S.btn('#0B1A2E', 'transparent'), border: '1px solid #C5D5E4' }}
+                        >
+                          {viewingCourseId === course.id ? 'Hide Details' : 'View Details'}
+                        </button>
                         <button
                           onClick={() => handleAction(course.id, 'approve')}
                           disabled={actionLoading === course.id + 'approve'}
@@ -400,6 +419,41 @@ export default function AdminPage() {
                         </button>
                       </div>
                     </div>
+
+                    {viewingCourseId === course.id && (
+                      <div style={{ borderTop: '1px solid #C5D5E4', paddingTop: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+                        {course.imageUrl && (
+                          <img src={course.imageUrl} alt="Course thumbnail" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', objectPosition: 'top', borderRadius: '8px' }} />
+                        )}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem 1.5rem' }}>
+                          {[
+                            { label: 'Grade Level', value: course.gradeLevel || '—' },
+                            { label: 'Course Type', value: course.courseType === 'LIVE' ? 'Live Class' : 'Self-Paced' },
+                            { label: 'Start Date', value: course.startDate || '—' },
+                            { label: 'Days', value: course.daysOfWeek?.join(', ') || '—' },
+                            { label: 'Start Time (UTC)', value: course.startTimeUtc || '—' },
+                            { label: 'Session Duration', value: course.sessionDurationMins ? `${course.sessionDurationMins} min` : '—' },
+                            { label: 'Fee', value: `$${Number(course.feeUsd).toFixed(2)} (${course.feeType?.replace('_', ' ') || ''})` },
+                            { label: 'Topics', value: course.topics?.join(', ') || '—' },
+                          ].map(({ label, value }) => (
+                            <div key={label}>
+                              <p style={{ color: '#5a7a96', fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.125rem' }}>{label}</p>
+                              <p style={{ color: '#0B1A2E', fontSize: '0.8rem' }}>{value}</p>
+                            </div>
+                          ))}
+                        </div>
+                        <div>
+                          <p style={{ color: '#5a7a96', fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Description</p>
+                          <p style={{ color: '#0B1A2E', fontSize: '0.825rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{course.description || '—'}</p>
+                        </div>
+                        {course.contentUrl && (
+                          <div>
+                            <p style={{ color: '#5a7a96', fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>Content / Classroom URL</p>
+                            <a href={course.contentUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#00C2A8', fontSize: '0.8rem', wordBreak: 'break-all' }}>{course.contentUrl}</a>
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {rejectingId === course.id && (
                       <div style={{ borderTop: '1px solid #C5D5E4', paddingTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <p style={{ color: '#fbbf24', fontSize: '0.8rem', fontWeight: 600 }}>What changes are needed? (shown to instructor on their edit page)</p>
