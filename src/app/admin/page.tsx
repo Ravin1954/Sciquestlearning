@@ -20,18 +20,6 @@ interface Instructor {
   _count: { courses: number }
 }
 
-interface UserRecord {
-  id: string
-  firstName: string
-  lastName: string
-  email: string
-  role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN'
-  country: string
-  createdAt: string
-  instructorStatus?: string
-  _count: { enrollments: number; courses: number }
-}
-
 interface Metrics {
   totalStudents: number
   totalInstructors: number
@@ -69,37 +57,6 @@ interface Course {
   _count: { enrollments: number }
 }
 
-interface Feedback {
-  id: string
-  attended: boolean
-  rating: number
-  comment?: string
-  createdAt: string
-  enrollment: {
-    student: { firstName: string; lastName: string; email: string }
-    course: {
-      title: string
-      subject: string
-      instructor: { firstName: string; lastName: string }
-    }
-  }
-}
-
-interface Enrollment {
-  id: string
-  enrolledAt: string
-  amountPaidUsd: number
-  instructorPayoutUsd: number
-  instructorPaidOut: boolean
-  instructorPaidOutAt: string | null
-  student: { firstName: string; lastName: string; email: string }
-  course: {
-    title: string
-    subject: string
-    instructor: { firstName: string; lastName: string; bankInfo: string | null }
-  }
-}
-
 const S = {
   card: { backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' } as React.CSSProperties,
   label: { color: '#5a7a96', fontSize: '0.8rem', textTransform: 'uppercase' as const, letterSpacing: '0.08em', fontWeight: 600, marginBottom: '0.25rem' },
@@ -115,42 +72,27 @@ const S = {
 export default function AdminPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null)
   const [courses, setCourses] = useState<Course[]>([])
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [rejectingId, setRejectingId] = useState<string | null>(null)
   const [rejectRemark, setRejectRemark] = useState('')
   const [viewingCourseId, setViewingCourseId] = useState<string | null>(null)
-  const [payoutLoading, setPayoutLoading] = useState<string | null>(null)
-  const [payoutMsg, setPayoutMsg] = useState<{ id: string; success: boolean; text: string } | null>(null)
-  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [meetLoading, setMeetLoading] = useState<string | null>(null)
   const [clearCancelLoading, setClearCancelLoading] = useState<string | null>(null)
-  const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
   const [instructors, setInstructors] = useState<Instructor[]>([])
   const [instructorActionLoading, setInstructorActionLoading] = useState<string | null>(null)
   const [rejectingInstructorId, setRejectingInstructorId] = useState<string | null>(null)
   const [instructorRejectRemark, setInstructorRejectRemark] = useState('')
-  const [allUsers, setAllUsers] = useState<UserRecord[]>([])
-  const [deleteUserLoading, setDeleteUserLoading] = useState<string | null>(null)
-  const [confirmDeleteUserId, setConfirmDeleteUserId] = useState<string | null>(null)
 
   useEffect(() => {
     Promise.all([
       fetch('/api/admin/metrics').then((r) => r.json()),
       fetch('/api/admin/courses').then((r) => r.json()),
-      fetch('/api/admin/enrollments').then((r) => r.json()),
-      fetch('/api/admin/feedback').then((r) => r.json()),
       fetch('/api/admin/instructors').then((r) => r.json()),
-      fetch('/api/admin/users').then((r) => r.json()),
-    ]).then(([m, c, e, f, i, u]) => {
+    ]).then(([m, c, i]) => {
       setMetrics(m)
       setCourses(Array.isArray(c) ? c : [])
-      setEnrollments(Array.isArray(e) ? e : [])
-      setFeedbacks(Array.isArray(f) ? f : [])
       setInstructors(Array.isArray(i) ? i : [])
-      setAllUsers(Array.isArray(u) ? u : [])
       setLoading(false)
     })
   }, [])
@@ -185,29 +127,6 @@ export default function AdminPage() {
     setRejectRemark('')
   }
 
-  const handlePayout = async (enrollmentId: string) => {
-    setPayoutLoading(enrollmentId)
-    setPayoutMsg(null)
-    try {
-      const res = await fetch('/api/admin/payout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enrollmentId }),
-      })
-      const data = await res.json()
-      if (res.ok) {
-        setPayoutMsg({ id: enrollmentId, success: true, text: `Paid out $${Number(data.payoutUsd).toFixed(2)} ✓` })
-        const updated = await fetch('/api/admin/enrollments').then((r) => r.json())
-        setEnrollments(Array.isArray(updated) ? updated : [])
-      } else {
-        setPayoutMsg({ id: enrollmentId, success: false, text: data.error || 'Payout failed' })
-      }
-    } catch {
-      setPayoutMsg({ id: enrollmentId, success: false, text: 'Network error' })
-    }
-    setPayoutLoading(null)
-  }
-
   const handleClearCancellations = async (courseId: string) => {
     setClearCancelLoading(courseId)
     await fetch(`/api/admin/courses/${courseId}/clear-cancellations`, { method: 'POST' })
@@ -233,36 +152,7 @@ export default function AdminPage() {
     setMeetLoading(null)
   }
 
-  const handleForceDelete = async (courseId: string) => {
-    setDeleteLoading(courseId)
-    await fetch(`/api/admin/courses/${courseId}`, { method: 'DELETE' })
-    const [updated, m] = await Promise.all([
-      fetch('/api/admin/courses').then((r) => r.json()),
-      fetch('/api/admin/metrics').then((r) => r.json()),
-    ])
-    setCourses(Array.isArray(updated) ? updated : [])
-    setMetrics(m)
-    setDeleteLoading(null)
-    setConfirmDeleteId(null)
-  }
-
-  const handleDeleteUser = async (userId: string) => {
-    setDeleteUserLoading(userId)
-    await fetch('/api/admin/users', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId }),
-    })
-    setAllUsers((prev) => prev.filter((u) => u.id !== userId))
-    const m = await fetch('/api/admin/metrics').then((r) => r.json())
-    setMetrics(m)
-    setDeleteUserLoading(null)
-    setConfirmDeleteUserId(null)
-  }
-
   const pending = courses.filter((c) => c.status === 'PENDING')
-  const pendingPayouts = enrollments.filter((e) => !e.instructorPaidOut)
-  const completedPayouts = enrollments.filter((e) => e.instructorPaidOut)
 
   return (
     <DashboardLayout role="admin">
@@ -454,6 +344,7 @@ export default function AdminPage() {
                         )}
                       </div>
                     )}
+
                     {rejectingId === course.id && (
                       <div style={{ borderTop: '1px solid #C5D5E4', paddingTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                         <p style={{ color: '#fbbf24', fontSize: '0.8rem', fontWeight: 600 }}>What changes are needed? (shown to instructor on their edit page)</p>
@@ -491,14 +382,8 @@ export default function AdminPage() {
           {courses.filter((c) => c.status === 'APPROVED' && c.courseType === 'LIVE' && !c.zoomJoinUrl).length > 0 && (
             <div style={{ marginBottom: '2.5rem' }}>
               <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '0.5rem' }}>
-                Missing Meet Links
-                <span style={{ backgroundColor: '#f87171', color: '#fff', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
-                  action needed
-                </span>
+                Live Courses Missing Meet Link
               </h2>
-              <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '1rem' }}>
-                These approved live courses don&apos;t have a Google Meet link yet.
-              </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {courses.filter((c) => c.status === 'APPROVED' && c.courseType === 'LIVE' && !c.zoomJoinUrl).map((course) => (
                   <div key={course.id} style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
@@ -526,13 +411,7 @@ export default function AdminPage() {
             <div style={{ marginBottom: '2.5rem' }}>
               <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '0.5rem' }}>
                 Courses with Cancelled Sessions
-                <span style={{ backgroundColor: '#F5C842', color: '#0B1A2E', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
-                  action needed
-                </span>
               </h2>
-              <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '1rem' }}>
-                These courses had all sessions automatically cancelled due to no enrollments. Clear cancellations to make sessions available again for students to enroll.
-              </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {courses.filter((c) => c.status === 'APPROVED' && c.courseType === 'LIVE' && (() => { try { return JSON.parse(c.cancelledSessionsJson || '[]').length > 0 } catch { return false } })()).map((course) => (
                   <div key={course.id} style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
@@ -554,334 +433,6 @@ export default function AdminPage() {
               </div>
             </div>
           )}
-
-          {/* Instructor Payouts */}
-          <div style={{ marginBottom: '2.5rem' }}>
-            <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '0.5rem' }}>
-              Instructor Payouts
-              {pendingPayouts.length > 0 && (
-                <span style={{ backgroundColor: '#F5C842', color: '#0B1A2E', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
-                  {pendingPayouts.length} pending
-                </span>
-              )}
-            </h2>
-            <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '1rem' }}>
-              Full payment is held on the platform. Pay out 80% to the instructor after the course has started.
-            </p>
-
-            {pendingPayouts.length === 0 ? (
-              <div style={{ ...S.card, textAlign: 'center', color: '#5a7a96', padding: '2rem' }}>
-                No pending payouts.
-              </div>
-            ) : (
-              <div style={{ ...S.card, padding: 0, overflow: 'hidden', marginBottom: '1rem' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #C5D5E4' }}>
-                      {['Student', 'Course', 'Instructor', 'Paid', 'Payout (80%)', 'Bank Details', 'Action'].map((h) => (
-                        <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#5a7a96', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendingPayouts.map((e, i) => (
-                      <tr key={e.id} style={{ borderBottom: i < pendingPayouts.length - 1 ? '1px solid #C5D5E4' : 'none' }}>
-                        <td style={{ padding: '0.75rem 1rem', color: '#0B1A2E', fontSize: '0.8rem' }}>{e.student.firstName} {e.student.lastName}</td>
-                        <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.8rem' }}>{e.course.title}</td>
-                        <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.8rem' }}>{e.course.instructor.firstName} {e.course.instructor.lastName}</td>
-                        <td style={{ padding: '0.75rem 1rem', color: '#F5C842', fontSize: '0.8rem', fontWeight: 600 }}>${Number(e.amountPaidUsd).toFixed(2)}</td>
-                        <td style={{ padding: '0.75rem 1rem', color: '#00C2A8', fontSize: '0.8rem', fontWeight: 600 }}>${Number(e.instructorPayoutUsd).toFixed(2)}</td>
-                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.75rem' }}>
-                          {e.course.instructor.bankInfo ? (() => {
-                            const b = JSON.parse(e.course.instructor.bankInfo)
-                            return b.payoutMethod === 'paypal'
-                              ? <span style={{ color: '#0B1A2E' }}>PayPal: {b.paypalEmail}</span>
-                              : <span style={{ color: '#0B1A2E' }}>{b.bankName} ****{b.accountNumber.slice(-4)}</span>
-                          })() : <span style={{ color: '#f87171' }}>Not added</span>}
-                        </td>
-                        <td style={{ padding: '0.75rem 1rem' }}>
-                          {payoutMsg?.id === e.id ? (
-                            <span style={{ fontSize: '0.8rem', color: payoutMsg.success ? '#00C2A8' : '#f87171' }}>{payoutMsg.text}</span>
-                          ) : (
-                            <button
-                              onClick={() => handlePayout(e.id)}
-                              disabled={payoutLoading === e.id || !e.course.instructor.bankInfo}
-                              style={{
-                                ...S.btn('#0B1A2E', '#00C2A8'),
-                                opacity: (!e.course.instructor.bankInfo || payoutLoading === e.id) ? 0.4 : 1,
-                                cursor: !e.course.instructor.bankInfo ? 'not-allowed' : 'pointer',
-                              }}
-                            >
-                              {payoutLoading === e.id ? '...' : 'Mark Paid'}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {completedPayouts.length > 0 && (
-              <details>
-                <summary style={{ color: '#5a7a96', fontSize: '0.8rem', cursor: 'pointer', marginBottom: '0.75rem' }}>
-                  {completedPayouts.length} completed payout{completedPayouts.length > 1 ? 's' : ''}
-                </summary>
-                <div style={{ ...S.card, padding: 0, overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '1px solid #C5D5E4' }}>
-                        {['Student', 'Course', 'Instructor', 'Amount Paid Out', 'Date'].map((h) => (
-                          <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#5a7a96', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {completedPayouts.map((e, i) => (
-                        <tr key={e.id} style={{ borderBottom: i < completedPayouts.length - 1 ? '1px solid #C5D5E4' : 'none' }}>
-                          <td style={{ padding: '0.75rem 1rem', color: '#0B1A2E', fontSize: '0.8rem' }}>{e.student.firstName} {e.student.lastName}</td>
-                          <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.8rem' }}>{e.course.title}</td>
-                          <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.8rem' }}>{e.course.instructor.firstName} {e.course.instructor.lastName}</td>
-                          <td style={{ padding: '0.75rem 1rem', color: '#00C2A8', fontSize: '0.8rem', fontWeight: 600 }}>${Number(e.instructorPayoutUsd).toFixed(2)}</td>
-                          <td style={{ padding: '0.75rem 1rem', color: '#5a7a96', fontSize: '0.8rem' }}>{e.instructorPaidOutAt ? new Date(e.instructorPaidOutAt).toLocaleDateString() : '—'}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </details>
-            )}
-          </div>
-
-          {/* Student Feedback & Attendance */}
-          <div style={{ marginBottom: '2.5rem' }}>
-            <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '0.5rem' }}>
-              Student Feedback & Attendance
-              {feedbacks.filter((f) => !f.attended).length > 0 && (
-                <span style={{ backgroundColor: '#f87171', color: '#fff', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
-                  {feedbacks.filter((f) => !f.attended).length} no-show report{feedbacks.filter((f) => !f.attended).length > 1 ? 's' : ''}
-                </span>
-              )}
-            </h2>
-            <p style={{ color: '#5a7a96', fontSize: '0.8rem', marginBottom: '1rem' }}>
-              Students confirm attendance and rate each class. Review before releasing instructor payouts.
-            </p>
-            {feedbacks.length === 0 ? (
-              <div style={{ ...S.card, textAlign: 'center', color: '#5a7a96', padding: '2rem' }}>
-                No feedback submitted yet.
-              </div>
-            ) : (
-              <div style={{ ...S.card, padding: 0, overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #C5D5E4' }}>
-                      {['Student', 'Course', 'Instructor', 'Attended', 'Rating', 'Comment', 'Date'].map((h) => (
-                        <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#5a7a96', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase' }}>{h}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {feedbacks.map((f, i) => (
-                      <tr key={f.id} style={{ borderBottom: i < feedbacks.length - 1 ? '1px solid #C5D5E4' : 'none', backgroundColor: !f.attended ? '#FEF2F2' : 'transparent' }}>
-                        <td style={{ padding: '0.75rem 1rem', color: '#0B1A2E', fontSize: '0.8rem' }}>{f.enrollment.student.firstName} {f.enrollment.student.lastName}</td>
-                        <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.8rem' }}>{f.enrollment.course.title}</td>
-                        <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.8rem' }}>{f.enrollment.course.instructor.firstName} {f.enrollment.course.instructor.lastName}</td>
-                        <td style={{ padding: '0.75rem 1rem', fontSize: '0.8rem' }}>
-                          {f.attended
-                            ? <span style={{ color: '#00C2A8', fontWeight: 600 }}>Yes</span>
-                            : <span style={{ color: '#f87171', fontWeight: 600 }}>No-show</span>}
-                        </td>
-                        <td style={{ padding: '0.75rem 1rem', color: '#F5C842', fontSize: '0.875rem' }}>
-                          {f.attended ? '★'.repeat(f.rating) + '☆'.repeat(5 - f.rating) : '—'}
-                        </td>
-                        <td style={{ padding: '0.75rem 1rem', color: '#5a7a96', fontSize: '0.8rem', maxWidth: '200px' }}>{f.comment || '—'}</td>
-                        <td style={{ padding: '0.75rem 1rem', color: '#5a7a96', fontSize: '0.8rem' }}>{new Date(f.createdAt).toLocaleDateString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          {/* All Instructors */}
-          {(() => {
-            const allInstructors = allUsers.filter((u) => u.role === 'INSTRUCTOR')
-            return (
-              <div style={{ marginBottom: '2.5rem' }}>
-                <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '1rem' }}>
-                  All Instructors
-                  <span style={{ backgroundColor: '#1a2d4a', color: '#2d4a6b', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
-                    {allInstructors.length}
-                  </span>
-                </h2>
-                {allInstructors.length === 0 ? (
-                  <div style={{ ...S.card, textAlign: 'center', color: '#5a7a96', padding: '2rem' }}>No instructors registered yet.</div>
-                ) : (
-                  <div style={{ ...S.card, padding: 0, overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid #C5D5E4', backgroundColor: '#EEF3F8' }}>
-                          {['Name', 'Email', 'Country', 'Status', 'Courses', 'Joined', ''].map((h) => (
-                            <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#5a7a96', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {allInstructors.map((u, i) => (
-                          <tr key={u.id} style={{ borderBottom: i < allInstructors.length - 1 ? '1px solid #C5D5E4' : 'none' }}>
-                            <td style={{ padding: '0.75rem 1rem', color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>
-                              {u.firstName || u.lastName ? `${u.firstName} ${u.lastName}`.trim() : '—'}
-                            </td>
-                            <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{u.email}</td>
-                            <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{u.country || '—'}</td>
-                            <td style={{ padding: '0.75rem 1rem' }}>
-                              {u.instructorStatus === 'APPROVED' || u.instructorStatus === 'NOT_APPLICABLE' ? (
-                                <span style={{ color: '#00C2A8', fontWeight: 600, fontSize: '0.8rem' }}>Active</span>
-                              ) : u.instructorStatus === 'PENDING_REVIEW' ? (
-                                <span style={{ color: '#F5C842', fontWeight: 600, fontSize: '0.8rem' }}>Pending</span>
-                              ) : u.instructorStatus === 'REJECTED' ? (
-                                <span style={{ color: '#f87171', fontWeight: 600, fontSize: '0.8rem' }}>Rejected</span>
-                              ) : (
-                                <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>—</span>
-                              )}
-                            </td>
-                            <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{u._count.courses}</td>
-                            <td style={{ padding: '0.75rem 1rem', color: '#5a7a96', fontSize: '0.875rem' }}>
-                              {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                            </td>
-                            <td style={{ padding: '0.75rem 1rem' }}>
-                              {confirmDeleteUserId === u.id ? (
-                                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                                  <span style={{ color: '#f87171', fontSize: '0.75rem' }}>Sure?</span>
-                                  <button onClick={() => handleDeleteUser(u.id)} disabled={deleteUserLoading === u.id}
-                                    style={{ ...S.btn('#fff', '#7f1d1d'), opacity: deleteUserLoading === u.id ? 0.5 : 1 }}>
-                                    {deleteUserLoading === u.id ? '...' : 'Yes'}
-                                  </button>
-                                  <button onClick={() => setConfirmDeleteUserId(null)} style={S.btn('#5a7a96', 'transparent')}>No</button>
-                                </div>
-                              ) : (
-                                <button onClick={() => setConfirmDeleteUserId(u.id)} style={S.btn('#f87171', 'transparent')}>Delete</button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            )
-          })()}
-
-          {/* All Students */}
-          {(() => {
-            const allStudents = allUsers.filter((u) => u.role === 'STUDENT')
-            return (
-              <div style={{ marginBottom: '2.5rem' }}>
-                <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '1rem' }}>
-                  All Students
-                  <span style={{ backgroundColor: '#1a2d4a', color: '#2d4a6b', borderRadius: '999px', padding: '0.1rem 0.6rem', fontSize: '0.8rem', fontWeight: 700, marginLeft: '0.75rem' }}>
-                    {allStudents.length}
-                  </span>
-                </h2>
-                {allStudents.length === 0 ? (
-                  <div style={{ ...S.card, textAlign: 'center', color: '#5a7a96', padding: '2rem' }}>No students registered yet.</div>
-                ) : (
-                  <div style={{ ...S.card, padding: 0, overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid #C5D5E4', backgroundColor: '#EEF3F8' }}>
-                          {['Name', 'Email', 'Country', 'Enrollments', 'Joined', ''].map((h) => (
-                            <th key={h} style={{ padding: '0.75rem 1rem', textAlign: 'left', color: '#5a7a96', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {allStudents.map((u, i) => (
-                          <tr key={u.id} style={{ borderBottom: i < allStudents.length - 1 ? '1px solid #C5D5E4' : 'none' }}>
-                            <td style={{ padding: '0.75rem 1rem', color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>
-                              {u.firstName || u.lastName ? `${u.firstName} ${u.lastName}`.trim() : '—'}
-                            </td>
-                            <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{u.email}</td>
-                            <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{u.country || '—'}</td>
-                            <td style={{ padding: '0.75rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{u._count.enrollments}</td>
-                            <td style={{ padding: '0.75rem 1rem', color: '#5a7a96', fontSize: '0.875rem' }}>
-                              {new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                            </td>
-                            <td style={{ padding: '0.75rem 1rem' }}>
-                              {confirmDeleteUserId === u.id ? (
-                                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                                  <span style={{ color: '#f87171', fontSize: '0.75rem' }}>Sure?</span>
-                                  <button onClick={() => handleDeleteUser(u.id)} disabled={deleteUserLoading === u.id}
-                                    style={{ ...S.btn('#fff', '#7f1d1d'), opacity: deleteUserLoading === u.id ? 0.5 : 1 }}>
-                                    {deleteUserLoading === u.id ? '...' : 'Yes'}
-                                  </button>
-                                  <button onClick={() => setConfirmDeleteUserId(null)} style={S.btn('#5a7a96', 'transparent')}>No</button>
-                                </div>
-                              ) : (
-                                <button onClick={() => setConfirmDeleteUserId(u.id)} style={S.btn('#f87171', 'transparent')}>Delete</button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            )
-          })()}
-
-          {/* All Courses Table */}
-          <div>
-            <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '1.25rem', color: '#0B1A2E', marginBottom: '1rem' }}>
-              All Courses
-            </h2>
-            <div style={{ ...S.card, padding: 0, overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid #C5D5E4' }}>
-                    {['Title', 'Instructor', 'Subject', 'Type', 'Fee', 'Enrollments', 'Status', ''].map((h) => (
-                      <th key={h} style={{ padding: '0.875rem 1rem', textAlign: 'left', color: '#5a7a96', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {courses.map((c, i) => (
-                    <tr key={c.id} style={{ borderBottom: i < courses.length - 1 ? '1px solid #C5D5E4' : 'none' }}>
-                      <td style={{ padding: '0.875rem 1rem', color: '#0B1A2E', fontSize: '0.875rem', fontWeight: 500 }}>{c.title}</td>
-                      <td style={{ padding: '0.875rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{c.instructor.firstName} {c.instructor.lastName}</td>
-                      <td style={{ padding: '0.875rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{c.subject.replace('_', ' ')}</td>
-                      <td style={{ padding: '0.875rem 1rem', fontSize: '0.75rem', fontWeight: 600, color: c.courseType === 'SELF_PACED' ? '#00C2A8' : '#F5C842' }}>{c.courseType === 'SELF_PACED' ? 'Self-Paced' : 'Live'}</td>
-                      <td style={{ padding: '0.875rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>${Number(c.feeUsd).toFixed(2)}</td>
-                      <td style={{ padding: '0.875rem 1rem', color: '#2d4a6b', fontSize: '0.875rem' }}>{c._count.enrollments}</td>
-                      <td style={{ padding: '0.875rem 1rem' }}><StatusBadge status={c.status} hasRemark={!!c.rejectionRemark} /></td>
-                      <td style={{ padding: '0.875rem 1rem' }}>
-                        {confirmDeleteId === c.id ? (
-                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                            <span style={{ color: '#f87171', fontSize: '0.75rem' }}>Sure?</span>
-                            <button onClick={() => handleForceDelete(c.id)} disabled={deleteLoading === c.id}
-                              style={{ ...S.btn('#fff', '#7f1d1d'), opacity: deleteLoading === c.id ? 0.5 : 1 }}>
-                              {deleteLoading === c.id ? '...' : 'Yes'}
-                            </button>
-                            <button onClick={() => setConfirmDeleteId(null)} style={S.btn('#5a7a96', 'transparent')}>No</button>
-                          </div>
-                        ) : (
-                          <button onClick={() => setConfirmDeleteId(c.id)} style={S.btn('#f87171', 'transparent')}>
-                            Delete
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </>
       )}
     </DashboardLayout>
