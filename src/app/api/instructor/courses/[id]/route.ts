@@ -44,12 +44,15 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     feeUsd, contentUrl, classroomUrl, imageUrl, topics, scheduleJson, recordingsJson,
   } = body
 
-  // Only reset to PENDING if content fields changed — schedule/date changes don't need re-approval
+  // If the course was rejected (modifications requested), always reset to PENDING on any save.
+  // Otherwise only reset if content fields changed — schedule/date changes don't need re-approval.
   const contentChanged =
+    course.status === 'REJECTED' ||
     title !== course.title ||
     description !== course.description ||
     subject !== course.subject ||
     courseType !== course.courseType ||
+    feeType !== course.feeType ||
     parseFloat(feeUsd) !== Number(course.feeUsd) ||
     (contentUrl || null) !== course.contentUrl
 
