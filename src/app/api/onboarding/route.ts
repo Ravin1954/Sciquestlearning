@@ -51,7 +51,7 @@ export async function POST(req: Request) {
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const { role, firstName: bodyFirstName, lastName: bodyLastName, timezone, country, qualifications, aboutMe, certificatesUrl, subjects, age, gender, fathersName, mothersName } = body
+  const { role, firstName: bodyFirstName, lastName: bodyLastName, timezone, country, qualifications, aboutMe, certificatesUrl, subjects, age, gender, gradeLevel, fathersName, mothersName } = body
 
   if (!role || !timezone) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -87,6 +87,7 @@ export async function POST(req: Request) {
       ? {
           age: age ? parseInt(age) : null,
           gender: gender || null,
+          gradeLevel: gradeLevel || null,
           fathersName: fathersName || null,
           mothersName: mothersName || null,
         }
