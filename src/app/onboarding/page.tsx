@@ -138,6 +138,7 @@ function OnboardingContent() {
   const [lastName, setLastName] = useState('')
   const [age, setAge] = useState('')
   const [gender, setGender] = useState('')
+  const [gradeLevel, setGradeLevel] = useState('')
   const [fathersName, setFathersName] = useState('')
   const [mothersName, setMothersName] = useState('')
 
@@ -189,6 +190,7 @@ function OnboardingContent() {
           certificatesUrl: role === 'instructor' ? certificatesUrl : undefined,
           age: role === 'student' ? age : undefined,
           gender: role === 'student' ? gender : undefined,
+          gradeLevel: role === 'student' ? gradeLevel : undefined,
           fathersName: role === 'student' ? fathersName : undefined,
           mothersName: role === 'student' ? mothersName : undefined,
         }),
@@ -354,6 +356,24 @@ function OnboardingContent() {
                         <option value="Prefer not to say">Prefer not to say</option>
                       </select>
                     </div>
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Grade Level</label>
+                    <select required value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)} style={inputStyle}>
+                      <option value="">Select grade level</option>
+                      <optgroup label="Middle School">
+                        <option value="6th Grade">6th Grade</option>
+                        <option value="7th Grade">7th Grade</option>
+                        <option value="8th Grade">8th Grade</option>
+                      </optgroup>
+                      <optgroup label="High School">
+                        <option value="9th Grade">9th Grade</option>
+                        <option value="10th Grade">10th Grade</option>
+                        <option value="11th Grade">11th Grade</option>
+                        <option value="12th Grade">12th Grade</option>
+                      </optgroup>
+                    </select>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

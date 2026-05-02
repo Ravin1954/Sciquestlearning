@@ -28,6 +28,7 @@ model User {
   // Student profile fields
   age              Int?
   gender           String?
+  gradeLevel       String?
   fathersName      String?
   mothersName      String?
   createdAt        DateTime     @default(now())
