@@ -362,17 +362,15 @@ function OnboardingContent() {
                     <label style={labelStyle}>Grade Level</label>
                     <select required value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)} style={inputStyle}>
                       <option value="">Select grade level</option>
-                      <optgroup label="Middle School">
-                        <option value="6th Grade">6th Grade</option>
-                        <option value="7th Grade">7th Grade</option>
-                        <option value="8th Grade">8th Grade</option>
-                      </optgroup>
-                      <optgroup label="High School">
-                        <option value="9th Grade">9th Grade</option>
-                        <option value="10th Grade">10th Grade</option>
-                        <option value="11th Grade">11th Grade</option>
-                        <option value="12th Grade">12th Grade</option>
-                      </optgroup>
+                      <option disabled>── Middle School ──</option>
+                      <option value="6th Grade">&nbsp;&nbsp;6th Grade</option>
+                      <option value="7th Grade">&nbsp;&nbsp;7th Grade</option>
+                      <option value="8th Grade">&nbsp;&nbsp;8th Grade</option>
+                      <option disabled>── High School ──</option>
+                      <option value="9th Grade">&nbsp;&nbsp;9th Grade</option>
+                      <option value="10th Grade">&nbsp;&nbsp;10th Grade</option>
+                      <option value="11th Grade">&nbsp;&nbsp;11th Grade</option>
+                      <option value="12th Grade">&nbsp;&nbsp;12th Grade</option>
                     </select>
                   </div>
 
