@@ -106,6 +106,24 @@ function formatUtcTime(utc: string) {
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true })
 }
 
+interface Review {
+  id: string
+  rating: number
+  comment: string
+  createdAt: string
+  student: { firstName: string; lastName: string }
+}
+
+function StarDisplay({ rating, size = '1rem' }: { rating: number; size?: string }) {
+  return (
+    <span style={{ fontSize: size, lineHeight: 1 }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span key={star} style={{ color: rating >= star ? '#F5C842' : rating >= star - 0.5 ? '#F5C842' : '#C5D5E4', opacity: rating >= star - 0.5 && rating < star ? 0.5 : 1 }}>★</span>
+      ))}
+    </span>
+  )
+}
+
 export default function CoursePageClient() {
   const { id } = useParams<{ id: string }>()
   const { isSignedIn } = useAuth()
@@ -118,15 +136,18 @@ export default function CoursePageClient() {
   const [sessionGroups, setSessionGroups] = useState<SessionGroup[]>([])
   const [selectedSessions, setSelectedSessions] = useState<Set<string>>(new Set())
   const [enrolledSessions, setEnrolledSessions] = useState<Set<string>>(new Set())
+  const [reviews, setReviews] = useState<Review[]>([])
 
   useEffect(() => {
     Promise.all([
       fetch(`/api/courses/${id}`).then((r) => r.json()),
       fetch(`/api/courses/${id}/my-sessions`).then((r) => r.json()).catch(() => ({ enrolledSessions: [] })),
-    ]).then(([data, myData]) => {
+      fetch(`/api/courses/${id}/reviews`).then((r) => r.json()).catch(() => []),
+    ]).then(([data, myData, reviewData]) => {
       setCourse(data)
       const alreadyEnrolled: string[] = myData.enrolledSessions || []
       setEnrolledSessions(new Set(alreadyEnrolled))
+      setReviews(Array.isArray(reviewData) ? reviewData : [])
 
       if (data.scheduleJson) {
         try {
@@ -449,6 +470,40 @@ export default function CoursePageClient() {
               <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem' }}>
                 <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.125rem', marginBottom: '0.875rem' }}>About the Instructor</h2>
                 <p style={{ color: '#2d4a6b', lineHeight: 1.7, fontSize: '0.9rem' }}>{course.instructor.qualifications}</p>
+              </div>
+            )}
+
+            {/* Student Reviews */}
+            {reviews.length > 0 && (
+              <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '12px', padding: '1.5rem', marginTop: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                  <h2 style={{ fontFamily: 'Fraunces, serif', color: '#0B1A2E', fontSize: '1.125rem', margin: 0 }}>Student Reviews</h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <StarDisplay rating={reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length} size="1.1rem" />
+                    <span style={{ color: '#F5C842', fontWeight: 700, fontSize: '1rem' }}>
+                      {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
+                    </span>
+                    <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>({reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {reviews.map((review) => (
+                    <div key={review.id} style={{ borderTop: '1px solid #EEF3F8', paddingTop: '1rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
+                        <div>
+                          <span style={{ color: '#0B1A2E', fontWeight: 600, fontSize: '0.9rem' }}>
+                            {review.student.firstName} {review.student.lastName}
+                          </span>
+                          <StarDisplay rating={review.rating} size="0.9rem" />
+                        </div>
+                        <span style={{ color: '#5a7a96', fontSize: '0.75rem' }}>
+                          {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <p style={{ color: '#2d4a6b', fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>{review.comment}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
