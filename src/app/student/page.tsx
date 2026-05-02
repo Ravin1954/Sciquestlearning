@@ -166,12 +166,86 @@ function FeedbackForm({ enrollmentId, onSubmitted }: { enrollmentId: string; onS
   )
 }
 
+function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const steps = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]
+  return (
+    <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span key={star} style={{ position: 'relative', display: 'inline-block', fontSize: '1.75rem', cursor: 'pointer', color: '#C5D5E4', lineHeight: 1 }}>
+          <span style={{ color: value >= star ? '#F5C842' : '#C5D5E4' }}>★</span>
+          {/* left half click → .5 */}
+          <span onClick={() => onChange(star - 0.5)} style={{ position: 'absolute', left: 0, top: 0, width: '50%', height: '100%', cursor: 'pointer' }} />
+          {/* right half click → full */}
+          <span onClick={() => onChange(star)} style={{ position: 'absolute', right: 0, top: 0, width: '50%', height: '100%', cursor: 'pointer' }} />
+          {/* half-fill overlay */}
+          {value === star - 0.5 && (
+            <span style={{ position: 'absolute', left: 0, top: 0, width: '50%', overflow: 'hidden', color: '#F5C842', pointerEvents: 'none' }}>★</span>
+          )}
+        </span>
+      ))}
+      <span style={{ color: '#5a7a96', fontSize: '0.85rem', marginLeft: '0.25rem' }}>{value > 0 ? `${value}/5` : ''}</span>
+    </div>
+  )
+}
+
+function ReviewForm({ courseId, onSubmitted }: { courseId: string; onSubmitted: () => void }) {
+  const [rating, setRating] = useState(0)
+  const [comment, setComment] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async () => {
+    if (rating === 0) { setError('Please select a rating.'); return }
+    if (!comment.trim()) { setError('Please write a short review.'); return }
+    setLoading(true)
+    const res = await fetch(`/api/courses/${courseId}/reviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rating, comment }),
+    })
+    if (res.ok) {
+      onSubmitted()
+    } else {
+      const d = await res.json()
+      setError(d.error || 'Failed to submit')
+    }
+    setLoading(false)
+  }
+
+  return (
+    <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#0a1a30', borderRadius: '8px', border: '1px solid #F5C842' }}>
+      <p style={{ color: '#F5C842', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem' }}>Write a Review</p>
+      <p style={{ color: '#5a7a96', fontSize: '0.78rem', marginBottom: '0.5rem' }}>Your rating (tap left half for half-star):</p>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <StarPicker value={rating} onChange={setRating} />
+      </div>
+      <textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Share your experience with this course..."
+        rows={3}
+        style={{ width: '100%', padding: '0.5rem', borderRadius: '6px', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', color: '#0B1A2E', fontSize: '0.8rem', resize: 'vertical', fontFamily: "'DM Sans', sans-serif", boxSizing: 'border-box' }}
+      />
+      {error && <p style={{ color: '#f87171', fontSize: '0.75rem', marginTop: '0.25rem' }}>{error}</p>}
+      <button
+        onClick={handleSubmit}
+        disabled={loading}
+        style={{ marginTop: '0.625rem', backgroundColor: '#F5C842', color: '#0B1A2E', border: 'none', padding: '0.5rem 1.25rem', borderRadius: '6px', fontWeight: 700, fontSize: '0.8rem', cursor: loading ? 'not-allowed' : 'pointer' }}
+      >
+        {loading ? 'Submitting...' : 'Submit Review'}
+      </button>
+    </div>
+  )
+}
+
 export default function StudentPage() {
   const { user } = useUser()
   const studentName = user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : ''
   const [enrollments, setEnrollments] = useState<Enrollment[]>([])
   const [loading, setLoading] = useState(true)
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<Set<string>>(new Set())
+  const [reviewedCourseIds, setReviewedCourseIds] = useState<Set<string>>(new Set())
+  const [reviewingCourseId, setReviewingCourseId] = useState<string | null>(null)
   const [now, setNow] = useState(new Date())
   const [reportEnrollmentId, setReportEnrollmentId] = useState<string | null>(null)
   const [reportIssue, setReportIssue] = useState('')
@@ -382,6 +456,30 @@ export default function StudentPage() {
                       />
                     )
                   )}
+
+                  {/* Review section */}
+                  <div style={{ marginTop: '0.75rem' }}>
+                    {reviewedCourseIds.has(course.id) ? (
+                      <div style={{ padding: '0.6rem 1rem', backgroundColor: '#0a1a30', borderRadius: '8px', border: '1px solid #F5C842', display: 'inline-block' }}>
+                        <p style={{ color: '#F5C842', fontSize: '0.8rem', fontWeight: 600 }}>Review submitted — thank you!</p>
+                      </div>
+                    ) : reviewingCourseId === course.id ? (
+                      <ReviewForm
+                        courseId={course.id}
+                        onSubmitted={() => {
+                          setReviewedCourseIds((prev) => new Set([...prev, course.id]))
+                          setReviewingCourseId(null)
+                        }}
+                      />
+                    ) : (
+                      <button
+                        onClick={() => setReviewingCourseId(course.id)}
+                        style={{ backgroundColor: 'transparent', color: '#F5C842', border: '1px solid #F5C842', padding: '0.3rem 0.875rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        Write a Review
+                      </button>
+                    )}
+                  </div>
 
                   {/* Report Issue */}
                   <div style={{ marginTop: '0.75rem' }}>

@@ -5,6 +5,24 @@ import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import StatusBadge from '@/components/StatusBadge'
 
+interface Review {
+  id: string
+  rating: number
+  comment: string
+  createdAt: string
+  student: { firstName: string; lastName: string }
+}
+
+function StarDisplay({ rating }: { rating: number }) {
+  return (
+    <span style={{ fontSize: '0.85rem' }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span key={star} style={{ color: rating >= star ? '#F5C842' : rating >= star - 0.5 ? '#F5C842' : '#C5D5E4', opacity: rating >= star - 0.5 && rating < star ? 0.5 : 1 }}>★</span>
+      ))}
+    </span>
+  )
+}
+
 interface Course {
   id: string
   title: string
@@ -104,6 +122,9 @@ export default function MyCoursesPage() {
   const [msgAttachment, setMsgAttachment] = useState('')
   const [msgSending, setMsgSending] = useState(false)
   const [msgResult, setMsgResult] = useState<string | null>(null)
+  const [reviewsCourseId, setReviewsCourseId] = useState<string | null>(null)
+  const [reviewsData, setReviewsData] = useState<Review[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(false)
 
   const handleViewRoster = async (courseId: string) => {
     if (rosterCourseId === courseId) { setRosterCourseId(null); setMsgResult(null); return }
@@ -114,6 +135,16 @@ export default function MyCoursesPage() {
     const data = await res.json()
     setRosterData(Array.isArray(data) ? data : [])
     setRosterLoading(false)
+  }
+
+  const handleViewReviews = async (courseId: string) => {
+    if (reviewsCourseId === courseId) { setReviewsCourseId(null); return }
+    setReviewsCourseId(courseId)
+    setReviewsLoading(true)
+    const res = await fetch(`/api/courses/${courseId}/reviews`)
+    const data = await res.json()
+    setReviewsData(Array.isArray(data) ? data : [])
+    setReviewsLoading(false)
   }
 
   const handleSendMessage = async (courseId: string) => {
@@ -470,6 +501,14 @@ export default function MyCoursesPage() {
                         <StatusBadge status={c.status} hasRemark={!!c.rejectionRemark} />
                         {c.status === 'APPROVED' && (
                           <button
+                            onClick={() => handleViewReviews(c.id)}
+                            style={{ backgroundColor: 'transparent', color: '#00C2A8', border: '1px solid #00C2A8', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                          >
+                            ★ Reviews
+                          </button>
+                        )}
+                        {c.status === 'APPROVED' && (
+                          <button
                             onClick={() => setRecordingCourseId(recordingCourseId === c.id ? null : c.id)}
                             style={{ backgroundColor: 'transparent', color: '#a855f7', border: '1px solid #a855f7', padding: '0.3rem 0.75rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
                           >
@@ -501,6 +540,47 @@ export default function MyCoursesPage() {
                         )}
                       </div>
                     </div>
+
+                    {/* Reviews panel */}
+                    {reviewsCourseId === c.id && (
+                      <div style={{ borderTop: '1px solid #C5D5E4', paddingTop: '1rem', marginTop: '0.5rem' }}>
+                        <p style={{ color: '#00C2A8', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.75rem' }}>★ Student Reviews</p>
+                        {reviewsLoading ? (
+                          <p style={{ color: '#5a7a96', fontSize: '0.85rem' }}>Loading reviews...</p>
+                        ) : reviewsData.length === 0 ? (
+                          <p style={{ color: '#5a7a96', fontSize: '0.85rem' }}>No reviews yet for this course.</p>
+                        ) : (
+                          <>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.875rem', backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '8px', padding: '0.6rem 0.875rem' }}>
+                              <StarDisplay rating={reviewsData.reduce((s, r) => s + r.rating, 0) / reviewsData.length} />
+                              <span style={{ color: '#F5C842', fontWeight: 700, fontSize: '0.9rem' }}>
+                                {(reviewsData.reduce((s, r) => s + r.rating, 0) / reviewsData.length).toFixed(1)}
+                              </span>
+                              <span style={{ color: '#5a7a96', fontSize: '0.8rem' }}>average · {reviewsData.length} review{reviewsData.length !== 1 ? 's' : ''}</span>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                              {reviewsData.map((review) => (
+                                <div key={review.id} style={{ backgroundColor: '#EEF3F8', border: '1px solid #C5D5E4', borderRadius: '8px', padding: '0.75rem 0.875rem' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                      <span style={{ color: '#0B1A2E', fontWeight: 600, fontSize: '0.825rem' }}>
+                                        {review.student.firstName} {review.student.lastName}
+                                      </span>
+                                      <StarDisplay rating={review.rating} />
+                                      <span style={{ color: '#F5C842', fontSize: '0.8rem', fontWeight: 600 }}>{review.rating}</span>
+                                    </div>
+                                    <span style={{ color: '#5a7a96', fontSize: '0.72rem' }}>
+                                      {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </span>
+                                  </div>
+                                  <p style={{ color: '#2d4a6b', fontSize: '0.825rem', lineHeight: 1.6, margin: 0 }}>{review.comment}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
 
                     {/* Recordings panel */}
                     {recordingCourseId === c.id && (() => {

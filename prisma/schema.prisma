@@ -33,6 +33,7 @@ model User {
   createdAt        DateTime     @default(now())
   courses          Course[]     @relation("InstructorCourses")
   enrollments      Enrollment[]
+  reviews          Review[]
 }
 
 model Course {
@@ -66,6 +67,7 @@ model Course {
   cancelledSessionsJson  String       @default("[]")
   createdAt              DateTime     @default(now())
   enrollments         Enrollment[]
+  reviews             Review[]
 }
 
 model Enrollment {
@@ -95,6 +97,19 @@ model Feedback {
   rating       Int
   comment      String?
   createdAt    DateTime   @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id])
+  rating    Float
+  comment   String
+  createdAt DateTime @default(now())
+
+  @@unique([courseId, studentId])
 }
 
 enum Role {
