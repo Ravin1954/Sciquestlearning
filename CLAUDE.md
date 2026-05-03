@@ -46,10 +46,20 @@ Node is at `/opt/homebrew/bin/node`. Always export `PATH="/opt/homebrew/bin:$PAT
 5. Admin manually triggers payouts from admin dashboard
 
 ## Database (Prisma)
-Schema at `prisma/schema.prisma`. Models: User, Course, Enrollment, Feedback. Enums: Role, Subject, CourseStatus.
+Schema at `prisma/schema.prisma`. Models: User, Course, Enrollment, Feedback, Review. Enums: Role, Subject, CourseStatus.
 - CourseType: LIVE | SELF_PACED
 - CourseStatus: PENDING | APPROVED | REJECTED
 - Role: ADMIN | INSTRUCTOR | STUDENT
+- Review: Float rating (supports 0.5 increments), comment, @@unique([courseId, studentId])
+- User has gradeLevel String? (student field: "6th Grade" through "12th Grade")
+
+## Running Prisma DB Push (production)
+After any schema change, run from local terminal:
+```
+DATABASE_URL="<DATABASE_PUBLIC_URL from postgres-volume-zZdA Railway service>" npx prisma db push
+```
+- Use DATABASE_PUBLIC_URL (not DATABASE_URL which is internal/private network only)
+- Find it in Railway → postgres-volume-zZdA → Variables tab → DATABASE_PUBLIC_URL
 
 ## Environment Variables (set in Railway)
 See `.env.example` for all required variables. Key ones:
@@ -78,14 +88,16 @@ See `.env.example` for all required variables. Key ones:
 - Shows logo, maintenance message, admin contact email
 - To restore: set `MAINTENANCE_MODE=false` or delete the variable, then redeploy
 
-### Admin Dashboard (src/app/admin/page.tsx)
-- View all courses (pending/approved/rejected), approve/reject with remarks
-- View all enrollments and revenue metrics
-- Generate Meet link button (fallback — auto-generated on approval)
+### Admin Dashboard (src/app/admin/ — split into separate pages)
+- **Overview** (src/app/admin/page.tsx): revenue metrics, recent enrollments summary
+- **Courses** (src/app/admin/courses/page.tsx): view all courses (pending/approved/rejected), approve/reject with remarks, generate Meet link, delete courses
+- **Users** (src/app/admin/users/page.tsx): view all students and instructors, search by name/email, filter by role
+- **Payouts** (src/app/admin/payouts/page.tsx): trigger instructor payouts
 - Receive emails for: new course submissions, new enrollments, refund requests, student complaints
+- Admin does NOT see "View & Enroll" on browse courses page
 
 ### Instructor Dashboard (src/app/instructor/)
-- **My Courses page**: 
+- **My Courses page**:
   - "Upcoming Classes" shows LIVE courses only (not self-paced)
   - Each course card shows: title, schedule, student count, next session time
   - "Open Meet Link" / "Start Class" button (glows teal when class is live within 30 min)
@@ -93,9 +105,11 @@ See `.env.example` for all required variables. Key ones:
   - **Manage Enrollment** button per student → shows refund request form (reason + amount) → emails admin
   - Message All Students form (sends email to all enrolled students)
   - Add Session Recordings (Google Drive / YouTube links)
+  - **★ Reviews button** per approved course → shows all student reviews with ratings and average
 - **Earnings page**: gross revenue, platform fee, net payout
 - **Profile page**: personal details
 - **New Course**: create course form (pending admin approval)
+- Cloudinary image upload on course creation/edit (CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME env vars)
 
 ### Student Dashboard (src/app/student/page.tsx)
 - Shows all enrolled courses with subject badge, type badge, instructor name
@@ -103,6 +117,26 @@ See `.env.example` for all required variables. Key ones:
 - Self-paced: "Access Course" button, expiry date, "Renew Access" button
 - Feedback form per live course (rating 1-5 stars, attended yes/no, comment)
 - **Report Issue** button per enrollment → sends complaint email to admin
+- **Write a Review** button per enrolled course → half-star rating picker (0.5–5) + comment → stored as Review record (upsertable)
+
+### Student Registration / Onboarding (src/app/onboarding/page.tsx)
+- Collects: country, first/last name, age, gender, grade level, father's name, mother's name, timezone, subjects of interest
+- **Grade Level** dropdown: Middle School (6th, 7th, 8th Grade) / High School (9th, 10th, 11th, 12th Grade)
+- API: src/app/api/onboarding/route.ts
+
+### Course Page (src/app/courses/[id]/CoursePageClient.tsx)
+- Instructor name hidden from logged-out users (shows "Experienced and Qualified Instructors")
+- Logged-in users see actual instructor name
+- "About the Instructor" section only shown to logged-in users
+- LIVE courses show "Taught by", SELF_PACED courses show "Created by"
+- **Student Reviews section**: shows average star rating + all reviews below About the Instructor
+- Course image upload via Cloudinary
+
+### Student Reviews (src/app/api/courses/[id]/reviews/route.ts)
+- GET: public, returns all reviews for a course with student name
+- POST: authenticated enrolled students only, upserts review (can edit after submitting)
+- Rating stored as Float (supports 0.5 increments, e.g. 4.5/5)
+- Reviews display on course page (public) and instructor dashboard (private)
 
 ### Refund Policy (implemented in UI, manual processing by admin)
 - Student cancels 24hrs before class → admin refunds full amount
@@ -147,3 +181,11 @@ All sent from noreply@sciquestlearning.com to admin@sciquestlearning.com or rele
 - POST /api/student/report — student submits complaint to admin
 - GET /api/instructor/courses/[id]/roster — returns enrolled students with enrollmentId and amountPaidUsd
 - POST /api/instructor/courses/[id]/message — send email to all enrolled students
+- GET /api/courses/[id]/reviews — public, returns all reviews for a course
+- POST /api/courses/[id]/reviews — authenticated student, submit/update review
+
+## Dashboard Layout (src/components/DashboardLayout.tsx)
+- Used by admin, instructor, and student dashboards
+- **Mobile responsive**: on screens <768px, sidebar is hidden; hamburger ☰ button in sticky top bar slides it in
+- Dark overlay closes sidebar when tapped; sidebar also closes on navigation
+- Desktop: fixed 240px sidebar, unchanged behaviour
