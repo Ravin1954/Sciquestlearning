@@ -83,6 +83,11 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className={`${fraunces.variable} ${dmSans.variable}`}>
+        <head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        </head>
         <body style={{ backgroundColor: '#0B1A2E', color: '#e8edf5', fontFamily: "var(--font-dm-sans), 'DM Sans', sans-serif", margin: 0 }}>
           {children}
         </body>

@@ -300,17 +300,21 @@ export default function HomePage() {
           {/* Circular science images */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1.75rem', marginBottom: '2.75rem', flexWrap: 'wrap' }}>
             {[
-              { url: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=200&h=200&fit=crop&crop=center', alt: 'Chemistry lab flasks' },
-              { url: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=200&h=200&fit=crop&crop=center', alt: 'Microscope biology' },
-              { url: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=200&h=200&fit=crop&crop=center', alt: 'Mathematics equations' },
-              { url: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=200&h=200&fit=crop&crop=center', alt: 'Science experiment' },
-              { url: 'https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=200&h=200&fit=crop&crop=center', alt: 'Biology nature science' },
+              { url: 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=300&h=300&fit=crop&crop=center', alt: 'Chemistry lab flasks' },
+              { url: 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=300&h=300&fit=crop&crop=center', alt: 'Microscope biology' },
+              { url: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=300&h=300&fit=crop&crop=center', alt: 'Mathematics equations' },
+              { url: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=300&h=300&fit=crop&crop=center', alt: 'Science experiment' },
+              { url: 'https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=300&h=300&fit=crop&crop=center', alt: 'Biology nature science' },
             ].map((img) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={img.url}
                 src={img.url}
                 alt={img.alt}
+                width={150}
+                height={150}
+                loading="lazy"
+                decoding="async"
                 style={{
                   width: '150px',
                   height: '150px',
