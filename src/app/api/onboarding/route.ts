@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db'
 
 const ALLOWED_STUDENT_COUNTRIES = new Set([
   'United States', 'Canada', 'Mexico', 'China', 'Philippines', 'South Korea',
-  'Australia', 'New Zealand', 'India', 'Japan', 'Singapore', 'Malaysia',
+  'Australia', 'New Zealand', 'India', 'Bangladesh', 'Nepal', 'Japan', 'Singapore', 'Malaysia',
   'Thailand', 'Indonesia', 'Hong Kong', 'United Arab Emirates',
   'United Kingdom', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus',
   'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany',
@@ -16,33 +16,8 @@ const ALLOWED_STUDENT_COUNTRIES = new Set([
   'Jamaica', 'Trinidad and Tobago', 'Dominican Republic', 'Bahamas',
 ])
 
-// Instructor countries: all countries where PayPal can receive payments
-// Instructors can use Stripe Connect (bank transfer) or PayPal for payouts
-// Only OFAC-sanctioned countries excluded (Cuba, Iran, North Korea, Syria, Sudan, Russia)
 const ALLOWED_INSTRUCTOR_COUNTRIES = new Set([
   'United States', 'Canada', 'Mexico',
-  'Albania', 'Andorra', 'Austria', 'Belgium', 'Bosnia and Herzegovina',
-  'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia',
-  'Finland', 'France', 'Germany', 'Gibraltar', 'Greece', 'Hungary', 'Iceland',
-  'Ireland', 'Italy', 'Kosovo', 'Latvia', 'Liechtenstein', 'Lithuania',
-  'Luxembourg', 'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands',
-  'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania', 'San Marino',
-  'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
-  'Ukraine', 'United Kingdom',
-  'Australia', 'New Zealand', 'Japan', 'South Korea', 'Singapore', 'Hong Kong',
-  'Taiwan', 'Malaysia', 'Thailand', 'Indonesia', 'Philippines', 'Vietnam',
-  'India', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Pakistan',
-  'Cambodia', 'Mongolia',
-  'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain',
-  'Oman', 'Jordan', 'Israel', 'Turkey',
-  'South Africa', 'Kenya', 'Ghana', 'Nigeria', 'Tanzania', 'Uganda',
-  'Rwanda', 'Mozambique', 'Zambia', 'Zimbabwe', 'Botswana', 'Namibia',
-  'Senegal', 'Ivory Coast', 'Cameroon',
-  'Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Uruguay', 'Ecuador',
-  'Paraguay', 'Bolivia', 'Venezuela', 'Guatemala', 'Costa Rica', 'Panama',
-  'El Salvador', 'Honduras', 'Nicaragua',
-  'Jamaica', 'Trinidad and Tobago', 'Dominican Republic', 'Bahamas',
-  'Barbados', 'Belize',
 ])
 
 export async function POST(req: Request) {
@@ -63,7 +38,7 @@ export async function POST(req: Request) {
 
   if (role === 'instructor' && !ALLOWED_INSTRUCTOR_COUNTRIES.has(country)) {
     return NextResponse.json({
-      error: 'Instructors must be based in the United States to receive payouts via Stripe.',
+      error: 'Instructor registration is currently available for residents of the United States, Canada, and Mexico only.',
     }, { status: 400 })
   }
 
