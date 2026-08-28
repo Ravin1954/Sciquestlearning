@@ -206,14 +206,22 @@ const faqs = [
 ]
 
 export default async function HomePage() {
-  const [instructorCount, courseCount, enrollmentCount, ratingResult] = await Promise.all([
-    prisma.user.count({ where: { role: 'INSTRUCTOR', instructorStatus: 'APPROVED' } }),
-    prisma.course.count({ where: { status: 'APPROVED' } }),
-    prisma.enrollment.count(),
-    prisma.review.aggregate({ _avg: { rating: true } }),
-  ])
+  let instructorCount = 0, courseCount = 0, enrollmentCount = 0, avgRating: number | null = null
+  try {
+    const [ic, cc, ec, rr] = await Promise.all([
+      prisma.user.count({ where: { role: 'INSTRUCTOR', instructorStatus: 'APPROVED' } }),
+      prisma.course.count({ where: { status: 'APPROVED' } }),
+      prisma.enrollment.count(),
+      prisma.review.aggregate({ _avg: { rating: true } }),
+    ])
+    instructorCount = ic
+    courseCount = cc
+    enrollmentCount = ec
+    avgRating = rr._avg.rating
+  } catch {
+    // Database unavailable at build time — stats shown as 0
+  }
 
-  const avgRating = ratingResult._avg.rating
   const ratingDisplay = avgRating ? avgRating.toFixed(1) + '★' : null
 
   const stats = [
