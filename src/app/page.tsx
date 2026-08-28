@@ -3,6 +3,8 @@ import Link from 'next/link'
 import NavBar from '@/components/NavBar'
 import { prisma } from '@/lib/db'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'SciQuest Learning — Live Science & Math Classes for Middle & High School',
   description: 'SciQuest Learning offers live, interactive online science and math classes for middle and high school students (grades 6–12). Biology, Chemistry, Physical Science, and Mathematics taught by verified educators via Google Meet.',
