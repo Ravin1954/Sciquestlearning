@@ -1,9 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
-import { prisma } from '@/lib/db'
-
-export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'SciQuest Learning — Live Science & Math Classes for Middle & High School',
@@ -205,31 +202,7 @@ const faqs = [
   },
 ]
 
-export default async function HomePage() {
-  let instructorCount = 0, courseCount = 0, enrollmentCount = 0, avgRating: number | null = null
-  try {
-    const [ic, cc, ec, rr] = await Promise.all([
-      prisma.user.count({ where: { role: 'INSTRUCTOR', instructorStatus: 'APPROVED' } }),
-      prisma.course.count({ where: { status: 'APPROVED' } }),
-      prisma.enrollment.count(),
-      prisma.review.aggregate({ _avg: { rating: true } }),
-    ])
-    instructorCount = ic
-    courseCount = cc
-    enrollmentCount = ec
-    avgRating = rr._avg.rating
-  } catch {
-    // Database unavailable at build time — stats shown as 0
-  }
-
-  const ratingDisplay = avgRating ? avgRating.toFixed(1) + '★' : null
-
-  const stats = [
-    { value: instructorCount.toString(), label: 'Verified Instructors' },
-    { value: courseCount.toString(), label: 'Approved Courses' },
-    { value: enrollmentCount.toString(), label: 'Student Enrollments' },
-    ...(ratingDisplay ? [{ value: ratingDisplay, label: 'Average Rating' }] : []),
-  ]
+export default function HomePage() {
   return (
     <div style={{ backgroundColor: '#EEF3F8', minHeight: '100vh' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
@@ -311,17 +284,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid #C5D5E4', borderBottom: '1px solid #C5D5E4', padding: '2rem 1.5rem' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'center', gap: '3rem', flexWrap: 'wrap' }}>
-          {stats.map((stat) => (
-            <div key={stat.label} style={{ textAlign: 'center' }}>
-              <div style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#00A896' }}>{stat.value}</div>
-              <div style={{ color: '#5a7a96', fontSize: '0.875rem', marginTop: '0.25rem' }}>{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* About Us Section */}
       <section id="about" style={{ padding: '5rem 1.5rem', backgroundColor: '#FFFFFF' }}>
