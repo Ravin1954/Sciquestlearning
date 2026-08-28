@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import NavBar from '@/components/NavBar'
+import { prisma } from '@/lib/db'
 
 export const metadata: Metadata = {
   title: 'SciQuest Learning — Live Science & Math Classes for Middle & High School',
@@ -167,7 +168,58 @@ const features = [
   },
 ]
 
-export default function HomePage() {
+const faqs = [
+  {
+    q: 'What subjects does SciQuest Learning offer?',
+    a: 'We offer live and self-paced online classes in Biology, Chemistry, Physical Science, and Mathematics — all tailored for middle and high school students (grades 6–12).',
+  },
+  {
+    q: 'How do live classes work?',
+    a: 'Live classes take place via Google Meet at scheduled times. Once enrolled, you receive a secure join link directly to your email. Classes are interactive — students can ask questions and engage with the instructor in real time.',
+  },
+  {
+    q: 'Are instructors verified?',
+    a: 'Yes. Every instructor on SciQuest Learning is individually reviewed and approved by our admin team before they can publish any course. We verify qualifications and teaching credentials.',
+  },
+  {
+    q: 'What if my child misses a class?',
+    a: 'Many of our instructors provide session recordings via Google Drive or YouTube for enrolled students. Check the course details page for recording availability before enrolling.',
+  },
+  {
+    q: 'Is payment secure?',
+    a: 'All payments are processed securely through Stripe — the same payment technology used by Amazon, Google, and thousands of other platforms worldwide. We never store your card details.',
+  },
+  {
+    q: 'Can I get a refund?',
+    a: 'Yes. If you cancel at least 24 hours before the first class, you are eligible for a full refund. Please review our Student Policies page for complete refund terms.',
+  },
+  {
+    q: 'Which countries can students register from?',
+    a: 'SciQuest Learning is open to students from the United States, Canada, India, Bangladesh, Nepal, the United Kingdom, Australia, and many more countries. Select your country during registration to confirm availability.',
+  },
+  {
+    q: 'How do I become an instructor?',
+    a: 'Instructors based in the United States, Canada, or Mexico can apply by clicking "Apply as Instructor" and completing the onboarding form. Your application is reviewed by our team and you will be notified once approved.',
+  },
+]
+
+export default async function HomePage() {
+  const [instructorCount, courseCount, enrollmentCount, ratingResult] = await Promise.all([
+    prisma.user.count({ where: { role: 'INSTRUCTOR', instructorStatus: 'APPROVED' } }),
+    prisma.course.count({ where: { status: 'APPROVED' } }),
+    prisma.enrollment.count(),
+    prisma.review.aggregate({ _avg: { rating: true } }),
+  ])
+
+  const avgRating = ratingResult._avg.rating
+  const ratingDisplay = avgRating ? avgRating.toFixed(1) + '★' : null
+
+  const stats = [
+    { value: instructorCount.toString(), label: 'Verified Instructors' },
+    { value: courseCount.toString(), label: 'Approved Courses' },
+    { value: enrollmentCount.toString(), label: 'Student Enrollments' },
+    ...(ratingDisplay ? [{ value: ratingDisplay, label: 'Average Rating' }] : []),
+  ]
   return (
     <div style={{ backgroundColor: '#EEF3F8', minHeight: '100vh' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
@@ -252,12 +304,7 @@ export default function HomePage() {
       {/* Stats Bar */}
       <section style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid #C5D5E4', borderBottom: '1px solid #C5D5E4', padding: '2rem 1.5rem' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'center', gap: '3rem', flexWrap: 'wrap' }}>
-          {[
-            { value: '50+', label: 'Verified Instructors' },
-            { value: '200+', label: 'Live Courses' },
-            { value: '1,500+', label: 'Students Enrolled' },
-            { value: '4.9★', label: 'Average Rating' },
-          ].map((stat) => (
+          {stats.map((stat) => (
             <div key={stat.label} style={{ textAlign: 'center' }}>
               <div style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#00A896' }}>{stat.value}</div>
               <div style={{ color: '#5a7a96', fontSize: '0.875rem', marginTop: '0.25rem' }}>{stat.label}</div>
@@ -499,6 +546,52 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section style={{ padding: '5rem 1.5rem', backgroundColor: '#FFFFFF' }}>
+        <div style={{ maxWidth: '780px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <div style={{ display: 'inline-block', backgroundColor: '#E0F7F4', color: '#00A896', padding: '0.375rem 1rem', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '1rem' }}>
+              FAQ
+            </div>
+            <h2 style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.5rem' }}>
+              Frequently Asked Questions
+            </h2>
+            <p style={{ color: '#5a7a96', fontSize: '1rem' }}>
+              Everything you need to know before getting started
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+            {faqs.map((faq, i) => (
+              <div
+                key={i}
+                style={{
+                  borderTop: i === 0 ? '1px solid #C5D5E4' : 'none',
+                  borderBottom: '1px solid #C5D5E4',
+                  padding: '1.5rem 0',
+                }}
+              >
+                <p style={{ fontWeight: 600, color: '#0B1A2E', marginBottom: '0.625rem', fontSize: '1rem', lineHeight: 1.5 }}>
+                  {faq.q}
+                </p>
+                <p style={{ color: '#5a7a96', fontSize: '0.9rem', lineHeight: 1.75, margin: 0 }}>
+                  {faq.a}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
+            <p style={{ color: '#5a7a96', fontSize: '0.9rem' }}>
+              Still have questions?{' '}
+              <Link href="/contact" style={{ color: '#00A896', fontWeight: 600, textDecoration: 'none' }}>
+                Contact us →
+              </Link>
+            </p>
           </div>
         </div>
       </section>
