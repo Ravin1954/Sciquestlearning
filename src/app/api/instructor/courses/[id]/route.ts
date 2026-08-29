@@ -56,12 +56,17 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     parseFloat(feeUsd) !== Number(course.feeUsd) ||
     (contentUrl || null) !== course.contentUrl
 
-  // Clear cancelled sessions when the instructor reschedules (start date changed)
-  const startDateChanged = (startDate || '') !== (course.startDate || '')
+  // Clear cancelled sessions whenever any schedule field changes — old cancellation
+  // keys (date|time) are no longer valid after the schedule is rescheduled
+  const scheduleChanged =
+    (startDate || '') !== (course.startDate || '') ||
+    (startTimeUtc || '') !== (course.startTimeUtc || '') ||
+    JSON.stringify(daysOfWeek || []) !== JSON.stringify(course.daysOfWeek || []) ||
+    (scheduleJson || '') !== (course.scheduleJson || '')
   const hasCancelledSessions = (() => {
     try { return JSON.parse(course.cancelledSessionsJson || '[]').length > 0 } catch { return false }
   })()
-  const clearCancellations = startDateChanged && hasCancelledSessions
+  const clearCancellations = scheduleChanged && hasCancelledSessions
 
   const updated = await prisma.course.update({
     where: { id },
