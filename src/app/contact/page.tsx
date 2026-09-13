@@ -59,9 +59,17 @@ export default function ContactPage() {
         <h1 style={{ fontFamily: 'Fraunces, serif', fontSize: '2rem', fontWeight: 700, color: '#0B1A2E', marginBottom: '0.5rem' }}>
           Contact Us
         </h1>
-        <p style={{ color: '#5a7a96', marginBottom: '2.5rem', lineHeight: 1.6 }}>
+        <p style={{ color: '#5a7a96', marginBottom: '1.25rem', lineHeight: 1.6 }}>
           Have a question or need help? Send us a message and we&apos;ll get back to you as soon as possible.
         </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', backgroundColor: '#FFFFFF', border: '1px solid #C5D5E4', borderRadius: '10px', padding: '0.875rem 1.25rem', marginBottom: '2rem' }}>
+          <span style={{ fontSize: '1.1rem' }}>✉️</span>
+          <span style={{ color: '#5a7a96', fontSize: '0.875rem' }}>Or email us directly at</span>
+          <a href="mailto:info@sciquestlearning.com" style={{ color: '#00A896', fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none' }}>
+            info@sciquestlearning.com
+          </a>
+        </div>
 
         {success ? (
           <div style={{ backgroundColor: '#003d35', border: '1px solid #00C2A8', borderRadius: '12px', padding: '2rem', textAlign: 'center' }}>
