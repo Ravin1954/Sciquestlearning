@@ -10,10 +10,12 @@
 Full-stack Next.js 14 (App Router) web app for SciQuest Learning — a live science/math tutoring platform for middle & high school students. Live at https://sciquestlearning.com
 
 ## Owner
-- Platform owner: Sabita Sudhakaran
+- Platform owner: Ravindernath Kumaran
 - Admin email: admin@sciquestlearning.com (Google Workspace Business Starter, $6/month)
-- Personal Gmail: krnath54@gmail.com (linked to Workspace account — same inbox)
+- Personal Gmail: krnath54@gmail.com (linked to admin@sciquestlearning.com Workspace — same inbox)
 - Gmail filter: `from:(noreply@sciquestlearning.com)` → Skip Inbox, Apply label "SciQuest"
+- Domain registrar: WordPress.com account @krnath1954 (krnath54@gmail.com) — expires Aug 8 2028, auto-renew enabled
+- Note: Sabita Sudhakaran is an Instructor on the platform, not the owner
 
 ## Node
 Node is at `/opt/homebrew/bin/node`. Always export `PATH="/opt/homebrew/bin:$PATH"` before running npm/node commands.
