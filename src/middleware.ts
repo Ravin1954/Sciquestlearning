@@ -11,6 +11,8 @@ const isPublicRoute = createRouteMatcher([
   '/api/webhooks(.*)',
   '/api/cron(.*)',
   '/contact',
+  '/for-parents',
+  '/teach-with-us',
   '/class-policies',
   '/student-policies',
   '/instructor-policies',
