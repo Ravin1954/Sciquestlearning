@@ -572,6 +572,8 @@ export default function HomePage() {
       <footer style={{ backgroundColor: '#FFFFFF', borderTop: '1px solid #C5D5E4', padding: '2rem 1.5rem', textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           <a href="/courses" style={{ color: '#5a7a96', fontSize: '0.8rem', textDecoration: 'none' }}>Browse Courses</a>
+          <a href="/for-parents" style={{ color: '#5a7a96', fontSize: '0.8rem', textDecoration: 'none' }}>For Parents</a>
+          <a href="/teach-with-us" style={{ color: '#5a7a96', fontSize: '0.8rem', textDecoration: 'none' }}>Teach With Us</a>
           <a href="/class-policies" style={{ color: '#5a7a96', fontSize: '0.8rem', textDecoration: 'none' }}>Class Policies</a>
           <a href="/instructor-policies" style={{ color: '#5a7a96', fontSize: '0.8rem', textDecoration: 'none' }}>Instructor Policies</a>
           <a href="/contact" style={{ color: '#5a7a96', fontSize: '0.8rem', textDecoration: 'none' }}>Contact Us</a>
