@@ -21,24 +21,30 @@ const subjectLabels: Record<string, string> = {
   MATHEMATICS: 'Mathematics',
 }
 
-export default async function OgImage({ params }: { params: { id: string } }) {
-  const course = await prisma.course.findUnique({
-    where: { id: params.id },
-    select: {
-      title: true,
-      subject: true,
-      gradeLevel: true,
-      durationWeeks: true,
-      feeUsd: true,
-      instructor: { select: { firstName: true, lastName: true } },
-    },
-  })
+export default async function OgImage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  let course: { title: string; subject: string; gradeLevel: string; feeUsd: unknown; instructor: { firstName: string; lastName: string } | null } | null = null
+  try {
+    course = await prisma.course.findUnique({
+      where: { id },
+      select: {
+        title: true,
+        subject: true,
+        gradeLevel: true,
+        durationWeeks: true,
+        feeUsd: true,
+        instructor: { select: { firstName: true, lastName: true } },
+      },
+    })
+  } catch {
+    // DB unavailable or course not found — fall through to defaults
+  }
 
   const title = course?.title ?? 'Science & Math Course'
   const subject = course?.subject ?? ''
   const color = subjectColors[subject] ?? '#00C2A8'
   const subjectLabel = subjectLabels[subject] ?? subject
-  const instructorName = course
+  const instructorName = course?.instructor
     ? `${course.instructor.firstName} ${course.instructor.lastName}`
     : 'Expert Educator'
   const fee = course ? `$${Number(course.feeUsd).toFixed(2)}` : ''
