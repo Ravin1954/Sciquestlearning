@@ -2,19 +2,7 @@ import { auth, clerkClient } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
-const ALLOWED_STUDENT_COUNTRIES = new Set([
-  'United States', 'Canada', 'Mexico', 'China', 'Philippines', 'South Korea',
-  'Australia', 'New Zealand', 'India', 'Bangladesh', 'Nepal', 'Japan', 'Singapore', 'Malaysia',
-  'Thailand', 'Indonesia', 'Hong Kong', 'United Arab Emirates',
-  'United Kingdom', 'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus',
-  'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany',
-  'Greece', 'Hungary', 'Iceland', 'Ireland', 'Italy', 'Latvia', 'Lithuania',
-  'Luxembourg', 'Malta', 'Netherlands', 'Norway', 'Poland', 'Portugal',
-  'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
-  'Brazil', 'Argentina', 'Colombia', 'Chile', 'Peru',
-  'South Africa', 'Kenya', 'Ghana', 'Nigeria',
-  'Jamaica', 'Trinidad and Tobago', 'Dominican Republic', 'Bahamas',
-])
+// Students can enroll from any country worldwide
 
 const ALLOWED_INSTRUCTOR_COUNTRIES = new Set([
   'United States', 'Canada', 'Mexico',
@@ -42,11 +30,6 @@ export async function POST(req: Request) {
     }, { status: 400 })
   }
 
-  if (role === 'student' && !ALLOWED_STUDENT_COUNTRIES.has(country)) {
-    return NextResponse.json({
-      error: 'SciQuest Learning is not yet available in your country.',
-    }, { status: 400 })
-  }
 
   const clerk = await clerkClient()
   const clerkUser = await clerk.users.getUser(userId)
