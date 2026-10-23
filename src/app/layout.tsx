@@ -20,10 +20,10 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL('https://sciquestlearning.com'),
   title: {
-    default: 'SciQuest Learning — Live Science & Math Classes for Middle & High School',
+    default: 'SciQuest Learning — Live Online Science & Math Classes for Grades 6–12',
     template: '%s | SciQuest Learning',
   },
-  description: 'SciQuest Learning offers live, interactive online science and math classes for middle and high school students (grades 6–12). Biology, Chemistry, Physical Science, and Mathematics taught by verified educators via Google Meet. Enroll today.',
+  description: 'Live online Biology, Chemistry, Physical Science, and Mathematics classes for middle and high school students (grades 6–12). Small groups, verified instructors, interactive Google Meet sessions. Students worldwide welcome — browse courses and enroll today.',
   keywords: [
     'online science tutor', 'online math tutor', 'live online science classes',
     'middle school science tutor', 'high school science tutor',
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://sciquestlearning.com',
     siteName: 'SciQuest Learning',
-    title: 'SciQuest Learning — Live Science & Math Classes for Grades 6–12',
-    description: 'Live, interactive online science and math classes for middle and high school students. Biology, Chemistry, Physical Science, Mathematics — taught by verified educators via Google Meet.',
+    title: 'SciQuest Learning — Live Online Science & Math Classes for Grades 6–12',
+    description: 'Live online Biology, Chemistry, Physical Science, and Mathematics classes for middle and high school students. Verified instructors, small groups, Google Meet. Students worldwide welcome.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SciQuest Learning — Live Science & Math Classes for Grades 6–12',
-    description: 'Live Google Meet science and math classes for middle and high school students. Biology, Chemistry, Physical Science, Mathematics.',
+    description: 'Live online Biology, Chemistry, Physical Science, and Mathematics classes for grades 6–12. Verified instructors, small groups, students worldwide welcome.',
   },
   robots: {
     index: true,
