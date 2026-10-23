@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Browse Online Science & Math Courses',
-  description: 'Browse live and self-paced online science and math courses for middle and high school students. Biology, Chemistry, Physical Science, and Mathematics taught by verified instructors via Google Meet.',
+  title: 'Online Science & Math Courses for Middle & High School | Browse & Enroll',
+  description: 'Browse live and self-paced Biology, Chemistry, Physical Science, and Mathematics courses for grades 6–12. Verified instructors, small groups, Google Meet. Students from any country can enroll — find your course today.',
   keywords: [
     'online science courses', 'online math courses', 'live biology class',
     'live chemistry class', 'live physics class', 'live math class',
@@ -10,8 +10,8 @@ export const metadata: Metadata = {
     'STEM online classes', 'affordable science tutor', 'Google Meet science class',
   ],
   openGraph: {
-    title: 'Browse Online Science & Math Courses | SciQuest Learning',
-    description: 'Live and self-paced online science and math classes for grades 6–12. Biology, Chemistry, Physical Science, Mathematics — taught by verified educators.',
+    title: 'Online Science & Math Courses for Grades 6–12 | SciQuest Learning',
+    description: 'Live and self-paced Biology, Chemistry, Physical Science, and Mathematics courses for middle and high school students. Verified instructors, students worldwide welcome.',
     url: 'https://sciquestlearning.com/courses',
   },
   alternates: {
